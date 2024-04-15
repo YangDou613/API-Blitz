@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>API Client</title>
+    </head>
+
+    <body>
+    <h1>API Client</h1>
+    <form action="/API.html" method="post">
+
+        <label for="method">Method:</label>
+        <select name="method" id="method">
+            <option value="GET">GET</option>
+            <option value="POST">POST</option>
+            <option value="PUT">PUT</option>
+            <option value="DELETE">DELETE</option>
+            <option value="HEAD">HEAD</option>
+            <option value="PATCH">PATCH</option>
+            <option value="OPTIONS">OPTIONS</option>
+        </select>
+        <br><br>
+
+        <label for="url">Url:</label><br>
+        <input type="text" id="url" name="url">
+        <br><br>
+
+        <div id="queryParams">
+            <label for="queryParams">Query Params:</label><br>
+            <input type="text" name="paramsKey" placeholder="Key">
+            <input type="text" name="paramsValue" placeholder="Value">
+            <br>
+        </div>
+        <button type="button" onclick="addQueryParam()">Add Query Param</button>
+        <br><br>
+
+        <div id="authorization">
+            <label for="authorization">Authorization:</label><br>
+            <input type="text" name="authorizationKey" placeholder="Key">
+            <input type="text" name="authorizationValue" placeholder="Value">
+            <br>
+        </div>
+        <br><br>
+
+        <div id="headers">
+            <label for="headers">Headers:</label><br>
+            <input type="text" name="headersKey" placeholder="Key">
+            <input type="text" name="headersValue" placeholder="Value">
+            <br>
+        </div>
+        <button type="button" onclick="addHeader()">Add Header</button>
+        <br><br>
+
+        <label for="body">Body:</label><br>
+        <textarea id="body" name="body" rows="5" cols="40"></textarea>
+        <br><br>
+
+        <input type="submit" value="Send Request">
+    </form>
+
+    <script>
+        function addQueryParam() {
+            const queryParamsDiv = document.getElementById("queryParams");
+            const inputDiv = document.createElement("div");
+            inputDiv.innerHTML = `
+                <input type="text" name="paramsKey" placeholder="Key">
+                <input type="text" name="paramsValue" placeholder="Value">
+                <br>
+            `;
+            queryParamsDiv.appendChild(inputDiv);
+        }
+
+        function addHeader() {
+            const headersDiv = document.getElementById("headers");
+            const inputDiv = document.createElement("div");
+            inputDiv.innerHTML = `
+                <input type="text" name="headerKey" placeholder="Key">
+                <input type="text" name="headerValue" placeholder="Value">
+                <br>
+            `;
+            headersDiv.appendChild(inputDiv);
+        }
+    </script>
+
+    </body>
+</html>
