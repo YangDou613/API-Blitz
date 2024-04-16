@@ -39,7 +39,7 @@ public class APIRepository {
 		// Get the API auto ID
 		Integer APIAutoId = keyHolder.getKey().intValue();
 
-		log.info("Successfully insert to database!");
+		log.info("Successfully insert to APIHistory table!");
 
 		return APIAutoId;
 	}

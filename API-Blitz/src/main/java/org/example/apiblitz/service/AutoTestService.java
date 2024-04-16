@@ -1,12 +1,20 @@
 package org.example.apiblitz.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import org.example.apiblitz.model.Request;
+import org.example.apiblitz.model.TestCase;
 import org.example.apiblitz.repository.AutoTestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,6 +28,61 @@ public class AutoTestService {
 	APIService apiService;
 
 	private static final ObjectMapper objectMapper = new ObjectMapper();
+
+	public void autoTest(Integer testCaseId) throws IOException {
+
+		// Test Date
+		LocalDate testDate = LocalDate.now();
+
+		// Test time
+		LocalTime testTime = LocalTime.now();
+		long startTime = System.currentTimeMillis(); // Start time (To calculate the executionDuration)
+
+		// Get API data
+		Request request = autoTestRepository.getAPIData(testCaseId);
+
+		// Send Request
+		ResponseEntity<?> response = apiService.sendRequest(request);
+
+		// Get response status code
+		Integer statusCode = response.getStatusCode().value();
+
+		// Execution duration
+		long endTime = System.currentTimeMillis(); // End time (To calculate the execution duration)
+		long executionDuration = endTime - startTime;
+
+		// Content length
+		long contentLength = response.getHeaders().getContentLength();
+
+		// Response headers
+		Object responseHeaders = objectMapper.writeValueAsString(response.getHeaders());
+
+		// Response body
+		Object responseBody;
+		if (!request.getMethod().equals("HEAD")) {
+			responseBody = response.getBody();
+		} else {
+			responseBody = null;
+		}
+
+		// Convert data type to compare
+		Map<String, Object> responseBodyMap = objectMapper.readValue(responseBody.toString(), new TypeReference<>() {});
+
+		// Compare response
+		String result = getCompareResult(testCaseId, statusCode, responseBodyMap);
+
+		// Insert to testResult
+		autoTestRepository.insertToTestResult(
+				testCaseId,
+				testDate,
+				testTime,
+				statusCode,
+				executionDuration,
+				contentLength,
+				responseHeaders,
+				responseBody,
+				result);
+	}
 
 	public String getCompareResult(Integer testCaseId,
 	                               Integer statusCode,

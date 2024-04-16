@@ -1,6 +1,7 @@
 package org.example.apiblitz.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.persistence.Column;
 import lombok.Data;
 
 @Data
@@ -9,6 +10,8 @@ public class Request {
 	private String APIUrl;
 	private String method;
 	private Object queryParams;
+	@Column(name = "headers")
 	private Object requestHeaders;
+	@Column(name = "body")
 	private Object requestBody;
 }
