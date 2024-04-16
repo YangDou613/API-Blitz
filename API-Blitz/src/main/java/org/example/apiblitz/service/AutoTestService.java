@@ -103,8 +103,6 @@ public class AutoTestService {
 		Set<String> keys = expectedResponseBody.keySet();
 
 		for (String key : keys) {
-			System.out.println(expectedResponseBody.get(key));
-			System.out.println(responseBody.get(key));
 			if (!expectedResponseBody.get(key).equals(responseBody.get(key))) {
 				return "failed";
 			}

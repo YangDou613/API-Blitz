@@ -49,7 +49,8 @@ public class TestCaseService {
 			try {
 				autoTestService.autoTest(testCaseId);
 				Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-				log.info(timestamp + " : " + testCaseId + " test finish!");
+				log.info(timestamp + " : testCaseId <" + testCaseId + "> Finish testing!");
+				log.info("--------------------------------------------------------------");
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
@@ -66,6 +67,9 @@ public class TestCaseService {
 				break;
 			case "Day":
 				timeUnit = TimeUnit.DAYS;
+				break;
+			case "Sec":
+				timeUnit = TimeUnit.SECONDS;
 				break;
 		}
 
