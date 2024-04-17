@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,6 +44,13 @@ public class TestCaseService {
 
 		// Store test case data into testCase table
 		Integer testCaseId = save(testCase);
+
+		// Store to next test schedule table
+		LocalDate testDate = LocalDate.now(); // Test Date
+		LocalTime testTime = LocalTime.now(); // Test time
+		LocalTime nextTestTime = testTime.plusSeconds(testCase.getIntervalsTimeValue());
+
+		testCaseRepository.insertToNextTestSchedule(testCaseId, testDate, nextTestTime);
 
 		// Set test schedule
 		ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
