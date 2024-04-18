@@ -2,6 +2,7 @@ package org.example.apiblitz.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import lombok.extern.slf4j.Slf4j;
 import org.example.apiblitz.model.*;
 import org.example.apiblitz.repository.TestCaseRepository;
@@ -112,7 +113,7 @@ public class TestCaseService {
 
 				testCaseRepository.updateNextTestTime(testCaseId, nextTestDate, nextTestTime);
 
-			} catch (IOException e) {
+			} catch (IOException | UnirestException e) {
 				throw new RuntimeException(e);
 			}
 		};

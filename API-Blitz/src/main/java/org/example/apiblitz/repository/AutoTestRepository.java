@@ -2,6 +2,7 @@ package org.example.apiblitz.repository;
 
 import lombok.extern.slf4j.Slf4j;
 import org.example.apiblitz.model.Request;
+import org.example.apiblitz.model.TestCase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -9,6 +10,8 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Repository
 @Slf4j
@@ -50,5 +53,10 @@ public class AutoTestRepository {
 				executionDuration, contentLength, responseHeaders, responseBody, result);
 
 		log.info("Successfully insert to testResult table!");
+	}
+
+	public String getRecipientEmailList(Integer testCaseId) {
+		String getRecipientEmailListSql = "SELECT recipientEmail FROM testCase WHERE id = ?";
+		return jdbcTemplate.queryForObject(getRecipientEmailListSql, String.class, testCaseId);
 	}
 }

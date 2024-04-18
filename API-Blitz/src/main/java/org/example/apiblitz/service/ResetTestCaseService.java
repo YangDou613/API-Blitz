@@ -1,5 +1,6 @@
 package org.example.apiblitz.service;
 
+import com.mashape.unirest.http.exceptions.UnirestException;
 import lombok.extern.slf4j.Slf4j;
 import org.example.apiblitz.model.NextSchedule;
 import org.example.apiblitz.repository.ResetTestCaseRepository;
@@ -70,6 +71,8 @@ public class ResetTestCaseService {
 							updateNextTestDateTime.toLocalTime());
 
 				} catch (IOException e) {
+					throw new RuntimeException(e);
+				} catch (UnirestException e) {
 					throw new RuntimeException(e);
 				}
 			};

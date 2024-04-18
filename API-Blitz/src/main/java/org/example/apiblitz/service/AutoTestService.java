@@ -1,20 +1,18 @@
 package org.example.apiblitz.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.criteria.CriteriaBuilder;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import org.example.apiblitz.model.Request;
-import org.example.apiblitz.model.TestCase;
 import org.example.apiblitz.repository.AutoTestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,9 +25,12 @@ public class AutoTestService {
 	@Autowired
 	APIService apiService;
 
+	@Autowired
+	SendEmailService sendEmailService;
+
 	private static final ObjectMapper objectMapper = new ObjectMapper();
 
-	public void autoTest(Integer testCaseId) throws IOException {
+	public void autoTest(Integer testCaseId) throws IOException, UnirestException {
 
 		// Test Date
 		LocalDate testDate = LocalDate.now();
@@ -70,6 +71,18 @@ public class AutoTestService {
 
 		// Compare response
 		String result = getCompareResult(testCaseId, statusCode, responseBodyMap);
+
+		if (result.equals("failed")) {
+
+			// Get recipient email list
+			String emailListAsString = autoTestRepository.getRecipientEmailList(testCaseId);
+			List<String> recipientEmailList = objectMapper.readValue(emailListAsString, new TypeReference<>() {
+			});
+
+			for (Object recipientEmail : recipientEmailList) {
+				sendEmailService.sendEmail(recipientEmail, request.getAPIUrl());
+			}
+		}
 
 		// Insert to testResult
 		autoTestRepository.insertToTestResult(
