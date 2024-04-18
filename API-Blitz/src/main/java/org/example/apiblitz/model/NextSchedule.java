@@ -23,4 +23,5 @@ public class NextSchedule {
 	private Object recipientEmail;
 	private LocalDate nextTestDate;
 	private LocalTime  nextTestTime;
+	private Integer resetStatus;
 }

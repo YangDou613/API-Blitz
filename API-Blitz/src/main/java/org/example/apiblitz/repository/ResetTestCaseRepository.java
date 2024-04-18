@@ -17,7 +17,7 @@ public class ResetTestCaseRepository {
 	public List<NextSchedule> getAllNextSchedule() {
 
 		String getNextTestScheduleSql = "SELECT * FROM testCase AS tc INNER JOIN nextTestSchedules AS nts " +
-				"ON tc.id = nts.testCaseId";
+				"ON tc.id = nts.testCaseId WHERE tc.resetStatus IS NOT NULL";
 		return jdbcTemplate.query(getNextTestScheduleSql, new BeanPropertyRowMapper<>(NextSchedule.class));
 	}
 }

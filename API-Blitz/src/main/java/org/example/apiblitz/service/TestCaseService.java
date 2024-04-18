@@ -3,9 +3,7 @@ package org.example.apiblitz.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.example.apiblitz.model.APIData;
-import org.example.apiblitz.model.Request;
-import org.example.apiblitz.model.TestCase;
+import org.example.apiblitz.model.*;
 import org.example.apiblitz.repository.TestCaseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -16,9 +14,11 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -40,26 +40,78 @@ public class TestCaseService {
 	@Autowired
 	AutoTestService autoTestService;
 
-	public void setTestSchedule(TestCase testCase) throws JsonProcessingException {
+	public Integer save(TestCase testCase) throws JsonProcessingException {
 
-		// Store test case data into testCase table
-		Integer testCaseId = save(testCase);
+		// Set testCase data in APIData
+		APIData apiData = setAPIData(testCase);
 
-		// Store to next test schedule table
+		// Package API data into http request
+		Request request = apiService.httpRequest(apiData);
+
+		// Store API data into APIHistory table and return testCaseId
+		return testCaseRepository.insertToTestCase(request, testCase);
+	}
+
+	public void setTestSchedule(Integer testCaseId, TestCase testCase) throws JsonProcessingException {
+
 		LocalDate testDate = LocalDate.now(); // Test Date
 		LocalTime testTime = LocalTime.now(); // Test time
-		LocalTime nextTestTime = testTime.plusSeconds(testCase.getIntervalsTimeValue());
 
-		testCaseRepository.insertToNextTestSchedule(testCaseId, testDate, nextTestTime);
+		// Confirm the test case id exist or not
+		boolean testCaseIdExist = testCaseRepository.isTestCaseIdExistInNextTestSchedule(testCaseId);
+
+		// Store to next test schedule table
+		if (!testCaseIdExist) {
+			testCaseRepository.insertToNextTestSchedule(testCaseId, testDate, testTime);
+		}
 
 		// Set test schedule
 		ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
 		Runnable test = () -> {
 			try {
-				autoTestService.autoTest(testCaseId);
 				Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-				log.info(timestamp + " : testCaseId <" + testCaseId + "> Finish testing!");
-				log.info("--------------------------------------------------------------");
+				// Confirm the reset status
+				Integer resetStatus = testCaseRepository.getResetStatusByTestCaseId(testCaseId);
+				if (resetStatus == 0) {
+					autoTestService.autoTest(testCaseId);
+					log.info(timestamp + " : testCaseId <" + testCaseId + "> Finish testing!");
+				} else {
+					executor.shutdown();
+					log.info(timestamp + " : testCaseId <" + testCaseId + "> Shutdown!");
+					if (resetStatus == 1) {
+						executor.shutdown();
+						setTestSchedule(testCaseId, testCase);
+						testCaseRepository.updateResetStatusByTestCaseId(testCaseId);
+						log.info(timestamp + " : testCaseId <" + testCaseId + "> Reset Successfully!");
+					}
+				}
+
+				LocalDate nextTestDate = timestamp.toLocalDateTime().toLocalDate();
+				LocalTime nextTestTime = timestamp.toLocalDateTime().toLocalTime();
+
+				LocalTime originalTime = nextTestTime;
+
+				switch(testCase.getIntervalsTimeUnit()) {
+					case "Hour":
+						nextTestTime = nextTestTime.plusHours(testCase.getIntervalsTimeValue());
+						if (nextTestTime.isBefore(originalTime)) {
+							nextTestDate = nextTestDate.plusDays(1);
+						}
+						break;
+					case "Day":
+						nextTestTime = nextTestTime.plusHours(testCase.getIntervalsTimeValue() * 24);
+						nextTestDate = nextTestDate.plusDays(testCase.getIntervalsTimeValue());
+						break;
+					case "Sec":
+						nextTestTime = nextTestTime.plusSeconds(testCase.getIntervalsTimeValue());
+						if (nextTestTime.isBefore(originalTime)) {
+							nextTestDate = nextTestDate.plusDays(1);
+						}
+						break;
+				}
+
+				testCaseRepository.updateNextTestTime(testCaseId, nextTestDate, nextTestTime);
+
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
@@ -88,16 +140,43 @@ public class TestCaseService {
 		executor.scheduleAtFixedRate(test, 0, intervalsTimeValue, timeUnit);
 	}
 
-	public Integer save(TestCase testCase) throws JsonProcessingException {
+	public List<NextSchedule> get(Integer userId) {
+		try {
+			return testCaseRepository.getTestCase(userId);
+		} catch (Exception e) {
+			log.info(e.getMessage());
+			return null;
+		}
+	}
+
+	public String update(ResetTestCase resetTestCase) throws JsonProcessingException {
 
 		// Set testCase data in APIData
-		APIData apiData = setAPIData(testCase);
+		APIData apiData = resetAPIData(resetTestCase);
 
 		// Package API data into http request
 		Request request = apiService.httpRequest(apiData);
 
-		// Store API data into APIHistory table and return testCaseId
-		return testCaseRepository.insertToTestCase(request, testCase);
+		// Update API data in APIHistory table
+		try {
+			testCaseRepository.updateTestCase(request, resetTestCase);
+			return "Update successfully!";
+		} catch (Exception e) {
+			log.info(e.getMessage());
+			return "Error";
+		}
+	}
+
+	public String delete(Integer testCaseId) {
+
+		// Delete API data in APIHistory table
+		try {
+			testCaseRepository.deleteTestCase(testCaseId);
+			return "Delete successfully!";
+		} catch (Exception e) {
+			log.info(e.getMessage());
+			return "Error";
+		}
 	}
 
 	public APIData setAPIData(TestCase testCase) {
@@ -113,6 +192,23 @@ public class TestCaseService {
 		apiData.setHeadersKey(testCase.getHeadersKey());
 		apiData.setHeadersValue(testCase.getHeadersValue());
 		apiData.setBody(testCase.getBody());
+
+		return apiData;
+	}
+
+	public APIData resetAPIData(ResetTestCase resetTestCase) {
+
+		APIData apiData = new APIData();
+
+		apiData.setMethod(resetTestCase.getMethod());
+		apiData.setUrl(resetTestCase.getUrl());
+		apiData.setParamsKey(resetTestCase.getParamsKey());
+		apiData.setParamsValue(resetTestCase.getParamsValue());
+		apiData.setAuthorizationKey(resetTestCase.getAuthorizationKey());
+		apiData.setAuthorizationValue(resetTestCase.getAuthorizationValue());
+		apiData.setHeadersKey(resetTestCase.getHeadersKey());
+		apiData.setHeadersValue(resetTestCase.getHeadersValue());
+		apiData.setBody(resetTestCase.getBody());
 
 		return apiData;
 	}

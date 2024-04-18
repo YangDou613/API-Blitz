@@ -3,12 +3,16 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Test Case</title>
+        <title>Reset Test Case</title>
     </head>
 
     <body>
-    <h2>Test Case</h2>
-    <form action="/api/1.0/testCase/create" method="post">
+    <h2>Reset Test Case</h2>
+    <form action="/api/1.0/testCase/update" method="post">
+
+        <label for="id">Id:</label><br>
+        <input type="number" id="id" name="id">
+        <br><br>
 
         <label for="method">Method:</label>
         <select name="method" id="method">

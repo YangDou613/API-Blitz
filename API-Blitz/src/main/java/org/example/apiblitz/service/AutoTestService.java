@@ -110,4 +110,8 @@ public class AutoTestService {
 
 		return "pass";
 	}
+
+	public void shutDown() {
+
+	}
 }
