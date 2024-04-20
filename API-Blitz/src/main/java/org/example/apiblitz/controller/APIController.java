@@ -1,16 +1,18 @@
 package org.example.apiblitz.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.example.apiblitz.model.*;
 import org.example.apiblitz.service.APIService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.stream.Collectors;
-
 @Controller
+@Slf4j
 public class APIController {
 
 	@Autowired
@@ -22,21 +24,18 @@ public class APIController {
 	}
 
 	@PostMapping("/API.html")
-	public ResponseEntity<?> GetResponse(@ModelAttribute APIData apiData) throws JsonProcessingException {
+	public ResponseEntity<?> GetResponse(@Valid @ModelAttribute APIData apiData, BindingResult bindingResult)
+			throws BindException {
 
-		ResponseEntity<?> response = apiService.APITest(apiData);
-
-		if (apiData.getMethod().equals("HEAD")) {
-			HttpHeaders headers = response.getHeaders();
-			String headersString = headers.entrySet().stream()
-					.map(entry -> entry.getKey() + ": " + entry.getValue())
-					.collect(Collectors.joining("\n"));
-			return ResponseEntity
-					.status(response.getStatusCode())
-					.body(headersString);
+		if (bindingResult.hasErrors()) {
+			throw new BindException(bindingResult);
 		}
-		return ResponseEntity
-				.status(response.getStatusCode())
-				.body(response);
+
+		try {
+			return apiService.APITest(apiData);
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error");
+		}
 	}
 }

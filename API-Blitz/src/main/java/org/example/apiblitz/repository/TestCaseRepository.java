@@ -10,17 +10,18 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Map;
 
 @Repository
 @Slf4j
+@Transactional
 public class TestCaseRepository {
 
 	@Autowired
@@ -68,7 +69,8 @@ public class TestCaseRepository {
 		return APIAutoId;
 	}
 
-	public void updateTestCase(Request request, ResetTestCase resetTestCase) throws JsonProcessingException {
+	public void updateTestCase(Request request, ResetTestCase resetTestCase)
+			throws SQLException, JsonProcessingException {
 
 		Integer notification = resetTestCase.getNotification().equals("Yes") ? 1 : 0;
 
@@ -95,22 +97,22 @@ public class TestCaseRepository {
 				resetTestCase.getId());
 	}
 
-	public List<NextSchedule> getTestCase(Integer userId) {
+	public List<NextSchedule> getTestCase(Integer userId) throws SQLException {
 		String getTestCaseSql = "SELECT * FROM testCase WHERE userId = ?";
 		return jdbcTemplate.query(getTestCaseSql, new BeanPropertyRowMapper<>(NextSchedule.class), userId);
 	}
 
-	public Integer getResetStatusByTestCaseId(Integer testCaseId) {
+	public Integer getResetStatusByTestCaseId(Integer testCaseId) throws SQLException {
 		String getResetStatusSql = "SELECT resetStatus FROM testCase WHERE id = ?";
 		return jdbcTemplate.queryForObject(getResetStatusSql, Integer.class, testCaseId);
 	}
 
-	public void updateResetStatusByTestCaseId(Integer testCaseId) {
+	public void updateResetStatusByTestCaseId(Integer testCaseId) throws SQLException {
 		String updateTestCaseSql = "UPDATE testCase SET resetStatus = 0 WHERE id = ?";
 		jdbcTemplate.update(updateTestCaseSql, testCaseId);
 	}
 
-	public void deleteTestCase(Integer testCaseId) {
+	public void deleteTestCase(Integer testCaseId) throws SQLException {
 
 		String deleteTestCaseSql = "UPDATE testCase SET resetStatus = null WHERE id = ?";
 		jdbcTemplate.update(deleteTestCaseSql, testCaseId);
@@ -130,7 +132,8 @@ public class TestCaseRepository {
 		jdbcTemplate.update(insertToNextTestScheduleSql, testCaseId, testDate, nextTestTime);
 	}
 
-	public void updateNextTestTime(Integer testCaseId, LocalDate nextTestDate, LocalTime nextTestTime) {
+	public void updateNextTestTime(Integer testCaseId, LocalDate nextTestDate, LocalTime nextTestTime)
+			throws SQLException {
 
 		String updateNextTestScheduleSql = "UPDATE nextTestSchedules SET nextTestDate = ?, nextTestTime = ? " +
 				"WHERE testCaseId = ?";
