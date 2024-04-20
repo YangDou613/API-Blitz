@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -32,7 +33,7 @@ public class ResetTestCaseService {
 	@Autowired
 	AutoTestService autoTestService;
 
-	public void resetTestCase() {
+	public void resetTestCase() throws SQLException {
 
 		// Get all exist test case
 		List<NextSchedule> nextSchedules = resetTestCaseRepository.getAllNextSchedule();
@@ -74,6 +75,8 @@ public class ResetTestCaseService {
 					throw new RuntimeException(e);
 				} catch (UnirestException e) {
 					throw new RuntimeException(e);
+				} catch (SQLException e) {
+					log.error(e.getMessage());
 				}
 			};
 

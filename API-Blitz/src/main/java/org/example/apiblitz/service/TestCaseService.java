@@ -7,20 +7,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.apiblitz.model.*;
 import org.example.apiblitz.repository.TestCaseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -53,7 +47,7 @@ public class TestCaseService {
 		return testCaseRepository.insertToTestCase(request, testCase);
 	}
 
-	public void setTestSchedule(Integer testCaseId, TestCase testCase) throws JsonProcessingException {
+	public void setTestSchedule(Integer testCaseId, TestCase testCase) {
 
 		LocalDate testDate = LocalDate.now(); // Test Date
 		LocalTime testTime = LocalTime.now(); // Test time
@@ -115,6 +109,8 @@ public class TestCaseService {
 
 			} catch (IOException | UnirestException e) {
 				throw new RuntimeException(e);
+			} catch (SQLException e) {
+				log.error(e.getMessage());
 			}
 		};
 
@@ -142,41 +138,38 @@ public class TestCaseService {
 	}
 
 	public List<NextSchedule> get(Integer userId) {
+
 		try {
 			return testCaseRepository.getTestCase(userId);
-		} catch (Exception e) {
-			log.info(e.getMessage());
+		} catch (SQLException e) {
+			log.error(e.getMessage());
 			return null;
 		}
 	}
 
-	public String update(ResetTestCase resetTestCase) throws JsonProcessingException {
+	public void update(ResetTestCase resetTestCase) {
 
-		// Set testCase data in APIData
-		APIData apiData = resetAPIData(resetTestCase);
-
-		// Package API data into http request
-		Request request = apiService.httpRequest(apiData);
-
-		// Update API data in APIHistory table
 		try {
+			// Set testCase data in APIData
+			APIData apiData = resetAPIData(resetTestCase);
+
+			// Package API data into http request
+			Request request = apiService.httpRequest(apiData);
+
+			// Update API data in APIHistory table
 			testCaseRepository.updateTestCase(request, resetTestCase);
-			return "Update successfully!";
-		} catch (Exception e) {
-			log.info(e.getMessage());
-			return "Error";
+		} catch (SQLException | JsonProcessingException e) {
+			log.error(e.getMessage());
 		}
 	}
 
-	public String delete(Integer testCaseId) {
+	public void delete(Integer testCaseId) {
 
 		// Delete API data in APIHistory table
 		try {
 			testCaseRepository.deleteTestCase(testCaseId);
-			return "Delete successfully!";
-		} catch (Exception e) {
-			log.info(e.getMessage());
-			return "Error";
+		} catch (SQLException e) {
+			log.error(e.getMessage());
 		}
 	}
 

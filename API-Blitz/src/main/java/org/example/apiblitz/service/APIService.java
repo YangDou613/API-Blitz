@@ -12,11 +12,14 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -31,84 +34,119 @@ public class APIService {
 	@Autowired
 	APIRepository apiRepository;
 
-	public ResponseEntity<?> APITest(APIData apiData) throws JsonProcessingException {
+	public ResponseEntity<?> APITest(APIData apiData) {
 
 		// Package API data into http request
 		Request request = httpRequest(apiData);
+		if (request == null) {
+			return ResponseEntity
+					.status(HttpStatus.BAD_REQUEST)
+					.body("Failed to parse JSON data. Please check the JSON format and try again.");
+		}
 
 		// Store API data into APIHistory table
 		apiRepository.insertToAPIHistory(request);
 
 		// Send Request
-		return sendRequest(request);
+		ResponseEntity<?> result = sendRequest(request);
+
+		return setResponse(apiData, result);
 	}
 
-	public Request httpRequest(APIData apiData) throws JsonProcessingException {
+	public ResponseEntity<?> setResponse(APIData apiData, ResponseEntity<?> result) {
+
+		// Get status code
+		HttpStatusCode statusCode = result.getStatusCode();
+
+		if (apiData.getMethod().equals("HEAD")) {
+			HttpHeaders headers = result.getHeaders();
+			String headersString = headers.entrySet().stream()
+					.map(entry -> entry.getKey() + ": " + entry.getValue())
+					.collect(Collectors.joining("\n"));
+			return ResponseEntity
+					.status(statusCode)
+					.body(headersString);
+		}
+		return ResponseEntity
+				.status(statusCode)
+				.body(result);
+	}
+
+	public Request httpRequest(APIData apiData) {
 
 		Request request = new Request();
 
-		// API url
-		String APIUrl;
-		if (apiData.getParamsKey() != null) {
-			APIUrl = AddParamsToAPIUrl(apiData.getUrl(), apiData.getParamsKey(), apiData.getParamsValue());
-		} else {
-			APIUrl = apiData.getUrl();
+		try {
+			// API url
+			String APIUrl;
+			if (apiData.getParamsKey() != null) {
+				APIUrl = AddParamsToAPIUrl(apiData.getUrl(), apiData.getParamsKey(), apiData.getParamsValue());
+			} else {
+				APIUrl = apiData.getUrl();
+			}
+			request.setAPIUrl(APIUrl);
+
+			// Method
+			String method = apiData.getMethod();
+			request.setMethod(method);
+
+			// Query params
+			Object queryParams;
+			if (apiData.getParamsKey().isEmpty()) {
+				queryParams = null;
+			} else {
+				queryParams = getQueryParams(apiData.getParamsKey(), apiData.getParamsValue());
+			}
+			request.setQueryParams(queryParams);
+
+			// Request headers
+			HttpHeaders headers = setHeaders(apiData);
+			Object requestHeaders = objectMapper.writeValueAsString(headers);
+			request.setRequestHeaders(requestHeaders);
+
+			// Request Body
+			Object requestBody;
+			if (apiData.getBody().isEmpty()) {
+				requestBody = null;
+			} else {
+				requestBody = apiData.getBody();
+			}
+			request.setRequestBody(requestBody);
+
+			return request;
+		} catch (JsonProcessingException e) {
+			log.error(e.getMessage());
+			return null;
 		}
-		request.setAPIUrl(APIUrl);
-
-		// Method
-		String method = apiData.getMethod();
-		request.setMethod(method);
-
-		// Query params
-		Object queryParams;
-		if (apiData.getParamsKey().isEmpty()) {
-			queryParams = null;
-		} else {
-			queryParams = getQueryParams(apiData.getParamsKey(), apiData.getParamsValue());
-		}
-		request.setQueryParams(queryParams);
-
-		// Request headers
-		HttpHeaders headers = setHeaders(apiData);
-		Object requestHeaders = objectMapper.writeValueAsString(headers);
-		request.setRequestHeaders(requestHeaders);
-
-		// Request Body
-		Object requestBody;
-		if (apiData.getBody().isEmpty()) {
-			requestBody = null;
-		} else {
-			requestBody = apiData.getBody();
-		}
-		request.setRequestBody(requestBody);
-
-		return request;
 	}
 
-	public ResponseEntity<?> sendRequest(Request request) throws JsonProcessingException {
+	public ResponseEntity<?> sendRequest(Request request) {
 
-		// Method
-		String method = request.getMethod();
+		try {
+			// Method
+			String method = request.getMethod();
 
-		// API url
-		String url = request.getAPIUrl();
+			// API url
+			String url = request.getAPIUrl();
 
-		// Http entity
-		HttpEntity<?> requestEntity = getHttpEntity(request);
+			// Http entity
+			HttpEntity<?> requestEntity = getHttpEntity(request);
 
-		// Send Request
-		ResponseEntity<?> response = switch (method) {
-			case "GET", "HEAD" -> restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
-			case "POST" -> restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-			case "PUT" -> restTemplate.exchange(url, HttpMethod.PUT, requestEntity, String.class);
-			case "DELETE" -> restTemplate.exchange(url, HttpMethod.DELETE, requestEntity, String.class);
-			case "PATCH" -> restTemplate.exchange(url, HttpMethod.PATCH, requestEntity, String.class);
-			case "OPTIONS" -> restTemplate.exchange(url, HttpMethod.OPTIONS, requestEntity, String.class);
-			default -> null;
-		};
-
-		return response;
+			// Send Request
+			return switch (method) {
+				case "GET", "HEAD" -> restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
+				case "POST" -> restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
+				case "PUT" -> restTemplate.exchange(url, HttpMethod.PUT, requestEntity, String.class);
+				case "DELETE" -> restTemplate.exchange(url, HttpMethod.DELETE, requestEntity, String.class);
+				case "PATCH" -> restTemplate.exchange(url, HttpMethod.PATCH, requestEntity, String.class);
+				case "OPTIONS" -> restTemplate.exchange(url, HttpMethod.OPTIONS, requestEntity, String.class);
+				default -> null;
+			};
+		} catch (HttpClientErrorException | HttpServerErrorException e) {
+			return ResponseEntity
+					.status(e.getStatusCode())
+					.body(e.getResponseBodyAsString());
+		}
 	}
 
 	public String AddParamsToAPIUrl(String APIUrl, ArrayList<Object> paramsKey, ArrayList<Object> paramsValue) {
