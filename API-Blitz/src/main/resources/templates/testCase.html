@@ -3,130 +3,135 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Test Case</title>
+        <title>API Blitz</title>
+        <link rel="stylesheet" href="/testCase.css">
     </head>
 
     <body>
-    <h2>Test Case</h2>
-    <form action="/api/1.0/testCase/create" method="post">
 
-        <label for="method">Method:</label>
-        <select name="method" id="method">
-            <option value="GET">GET</option>
-            <option value="POST">POST</option>
-            <option value="PUT">PUT</option>
-            <option value="DELETE">DELETE</option>
-            <option value="HEAD">HEAD</option>
-            <option value="PATCH">PATCH</option>
-            <option value="OPTIONS">OPTIONS</option>
-        </select>
-        <br><br>
+    <header>
 
-        <label for="url">Url:</label><br>
-        <input type="text" id="url" name="url">
-        <br><br>
+        <div class="nav">
+            <a href="http://localhost:8080/APITest.html">
+                <img id="logo" src="/logo.png" alt="Logo">
+            </a>
 
-        <div id="queryParams">
-            <label for="queryParams">Query Params:</label><br>
-            <input type="text" name="paramsKey" placeholder="Key">
-            <input type="text" name="paramsValue" placeholder="Value">
-            <br>
+            <h1>API Blitz</h1>
         </div>
-        <button type="button" onclick="addQueryParam()">Add Query Param</button>
-        <br><br>
 
-        <div id="authorization">
-            <label for="authorization">Authorization:</label><br>
-            <input type="text" name="authorizationKey" placeholder="Key">
-            <input type="text" name="authorizationValue" placeholder="Value">
-            <br>
+    </header>
+
+    <div class="content-wrapper">
+
+        <div class="sidebar">
+
+            <br><br>
+            <a href="http://localhost:8080/APITest.html" class="sidebar-link">
+                <img id="test" src="/test.png" alt="test">
+                <p>API Test</p>
+            </a>
+
+            <br><br>
+            <a href="/api/1.0/testCase" class="sidebar-link">
+                <img id="auto-test" src="/auto-test.png" alt="test">
+                <p>Automated Testing</p>
+            </a>
+
         </div>
-        <br>
 
-        <div id="headers">
-            <label for="headers">Headers:</label><br>
-            <input type="text" name="headersKey" placeholder="Key">
-            <input type="text" name="headersValue" placeholder="Value">
-            <br>
-        </div>
-        <button type="button" onclick="addHeader()">Add Header</button>
-        <br><br>
+        <div id="container">
 
-        <label for="body">Body:</label><br>
-        <textarea id="body" name="body" rows="5" cols="40"></textarea>
-        <br><br>
+            <div class="content">
 
-        <label for="statusCode">Status Code:</label><br>
-        <input type="text" id="statusCode" name="statusCode">
-        <br><br>
+                <h2>Test Case</h2>
+                <form action="/api/1.0/testCase/create" method="post" onsubmit="return validateFormAndSubmit()">
 
-        <label for="expectedResponseBody">Expected Response Body:</label><br>
-        <textarea id="expectedResponseBody" name="expectedResponseBody" rows="5" cols="40"></textarea>
-        <br><br>
+                    <label for="method"></label>
+                    <select name="method" id="method">
+                        <option value="GET">GET</option>
+                        <option value="POST">POST</option>
+                        <option value="PUT">PUT</option>
+                        <option value="DELETE">DELETE</option>
+                        <option value="HEAD">HEAD</option>
+                        <option value="PATCH">PATCH</option>
+                        <option value="OPTIONS">OPTIONS</option>
+                    </select>
 
-        <label for="intervalsTimeUnit">Intervals Time Unit:</label>
-        <select name="intervalsTimeUnit" id="intervalsTimeUnit">
-            <option value="Hour">Hour</option>
-            <option value="Day">Day</option>
-            <option value="Sec">Sec</option>
-        </select>
-        <br><br>
+                    <label for="url"></label>
+                    <input type="text" id="url" name="url" placeholder="URL">
+                    <br><br>
 
-        <label for="intervalsTimeValue">Intervals Time Value:</label><br>
-        <input type="number" id="intervalsTimeValue" name="intervalsTimeValue">
-        <br><br>
+                    <div id="queryParams">
+                        <label for="queryParams">Query Params:</label><br>
+                        <input type="text" class="dynamic-input" name="paramsKey" placeholder="Key" oninput="addQueryParamsInputOfTestCase(event)">
+                        <input type="text" class="dynamic-input" name="paramsValue" placeholder="Value" oninput="addQueryParamsInputOfTestCase(event)">
+                    </div>
+                    <br><br>
 
-        <label for="notification">Notification:</label><br>
-        <select name="notification" id="notification">
-            <option value="Yes">Yes</option>
-            <option value="No">No</option>
-        </select>
-        <br><br>
-
-        <div id="recipientEmail">
-            <label for="recipientEmail">Recipient Email:</label><br>
-            <input type="text" name="recipientEmail" placeholder="Email">
-            <br>
-        </div>
-        <button type="button" onclick="addRecipientEmail()">Add Recipient Email</button>
-        <br><br>
-
-        <input type="submit" value="Submit">
-    </form>
-
-    <script>
-        function addQueryParam() {
-            const queryParamsDiv = document.getElementById("queryParams");
-            const inputDiv = document.createElement("div");
-            inputDiv.innerHTML = `
-                    <input type="text" name="paramsKey" placeholder="Key">
-                    <input type="text" name="paramsValue" placeholder="Value">
+                    <div id="authorization">
+                        <label for="authorization">Authorization:</label><br>
+                        <input type="text" name="authorizationKey" placeholder="Key">
+                        <input type="text" name="authorizationValue" placeholder="Value">
+                        <br>
+                    </div>
                     <br>
-                `;
-            queryParamsDiv.appendChild(inputDiv);
-        }
 
-        function addHeader() {
-            const headersDiv = document.getElementById("headers");
-            const inputDiv = document.createElement("div");
-            inputDiv.innerHTML = `
-                    <input type="text" name="headerKey" placeholder="Key">
-                    <input type="text" name="headerValue" placeholder="Value">
-                    <br>
-                `;
-            headersDiv.appendChild(inputDiv);
-        }
+                    <div id="headers">
+                        <label for="headers">Headers:</label><br>
+                        <input type="text" class="headers-input" name="headersKey" placeholder="Key" oninput="addHeadersInputOfTestCase(event)">
+                        <input type="text" class="headers-input" name="headersValue" placeholder="Value" oninput="addHeadersInputOfTestCase(event)">
+                    </div>
+                    <br><br>
 
-        function addRecipientEmail() {
-            const recipientEmailDiv = document.getElementById("recipientEmail");
-            const inputDiv = document.createElement("div");
-            inputDiv.innerHTML = `
-                    <input type="text" id="recipientEmail" name="recipientEmail">
-                    <br>
-                `;
-            recipientEmailDiv.appendChild(inputDiv);
-        }
-    </script>
+                    <label for="body">Body:</label><br>
+                    <textarea id="body" name="body" rows="5" cols="40"></textarea>
+                    <br><br>
+
+                    <label for="statusCode">Status Code:</label><br>
+                    <input type="text" id="statusCode" name="statusCode">
+                    <br><br>
+
+                    <label for="expectedResponseBody">Expected Response Body:</label><br>
+                    <textarea id="expectedResponseBody" name="expectedResponseBody" rows="5" cols="40"></textarea>
+                    <br><br>
+
+                    <label for="intervalsTimeUnit">Intervals Time Unit:</label>
+                    <select name="intervalsTimeUnit" id="intervalsTimeUnit">
+                        <option value="Hour">Hour</option>
+                        <option value="Day">Day</option>
+                        <option value="Sec">Sec</option>
+                    </select>
+                    <br><br>
+
+                    <label for="intervalsTimeValue">Intervals Time Value:</label><br>
+                    <input type="number" id="intervalsTimeValue" name="intervalsTimeValue">
+                    <br><br>
+
+                    <label for="notification">Notification:</label><br>
+                    <select name="notification" id="notification">
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                    </select>
+                    <br><br>
+
+                    <div id="recipientEmail">
+                        <label for="recipientEmail">Recipient Email:</label><br>
+                        <input type="text" name="recipientEmail" placeholder="Email">
+                        <br>
+                    </div>
+                    <button type="button" onclick="addRecipientEmail()">Add Recipient Email</button>
+                    <br><br>
+
+                    <input type="submit" value="Add New Test Case">
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="/testCase.js"></script>
 
     </body>
 </html>
