@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>API Blitz</title>
+        <link rel="stylesheet" href="APITest.css">
+    </head>
+
+    <body>
+
+    <header>
+
+        <div class="nav">
+            <a href="APITest.html">
+                <img id="logo" src="logo.png" alt="Logo">
+            </a>
+
+            <h1>API Blitz</h1>
+        </div>
+
+    </header>
+
+    <div class="content-wrapper">
+
+        <div class="sidebar">
+
+            <br><br>
+            <a href="APITest.html" class="sidebar-link">
+                <img id="test" src="test.png" alt="test">
+                <p>API Test</p>
+            </a>
+
+            <br><br>
+            <a href="/api/1.0/testCase" class="sidebar-link">
+                <img id="auto-test" src="auto-test.png" alt="test">
+                <p>Automated Testing</p>
+            </a>
+
+        </div>
+
+        <div id="container">
+
+            <div class="content">
+                <h1>API Data</h1><br>
+                <form id="api-form" action="/APITest.html" method="post">
+
+                    <label for="method"></label>
+                    <select name="method" id="method">
+                        <option value="GET">GET</option>
+                        <option value="POST">POST</option>
+                        <option value="PUT">PUT</option>
+                        <option value="DELETE">DELETE</option>
+                        <option value="HEAD">HEAD</option>
+                        <option value="PATCH">PATCH</option>
+                        <option value="OPTIONS">OPTIONS</option>
+                    </select>
+
+                    <label for="url"></label>
+                    <input type="text" id="url" name="url" placeholder="URL">
+                    <br><br>
+
+                    <div id="queryParams">
+                        <label for="queryParams">Query Params:</label><br>
+                        <input type="text" class="dynamic-input" name="paramsKey" placeholder="Key" oninput="addQueryParamsInput(event)">
+                        <input type="text" class="dynamic-input" name="paramsValue" placeholder="Value" oninput="addQueryParamsInput(event)">
+                    </div>
+                    <br><br>
+
+                    <div id="authorization">
+                        <label for="authorization">Authorization:</label><br>
+                        <input type="text" name="authorizationKey" placeholder="Key">
+                        <input type="text" name="authorizationValue" placeholder="Value">
+                        <br>
+                    </div>
+                    <br><br>
+
+                    <div id="headers">
+                        <label for="headers">Headers:</label><br>
+                        <input type="text" class="headers-input" name="headersKey" placeholder="Key" oninput="addHeadersInput(event)">
+                        <input type="text" class="headers-input" name="headersValue" placeholder="Value" oninput="addHeadersInput(event)">
+                    </div>
+                    <br><br>
+
+                    <label for="body">Body:</label><br>
+                    <textarea id="body" name="body" rows="5" cols="40"></textarea>
+                    <br><br>
+
+                    <input type="submit" value="Send">
+                </form>
+                <br><br>
+            </div>
+
+            <div id="response-container">
+                <h1>Response<br></h1>
+                <div id="status-code"></div>
+                <div id="response-time"> </div>
+                <div id="response-size"></div>
+                <div id="option-button"></div>
+                <div id="response"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="APITest.js"></script>
+
+    </body>
+</html>

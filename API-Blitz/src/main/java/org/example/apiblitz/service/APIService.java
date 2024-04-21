@@ -122,6 +122,9 @@ public class APIService {
 
 	public ResponseEntity<?> sendRequest(Request request) {
 
+		// Test time
+		long startTime = System.currentTimeMillis(); // Start time (To calculate the executionDuration)
+
 		try {
 			// Method
 			String method = request.getMethod();
@@ -133,7 +136,7 @@ public class APIService {
 			HttpEntity<?> requestEntity = getHttpEntity(request);
 
 			// Send Request
-			return switch (method) {
+			ResponseEntity<?> response =  switch (method) {
 				case "GET", "HEAD" -> restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
 				case "POST" -> restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
 				case "PUT" -> restTemplate.exchange(url, HttpMethod.PUT, requestEntity, String.class);
@@ -142,10 +145,47 @@ public class APIService {
 				case "OPTIONS" -> restTemplate.exchange(url, HttpMethod.OPTIONS, requestEntity, String.class);
 				default -> null;
 			};
+
+			// Execution duration
+			long endTime = System.currentTimeMillis(); // End time (To calculate the execution duration)
+			long executionDuration = endTime - startTime;
+
+			HttpHeaders headers = response.getHeaders();
+
+			// Create a new HttpHeaders object
+			HttpHeaders newHeaders = new HttpHeaders();
+			newHeaders.putAll(headers);
+
+			if (headers.getContentLength() == -1) {
+
+				// Calculate response size
+				Object body = response.getBody();
+				int headerSize = headers.toString().getBytes().length;
+				int bodySize = body != null ? body.toString().length() : 0;
+				int totalSize = headerSize + bodySize;
+				newHeaders.set("Content-Length", String.valueOf(totalSize));
+			}
+
+			newHeaders.set("Execution-Duration", String.valueOf(executionDuration));
+
+			return new ResponseEntity<>(response.getBody(), newHeaders, response.getStatusCode());
+
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
-			return ResponseEntity
-					.status(e.getStatusCode())
-					.body(e.getResponseBodyAsString());
+
+			// Execution duration
+			long endTime = System.currentTimeMillis(); // End time (To calculate the execution duration)
+			long executionDuration = endTime - startTime;
+
+			// Create a new HttpHeaders object
+			HttpHeaders newHeaders = new HttpHeaders();
+
+			// Calculate response size
+			int body = e.getMessage().length();
+			newHeaders.set("Content-Length", String.valueOf(body));
+
+			newHeaders.set("Execution-Duration", String.valueOf(executionDuration));
+
+			return new ResponseEntity<>(e.getResponseBodyAsString(), newHeaders, e.getStatusCode());
 		}
 	}
 

@@ -2,6 +2,7 @@ package org.example.apiblitz.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -19,12 +20,12 @@ public class TestCase {
 	private ArrayList<String> headersKey;
 	private ArrayList<String> headersValue;
 	private String body;
-	@NotBlank
+	@NotNull
 	private Integer statusCode;
 	private String expectedResponseBody;
 	@NotBlank
 	private String intervalsTimeUnit;
-	@NotBlank
+	@NotNull
 	private Integer intervalsTimeValue;
 	@NotBlank
 	private String notification;

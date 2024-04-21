@@ -37,7 +37,6 @@ public class AutoTestService {
 
 		// Test time
 		LocalTime testTime = LocalTime.now();
-		long startTime = System.currentTimeMillis(); // Start time (To calculate the executionDuration)
 
 		// Get API data
 		Request request = autoTestRepository.getAPIData(testCaseId);
@@ -47,13 +46,6 @@ public class AutoTestService {
 
 		// Get response status code
 		Integer statusCode = response.getStatusCode().value();
-
-		// Execution duration
-		long endTime = System.currentTimeMillis(); // End time (To calculate the execution duration)
-		long executionDuration = endTime - startTime;
-
-		// Content length
-		long contentLength = response.getHeaders().getContentLength();
 
 		// Response headers
 		Object responseHeaders = objectMapper.writeValueAsString(response.getHeaders());
@@ -90,8 +82,8 @@ public class AutoTestService {
 				testDate,
 				testTime,
 				statusCode,
-				executionDuration,
-				contentLength,
+				response.getHeaders().getContentLength(),
+				response.getHeaders().getFirst("Execution-Duration"),
 				responseHeaders,
 				responseBody,
 				result);

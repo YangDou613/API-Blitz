@@ -2,7 +2,6 @@ package org.example.apiblitz.repository;
 
 import lombok.extern.slf4j.Slf4j;
 import org.example.apiblitz.model.Request;
-import org.example.apiblitz.model.TestCase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -11,8 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Repository
 @Slf4j
@@ -42,7 +39,7 @@ public class AutoTestRepository {
 	                               LocalTime testTime,
 	                               Integer statusCode,
 	                               long executionDuration,
-	                               long contentLength,
+	                               String contentLength,
 	                               Object responseHeaders,
 	                               Object responseBody,
 	                               String result) {

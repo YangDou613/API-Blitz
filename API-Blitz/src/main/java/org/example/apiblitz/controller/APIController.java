@@ -18,12 +18,12 @@ public class APIController {
 	@Autowired
 	APIService apiService;
 
-	@GetMapping ("/API.html")
+	@GetMapping ("/APITest.html")
 	public String APITestPage() {
-		return "API";
+		return "APITest";
 	}
 
-	@PostMapping("/API.html")
+	@PostMapping("/APITest.html")
 	public ResponseEntity<?> GetResponse(@Valid @ModelAttribute APIData apiData, BindingResult bindingResult)
 			throws BindException {
 
