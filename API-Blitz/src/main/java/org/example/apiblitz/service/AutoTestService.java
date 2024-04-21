@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import org.example.apiblitz.model.Request;
+import org.example.apiblitz.model.TestResult;
 import org.example.apiblitz.repository.AutoTestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -82,8 +83,8 @@ public class AutoTestService {
 				testDate,
 				testTime,
 				statusCode,
-				response.getHeaders().getContentLength(),
 				response.getHeaders().getFirst("Execution-Duration"),
+				response.getHeaders().getContentLength(),
 				responseHeaders,
 				responseBody,
 				result);
@@ -114,5 +115,13 @@ public class AutoTestService {
 		}
 
 		return "pass";
+	}
+
+	public List<Integer> getAllTestCaseId(Integer userId) {
+		return autoTestRepository.getAllTestCaseIdByUserId(userId);
+	}
+
+	public List<TestResult> getAllTestResult(Integer testCaseId) {
+		return autoTestRepository.getAllTestResultByTestCaseId(testCaseId);
 	}
 }

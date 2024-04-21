@@ -63,10 +63,19 @@
 
                     <div id="queryParams">
                         <label for="queryParams">Query Params:</label><br>
-                        <input type="text" class="dynamic-input" name="paramsKey" placeholder="Key" oninput="addQueryParamsInputOfTestCase(event)">
-                        <input type="text" class="dynamic-input" name="paramsValue" placeholder="Value" oninput="addQueryParamsInputOfTestCase(event)">
+                        <input type="text" name="paramsKey" placeholder="Key">
+                        <input type="text" name="paramsValue" placeholder="Value">
+                        <br>
                     </div>
+                    <button type="button" onclick="addQueryParam()">Add Query Param</button>
                     <br><br>
+
+<!--                    <div id="queryParams">-->
+<!--                        <label for="queryParams">Query Params:</label><br>-->
+<!--                        <input type="text" class="dynamic-input" name="paramsKey" placeholder="Key" oninput="addQueryParamsInputOfTestCase(event)">-->
+<!--                        <input type="text" class="dynamic-input" name="paramsValue" placeholder="Value" oninput="addQueryParamsInputOfTestCase(event)">-->
+<!--                    </div>-->
+<!--                    <br><br>-->
 
                     <div id="authorization">
                         <label for="authorization">Authorization:</label><br>
@@ -78,10 +87,19 @@
 
                     <div id="headers">
                         <label for="headers">Headers:</label><br>
-                        <input type="text" class="headers-input" name="headersKey" placeholder="Key" oninput="addHeadersInputOfTestCase(event)">
-                        <input type="text" class="headers-input" name="headersValue" placeholder="Value" oninput="addHeadersInputOfTestCase(event)">
+                        <input type="text" name="headersKey" placeholder="Key">
+                        <input type="text" name="headersValue" placeholder="Value">
+                        <br>
                     </div>
+                    <button type="button" onclick="addHeader()">Add Header</button>
                     <br><br>
+
+<!--                    <div id="headers">-->
+<!--                        <label for="headers">Headers:</label><br>-->
+<!--                        <input type="text" class="headers-input" name="headersKey" placeholder="Key" oninput="addHeadersInputOfTestCase(event)">-->
+<!--                        <input type="text" class="headers-input" name="headersValue" placeholder="Value" oninput="addHeadersInputOfTestCase(event)">-->
+<!--                    </div>-->
+<!--                    <br><br>-->
 
                     <label for="body">Body:</label><br>
                     <textarea id="body" name="body" rows="5" cols="40"></textarea>
