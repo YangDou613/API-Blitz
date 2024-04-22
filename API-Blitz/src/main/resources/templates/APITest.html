@@ -49,6 +49,12 @@
 
             <div class="content">
                 <h1>API Data</h1><br>
+
+                <button id="show-history" onclick="showHistory()">API History</button>
+                <br><br>
+
+                <div id="api-history-list" style="display: none"></div>
+
                 <form id="api-form" action="/APITest.html" method="post">
 
                     <label for="method"></label>
@@ -68,11 +74,11 @@
 
                     <div id="queryParams">
                         <label for="queryParams">Query Params:</label><br>
-                        <input type="text" name="paramsKey" placeholder="Key">
-                        <input type="text" name="paramsValue" placeholder="Value">
+                        <input id="paramsKey" type="text" name="paramsKey" placeholder="Key">
+                        <input id="paramsValue" type="text" name="paramsValue" placeholder="Value">
                         <br>
                     </div>
-                    <button type="button" onclick="addQueryParam()">Add Query Param</button>
+                    <button id="queryParamsButton" type="button" onclick="addQueryParam()">Add Query Param</button>
                     <br><br>
 
 <!--                    <div id="queryParams">-->
@@ -84,19 +90,19 @@
 
                     <div id="authorization">
                         <label for="authorization">Authorization:</label><br>
-                        <input type="text" name="authorizationKey" placeholder="Key">
-                        <input type="text" name="authorizationValue" placeholder="Value">
+                        <input id="authorizationKey" type="text" name="authorizationKey" placeholder="Key">
+                        <input id="authorizationValue" type="text" name="authorizationValue" placeholder="Value">
                         <br>
                     </div>
                     <br><br>
 
                     <div id="headers">
                         <label for="headers">Headers:</label><br>
-                        <input type="text" name="headersKey" placeholder="Key">
-                        <input type="text" name="headersValue" placeholder="Value">
+                        <input id="headersKey" type="text" name="headersKey" placeholder="Key">
+                        <input id="headersValue" type="text" name="headersValue" placeholder="Value">
                         <br>
                     </div>
-                    <button type="button" onclick="addHeader()">Add Header</button>
+                    <button id="headersButton" type="button" onclick="addHeader()">Add Header</button>
                     <br><br>
 
 <!--                    <div id="headers">-->

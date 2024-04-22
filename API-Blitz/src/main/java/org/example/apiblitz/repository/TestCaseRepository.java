@@ -46,7 +46,7 @@ public class TestCaseRepository {
 		jdbcTemplate.update(connection -> {
 			PreparedStatement ps = connection.prepareStatement(insertToTestCaseSql, Statement.RETURN_GENERATED_KEYS);
 			ps.setInt(1, 1);
-			ps.setString(2, request.getAPIUrl());
+			ps.setString(2, testCase.getUrl());
 			ps.setString(3, request.getMethod());
 			ps.setObject(4, request.getQueryParams());
 			ps.setObject(5, request.getRequestHeaders());

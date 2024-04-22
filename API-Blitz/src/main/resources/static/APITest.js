@@ -1,4 +1,4 @@
-let storedResponse = null;
+let selectedAPI = null;
 
 document.getElementById('api-form').addEventListener('submit', function(event) {
     event.preventDefault();
@@ -129,6 +129,180 @@ function formatJSON(json) {
         .replace(/(["{\[\]}])\n(?=.)/g, '$1\n')
         .replace(/(".*?": )/g, '\n$1')
         .replace(/\n/g, '\n    ');
+}
+
+function showHistory() {
+
+    const form = document.getElementById("api-form");
+    const dom = document.getElementById('api-history-list');
+    if (dom.style.display === "block") {
+        dom.style.display = "none";
+        form.style.display = "block";
+    } else {
+        form.style.display = "none";
+        dom.style.display = "block";
+        dom.innerHTML = '';
+
+        fetch('/APITest/history?userId=1')
+            .then(response => {
+                if (!response.ok) {
+                    console.log(response.status)
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                data.forEach(api => {
+                    const method = document.createElement('p');
+                    method.innerHTML = api["method"];
+                    dom.appendChild(method);
+                    const button = document.createElement('button');
+                    button.innerText = api["apiurl"];
+                    dom.appendChild(button);
+                    const lineBreak = document.createElement('br');
+                    dom.appendChild(lineBreak);
+                    button.addEventListener('click', () => {
+                        selectedAPI = api;
+                        dom.style.display = "none";
+                        insertData(selectedAPI)
+                    });
+                });
+            })
+            .catch(error => {
+                console.error('There was an error!', error);
+            });
+    }
+}
+
+function insertData(selectedAPI) {
+
+    const form = document.getElementById("api-form");
+    form.style.display = "block";
+
+    // Method
+    document.getElementById('method').value = selectedAPI["method"];
+
+    // API url
+    document.getElementById('url').value = selectedAPI["apiurl"];
+
+    // Query Params
+    const paramsKeyInputs = document.querySelectorAll('#queryParams input[name="paramsKey"]');
+    const paramsValueInputs = document.querySelectorAll('#queryParams input[name="paramsValue"]');
+
+    paramsKeyInputs.forEach((input, index) => {
+        if (index > 0) {
+            input.parentNode.removeChild(input);
+        } else {
+            input.value = '';
+        }
+    });
+
+    paramsValueInputs.forEach((input, index) => {
+        if (index > 0) {
+            input.parentNode.removeChild(input);
+        } else {
+            input.value = '';
+        }
+    });
+
+    const queryParams = document.getElementById("queryParams");
+    if (selectedAPI["queryParams"] != null) {
+        const queryParamsObj = JSON.parse(selectedAPI["queryParams"]);
+        const queryParamsMap = objectToMap(queryParamsObj);
+        let isFirstIteration = true;
+        queryParamsMap.forEach((value, key) => {
+            if (isFirstIteration) {
+                document.getElementById('paramsKey').value = key;
+                document.getElementById('paramsValue').value = value;
+                isFirstIteration = false;
+            } else {
+                document.getElementById("queryParamsButton").style.display = "none";
+                let paramKeyHtml = `<input id="paramsKey" type="text" name="paramsKey" placeholder="Key" value=${key}>`;
+                let paramValueHtml = `<input id="paramsValue" type="text" name="paramsValue" placeholder="Value" value=${value}>`;
+                queryParams.insertAdjacentHTML("beforeend", paramKeyHtml)
+                queryParams.insertAdjacentHTML("beforeend", paramValueHtml)
+            }
+        });
+        document.getElementById("queryParamsButton").style.display = "block";
+    }
+
+    document.getElementById('authorizationKey').value = '';
+    document.getElementById('authorizationValue').value = '';
+
+    const headersKeyInputs = document.querySelectorAll('#headers input[name="headersKey"]');
+    const headersValueInputs = document.querySelectorAll('#headers input[name="headersValue"]');
+
+    headersKeyInputs.forEach((input, index) => {
+        if (index > 0) {
+            input.parentNode.removeChild(input);
+        } else {
+            input.value = '';
+        }
+    });
+
+    headersValueInputs.forEach((input, index) => {
+        if (index > 0) {
+            input.parentNode.removeChild(input);
+        } else {
+            input.value = '';
+        }
+    });
+
+    if (selectedAPI["headers"] != null) {
+        const headersObj = JSON.parse(selectedAPI["headers"]);
+        const headersMap = objectToMap(headersObj);
+
+        // Authorization
+        if (headersMap.has("Authorization")) {
+            getAuthorization(headersMap);
+        }
+
+        // Headers
+        const headers = document.getElementById("headers");
+        let isFirstIteration = true;
+        headersMap.forEach((value, key) => {
+            if (key !== "Content-Type" && key !== "Authorization") {
+                if (isFirstIteration) {
+                    document.getElementById('headersKey').value = key;
+                    document.getElementById('headersValue').value = value;
+                    isFirstIteration = false;
+                } else {
+                    document.getElementById("headersButton").style.display = "none";
+                    let headersKeyHtml = `<input id="headersKey" type="text" name="headersKey" placeholder="Key" value=${key}>`;
+                    let headersValueHtml = `<input id="headersValue" type="text" name="headersValue" placeholder="Value" value=${value}>`;
+                    headers.insertAdjacentHTML("beforeend", headersKeyHtml)
+                    headers.insertAdjacentHTML("beforeend", headersValueHtml)
+                }
+            }
+        });
+        document.getElementById("headersButton").style.display = "block";
+    }
+
+    // Body
+    document.getElementById('body').value = '';
+    if (selectedAPI["body"] != null) {
+        document.getElementById('body').value = selectedAPI["body"];
+    }
+}
+
+function objectToMap(obj) {
+    const map = new Map();
+    for (const key in obj) {
+        if (Object.hasOwnProperty.call(obj, key)) {
+            map.set(key, obj[key]);
+        }
+    }
+    return map;
+}
+
+function getAuthorization(headersMap) {
+    headersMap.forEach((value, key) => {
+        if (key === "Authorization") {
+            let getKeyValue = value[0].split(" ");
+            document.getElementById('authorizationKey').value = getKeyValue[0];
+            document.getElementById('authorizationValue').value = getKeyValue[1];
+        }
+    });
 }
 
 // function addQueryParamsInput(event) {

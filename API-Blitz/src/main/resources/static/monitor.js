@@ -76,7 +76,7 @@ function dashboard(data) {
             title: 'Test Time',
         },
         yaxis: {
-            title: 'Execution Duration (ms)',
+            title: 'Execution Duration (s)',
         }
 
     };

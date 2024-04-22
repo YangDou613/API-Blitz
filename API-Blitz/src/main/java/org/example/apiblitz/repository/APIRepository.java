@@ -2,7 +2,6 @@ package org.example.apiblitz.repository;
 
 import lombok.extern.slf4j.Slf4j;
 import org.example.apiblitz.model.Request;
-import org.example.apiblitz.model.TestResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -23,7 +22,7 @@ public class APIRepository {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
-	public Integer insertToAPIHistory(Request request) {
+	public Integer insertToAPIHistory(String APIUrl, Request request) {
 
 		String insertToAPIHistorySql = "INSERT INTO APIHistory (userId, APIUrl, method, queryParams, headers, body) " +
 				"VALUES (?, ?, ?, ?, ?, ?)";
@@ -33,7 +32,7 @@ public class APIRepository {
 		jdbcTemplate.update(connection -> {
 			PreparedStatement ps = connection.prepareStatement(insertToAPIHistorySql, Statement.RETURN_GENERATED_KEYS);
 			ps.setInt(1, 1);
-			ps.setString(2, request.getAPIUrl());
+			ps.setString(2, APIUrl);
 			ps.setString(3, request.getMethod());
 			ps.setObject(4, request.getQueryParams());
 			ps.setObject(5, request.getRequestHeaders());

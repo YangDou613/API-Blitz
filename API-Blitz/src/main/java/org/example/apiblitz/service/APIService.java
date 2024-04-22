@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.example.apiblitz.model.APIData;
 import org.example.apiblitz.model.Request;
-import org.example.apiblitz.model.TestResult;
 import org.example.apiblitz.repository.APIRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -47,7 +46,7 @@ public class APIService {
 		}
 
 		// Store API data into APIHistory table
-		apiRepository.insertToAPIHistory(request);
+		apiRepository.insertToAPIHistory(apiData.getUrl(), request);
 
 		// Send Request
 		ResponseEntity<?> result = sendRequest(request);

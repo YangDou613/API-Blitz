@@ -1,5 +1,6 @@
 package org.example.apiblitz.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mashape.unirest.http.exceptions.UnirestException;
@@ -41,6 +42,15 @@ public class AutoTestService {
 
 		// Get API data
 		Request request = autoTestRepository.getAPIData(testCaseId);
+
+		// Set API url
+		String APIUrl;
+		if (request.getQueryParams() != null) {
+			APIUrl = AddParamsToAPIUrl(request.getAPIUrl(), request.getQueryParams());
+		} else {
+			APIUrl = request.getAPIUrl();
+		}
+		request.setAPIUrl(APIUrl);
 
 		// Send Request
 		ResponseEntity<?> response = apiService.sendRequest(request);
@@ -115,6 +125,27 @@ public class AutoTestService {
 		}
 
 		return "pass";
+	}
+
+	public String AddParamsToAPIUrl(String APIUrl, Object getQueryParams) throws JsonProcessingException {
+
+		boolean isFirstIteration = true;
+
+		Map<String, Object> queryParams = objectMapper.readValue(getQueryParams.toString(), new TypeReference<>() {});
+
+		for (Map.Entry<String, Object> queryParam : queryParams.entrySet()) {
+			String key = queryParam.getKey();
+			Object value = queryParam.getValue();
+			String param = key + "=" + value;
+			if (isFirstIteration) {
+				APIUrl += "?";
+				isFirstIteration = false;
+			} else {
+				APIUrl += "&";
+			}
+			APIUrl += param;
+		}
+		return APIUrl;
 	}
 
 	public List<Integer> getAllTestCaseId(Integer userId) {
