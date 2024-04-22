@@ -61,9 +61,9 @@ public class TestCaseController {
 		return "redirect:/api/1.0/testCase";
 	}
 
-	@GetMapping("/resetTestCase")
-	public String resetTestCasePage() {
-		return "resetTestCase";
+	@GetMapping("/modifyTestCase")
+	public String modifyTestCasePage() {
+		return "modifyTestCase";
 	}
 
 	@PostMapping(path = "/update")

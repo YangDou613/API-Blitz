@@ -20,6 +20,16 @@ function addHeader() {
     headersDiv.appendChild(inputDiv);
 }
 
+function addRecipientEmail() {
+    const recipientEmailDiv = document.getElementById("recipientEmail");
+    const inputDiv = document.createElement("div");
+    inputDiv.innerHTML = `
+                    <input id="email" type="text" name="email" placeholder="Email">
+                    <br>
+                `;
+    recipientEmailDiv.appendChild(inputDiv);
+}
+
 function validateForm() {
     const bodyInput = document.getElementById("body");
     const expectedResponseBodyInput = document.getElementById("expectedResponseBody");

@@ -74,7 +74,7 @@ public class TestCaseRepository {
 
 		Integer notification = resetTestCase.getNotification().equals("Yes") ? 1 : 0;
 
-		Object email = objectMapper.writeValueAsString(resetTestCase.getRecipientEmail());
+		Object email = objectMapper.writeValueAsString(resetTestCase.getEmail());
 
 		String updateTestCaseSql = "UPDATE testCase SET userId = ?, APIUrl = ?, method = ?, queryParams = ?, " +
 				"headers = ?, body = ?, statusCode = ?, expectedResponseBody = ?, intervalsTimeUnit = ?, " +
@@ -82,7 +82,7 @@ public class TestCaseRepository {
 
 		jdbcTemplate.update(updateTestCaseSql,
 				1,
-				request.getAPIUrl(),
+				resetTestCase.getUrl(),
 				request.getMethod(),
 				request.getQueryParams(),
 				request.getRequestHeaders(),

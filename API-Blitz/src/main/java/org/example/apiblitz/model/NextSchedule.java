@@ -10,6 +10,7 @@ import java.time.LocalTime;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class NextSchedule {
 	private Integer testCaseId;
+	private Integer id;
 	private String APIUrl;
 	private String method;
 	private Object queryParams;

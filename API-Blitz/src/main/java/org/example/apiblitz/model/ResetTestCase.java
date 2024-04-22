@@ -23,5 +23,5 @@ public class ResetTestCase {
 	private String intervalsTimeUnit;
 	private Integer intervalsTimeValue;
 	private String notification;
-	private ArrayList<Object> recipientEmail;
+	private ArrayList<String> email;
 }

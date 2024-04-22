@@ -4,7 +4,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>API Blitz</title>
-        <link rel="stylesheet" href="/testCase.css">
+        <link rel="stylesheet" href="/modifyTestCase.css">
     </head>
 
     <body>
@@ -53,10 +53,15 @@
 
         <div id="container">
 
-            <div class="content">
+            <div id="test-case-list"></div>
 
-                <h2>Test Case</h2>
-                <form action="/api/1.0/testCase/create" method="post" onsubmit="return validateFormAndSubmit()">
+            <div id="content">
+
+                <form id="modify-form" method="post" style="display: none">
+
+                    <label for="id">Id</label>
+                    <input type="number" id="id" name="id">
+                    <br><br>
 
                     <label for="method"></label>
                     <select name="method" id="method">
@@ -75,43 +80,29 @@
 
                     <div id="queryParams">
                         <label for="queryParams">Query Params:</label><br>
-                        <input type="text" name="paramsKey" placeholder="Key">
-                        <input type="text" name="paramsValue" placeholder="Value">
+                        <input id="paramsKey" type="text" name="paramsKey" placeholder="Key">
+                        <input id="paramsValue" type="text" name="paramsValue" placeholder="Value">
                         <br>
                     </div>
-                    <button type="button" onclick="addQueryParam()">Add Query Param</button>
+                    <button id="queryParamsButton" type="button" onclick="addQueryParam()">Add Query Param</button>
                     <br><br>
-
-<!--                    <div id="queryParams">-->
-<!--                        <label for="queryParams">Query Params:</label><br>-->
-<!--                        <input type="text" class="dynamic-input" name="paramsKey" placeholder="Key" oninput="addQueryParamsInputOfTestCase(event)">-->
-<!--                        <input type="text" class="dynamic-input" name="paramsValue" placeholder="Value" oninput="addQueryParamsInputOfTestCase(event)">-->
-<!--                    </div>-->
-<!--                    <br><br>-->
 
                     <div id="authorization">
                         <label for="authorization">Authorization:</label><br>
-                        <input type="text" name="authorizationKey" placeholder="Key">
-                        <input type="text" name="authorizationValue" placeholder="Value">
+                        <input id="authorizationKey" type="text" name="authorizationKey" placeholder="Key">
+                        <input id="authorizationValue" type="text" name="authorizationValue" placeholder="Value">
                         <br>
                     </div>
                     <br>
 
                     <div id="headers">
                         <label for="headers">Headers:</label><br>
-                        <input type="text" name="headersKey" placeholder="Key">
-                        <input type="text" name="headersValue" placeholder="Value">
+                        <input id="headersKey" type="text" name="headersKey" placeholder="Key">
+                        <input id="headersValue" type="text" name="headersValue" placeholder="Value">
                         <br>
                     </div>
-                    <button type="button" onclick="addHeader()">Add Header</button>
+                    <button id="headersButton" type="button" onclick="addHeader()">Add Header</button>
                     <br><br>
-
-<!--                    <div id="headers">-->
-<!--                        <label for="headers">Headers:</label><br>-->
-<!--                        <input type="text" class="headers-input" name="headersKey" placeholder="Key" oninput="addHeadersInputOfTestCase(event)">-->
-<!--                        <input type="text" class="headers-input" name="headersValue" placeholder="Value" oninput="addHeadersInputOfTestCase(event)">-->
-<!--                    </div>-->
-<!--                    <br><br>-->
 
                     <label for="body">Body:</label><br>
                     <textarea id="body" name="body" rows="5" cols="40"></textarea>
@@ -152,7 +143,7 @@
                     <button id="emailButton" type="button" onclick="addRecipientEmail()">Add Recipient Email</button>
                     <br><br>
 
-                    <input type="submit" value="Add New Test Case">
+                    <input type="submit" value="Submit">
                 </form>
 
             </div>
@@ -161,7 +152,7 @@
 
     </div>
 
-    <script src="/testCase.js"></script>
+    <script src="/modifyTestCase.js"></script>
 
     </body>
 </html>

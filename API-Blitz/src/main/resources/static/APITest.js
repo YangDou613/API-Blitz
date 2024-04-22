@@ -218,7 +218,7 @@ function insertData(selectedAPI) {
             } else {
                 document.getElementById("queryParamsButton").style.display = "none";
                 let paramKeyHtml = `<input id="paramsKey" type="text" name="paramsKey" placeholder="Key" value=${key}>`;
-                let paramValueHtml = `<input id="paramsValue" type="text" name="paramsValue" placeholder="Value" value=${value}>`;
+                let paramValueHtml = `<input id="paramsValue" type="text" name="paramsValue" placeholder="Value" value=${value}><br>`;
                 queryParams.insertAdjacentHTML("beforeend", paramKeyHtml)
                 queryParams.insertAdjacentHTML("beforeend", paramValueHtml)
             }
@@ -269,7 +269,7 @@ function insertData(selectedAPI) {
                 } else {
                     document.getElementById("headersButton").style.display = "none";
                     let headersKeyHtml = `<input id="headersKey" type="text" name="headersKey" placeholder="Key" value=${key}>`;
-                    let headersValueHtml = `<input id="headersValue" type="text" name="headersValue" placeholder="Value" value=${value}>`;
+                    let headersValueHtml = `<input id="headersValue" type="text" name="headersValue" placeholder="Value" value=${value}><br>`;
                     headers.insertAdjacentHTML("beforeend", headersKeyHtml)
                     headers.insertAdjacentHTML("beforeend", headersValueHtml)
                 }
