@@ -2,7 +2,9 @@ package org.example.apiblitz.repository;
 
 import lombok.extern.slf4j.Slf4j;
 import org.example.apiblitz.model.Request;
+import org.example.apiblitz.model.TestResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -11,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.List;
 
 @Repository
 @Slf4j
@@ -44,5 +47,10 @@ public class APIRepository {
 		log.info("Successfully insert to APIHistory table!");
 
 		return APIAutoId;
+	}
+
+	public List<Request> getAllHistoryList(Integer userId) {
+		String getHistoryListSql = "SELECT * FROM APIHistory WHERE userId = ? ORDER BY id DESC LIMIT 20";
+		return jdbcTemplate.query(getHistoryListSql, new BeanPropertyRowMapper<>(Request.class), userId);
 	}
 }

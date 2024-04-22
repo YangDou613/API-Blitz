@@ -12,6 +12,8 @@ public class Request {
 	private Object queryParams;
 	@Column(name = "headers")
 	private Object requestHeaders;
+	private String headers;
 	@Column(name = "body")
 	private Object requestBody;
+	private String body;
 }

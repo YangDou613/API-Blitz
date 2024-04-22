@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.example.apiblitz.model.APIData;
 import org.example.apiblitz.model.Request;
+import org.example.apiblitz.model.TestResult;
 import org.example.apiblitz.repository.APIRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -18,6 +19,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -262,5 +264,9 @@ public class APIService {
 		}
 
 		return requestHeaders;
+	}
+
+	public List<Request> getAllHistory(Integer userId) {
+		return apiRepository.getAllHistoryList(userId);
 	}
 }

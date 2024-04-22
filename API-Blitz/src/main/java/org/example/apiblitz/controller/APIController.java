@@ -11,6 +11,8 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Controller
 @Slf4j
 public class APIController {
@@ -24,7 +26,7 @@ public class APIController {
 	}
 
 	@PostMapping("/APITest.html")
-	public ResponseEntity<?> GetResponse(@Valid @ModelAttribute APIData apiData, BindingResult bindingResult)
+	public ResponseEntity<?> getResponse(@Valid @ModelAttribute APIData apiData, BindingResult bindingResult)
 			throws BindException {
 
 		if (bindingResult.hasErrors()) {
@@ -36,6 +38,16 @@ public class APIController {
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error");
+		}
+	}
+
+	@GetMapping("/APITest/history")
+	public ResponseEntity<?> getHistory(@RequestParam Integer userId) {
+		List<Request> historyList = apiService.getAllHistory(userId);
+		if (historyList != null) {
+			return ResponseEntity.ok(historyList);
+		} else {
+			return ResponseEntity.badRequest().body("There is currently no API history.");
 		}
 	}
 }

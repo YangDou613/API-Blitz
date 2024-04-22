@@ -40,7 +40,7 @@ public class AutoTestController {
 		if (testResultList != null) {
 			return ResponseEntity.ok(testResultList);
 		} else {
-			return ResponseEntity.badRequest().body("There are currently no test results.");
+			return ResponseEntity.badRequest().body("There is currently no test results.");
 		}
 	}
 }
