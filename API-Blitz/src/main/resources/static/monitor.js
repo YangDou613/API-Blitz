@@ -98,43 +98,43 @@ function showDetails(selectedData) {
     detailTable.classList.add('detail-table');
 
     const testDateTr = document.createElement("tr");
-    let testDateKeyHtml = `<td>Result<td>`;
-    let testDateValueHtml = `<td>${selectedData["testDate"]}<td>`;
+    let testDateKeyHtml = `<td>Result</td>`;
+    let testDateValueHtml = `<td>${selectedData["testDate"]}</td>`;
     testDateTr.insertAdjacentHTML('beforeend', testDateKeyHtml);
     testDateTr.insertAdjacentHTML('beforeend', testDateValueHtml);
     detailTable.appendChild(testDateTr);
 
     const testTimeTr = document.createElement("tr");
-    let testTimeKeyHtml = `<td>Test Time<td>`;
-    let testTimeValueHtml = `<td>${selectedData["testTime"]}<td>`;
+    let testTimeKeyHtml = `<td>Test Time</td>`;
+    let testTimeValueHtml = `<td>${selectedData["testTime"]}</td>`;
     testTimeTr.insertAdjacentHTML('beforeend', testTimeKeyHtml);
     testTimeTr.insertAdjacentHTML('beforeend', testTimeValueHtml);
     detailTable.appendChild(testTimeTr);
 
     const resultTr = document.createElement("tr");
-    let resultKeyHtml = `<td>Result<td>`;
-    let resultValueHtml = `<td>${selectedData["result"]}<td>`;
+    let resultKeyHtml = `<td>Result</td>`;
+    let resultValueHtml = `<td>${selectedData["result"]}</td>`;
     resultTr.insertAdjacentHTML('beforeend', resultKeyHtml);
     resultTr.insertAdjacentHTML('beforeend', resultValueHtml);
     detailTable.appendChild(resultTr);
 
     const executionDurationTr = document.createElement("tr");
-    let executionDurationKeyHtml = `<td>Execution Duration<td>`;
-    let executionDurationValueHtml = `<td>${selectedData["executionDuration"]}<td>`;
+    let executionDurationKeyHtml = `<td>Execution Duration</td>`;
+    let executionDurationValueHtml = `<td>${selectedData["executionDuration"]}</td>`;
     executionDurationTr.insertAdjacentHTML('beforeend', executionDurationKeyHtml);
     executionDurationTr.insertAdjacentHTML('beforeend', executionDurationValueHtml);
     detailTable.appendChild(executionDurationTr);
 
     const contentLengthTr = document.createElement("tr");
-    let contentLengthKeyHtml = `<td>Content Length<td>`;
-    let contentLengthValueHtml = `<td>${selectedData["contentLength"]}<td>`;
+    let contentLengthKeyHtml = `<td>Content Length</td>`;
+    let contentLengthValueHtml = `<td>${selectedData["contentLength"]}</td>`;
     contentLengthTr.insertAdjacentHTML('beforeend', contentLengthKeyHtml);
     contentLengthTr.insertAdjacentHTML('beforeend', contentLengthValueHtml);
     detailTable.appendChild(contentLengthTr);
 
     const statusCodeTr = document.createElement("tr");
-    let statusCodeKeyHtml = `<td>Status Code<td>`;
-    let statusCodeValueHtml = `<td>${selectedData["statusCode"]}<td>`;
+    let statusCodeKeyHtml = `<td>Status Code</td>`;
+    let statusCodeValueHtml = `<td>${selectedData["statusCode"]}</td>`;
     statusCodeTr.insertAdjacentHTML('beforeend', statusCodeKeyHtml);
     statusCodeTr.insertAdjacentHTML('beforeend', statusCodeValueHtml);
     detailTable.appendChild(statusCodeTr);
@@ -147,9 +147,9 @@ function showDetails(selectedData) {
     // detailTable.appendChild(responseHeadersTr);
 
     const responseBodyTr = document.createElement("tr");
-    let responseBodyKeyHtml = `<td>Response Body<td>`;
+    let responseBodyKeyHtml = `<td>Response Body</td>`;
     let responseBodyText = formatJSON(selectedData["responseBody"]);
-    let responseBodyValueHtml = `<td><pre><code>${responseBodyText}</code></pre><td>`;
+    let responseBodyValueHtml = `<td><pre><code>${responseBodyText}</code></pre></td>`;
     responseBodyTr.insertAdjacentHTML('beforeend', responseBodyKeyHtml);
     responseBodyTr.insertAdjacentHTML('beforeend', responseBodyValueHtml);
     detailTable.appendChild(responseBodyTr);
