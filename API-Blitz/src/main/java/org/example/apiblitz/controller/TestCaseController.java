@@ -86,7 +86,7 @@ public class TestCaseController {
 		}
 	}
 
-	@DeleteMapping(path = "delete")
+	@DeleteMapping(path = "/delete")
 	public ResponseEntity<?> deleteTestCase(Integer testCaseId) {
 
 		try {
