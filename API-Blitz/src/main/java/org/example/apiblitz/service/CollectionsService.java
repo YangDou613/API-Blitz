@@ -67,10 +67,10 @@ public class CollectionsService {
 		}
 	}
 
-	public void delete(Integer userId, String collectionName, String requestName) {
+	public void delete(Integer userId, String collectionName, Integer requestId) {
 
 		try {
-			collectionRepository.deleteCollection(userId, collectionName, requestName);
+			collectionRepository.deleteCollection(userId, collectionName, requestId);
 		} catch (SQLException e) {
 			log.error(e.getMessage());
 		}

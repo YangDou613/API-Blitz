@@ -24,6 +24,7 @@ public class CollectionsRepository {
 		String getCollectionSql = "SELECT *, (" +
 				"SELECT JSON_ARRAYAGG(" +
 				"JSON_OBJECT(" +
+				"'id', id," +
 				"'requestName', requestName," +
 				"'apiurl', apiurl," +
 				"'method', method," +
@@ -85,19 +86,18 @@ public class CollectionsRepository {
 		log.info("Update successfully!");
 	}
 
-	public void deleteCollection(Integer userId, String collectionName, String requestName) throws SQLException {
+	public void deleteCollection(Integer userId, String collectionName, Integer requestId) throws SQLException {
 
 		// Get collection id
 		String getCollectionIdSql = "SELECT id FROM collections WHERE collectionName = ? AND userId = ?";
 		Integer collectionId = jdbcTemplate.queryForObject(getCollectionIdSql, Integer.class, collectionName, userId);
 
-		if (requestName == null) {
+		if (requestId == null) {
 			String deleteCollectionSql = "DELETE FROM collections WHERE collectionName = ? AND userId = ?";
 			jdbcTemplate.update(deleteCollectionSql, collectionName, userId);
 		} else {
-			String deleteCollectionDetailsSql = "DELETE FROM collectionDetails WHERE collectionId = ? AND " +
-					"requestName = ?";
-			jdbcTemplate.update(deleteCollectionDetailsSql, collectionId, requestName);
+			String deleteCollectionDetailsSql = "DELETE FROM collectionDetails WHERE collectionId = ? AND id = ?";
+			jdbcTemplate.update(deleteCollectionDetailsSql, collectionId, requestId);
 		}
 
 		log.info("Delete successfully!");

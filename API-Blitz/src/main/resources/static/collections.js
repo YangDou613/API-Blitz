@@ -1,5 +1,7 @@
 let selectedAPI;
 let selectedCollection;
+let selectedCollectionName;
+let selectedRequestId;
 
 function createCollection() {
     const dom = document.getElementById("collection-form")
@@ -46,6 +48,11 @@ fetch('/api/1.0/collections/get?userId=1')
             const button = document.createElement('button');
             button.innerText = `${collection["collectionName"]}`;
             dom.appendChild(button);
+            const img = document.createElement('img');
+            img.setAttribute("src", "/delete.png")
+            img.setAttribute("width", "20");
+            img.setAttribute("height", "20");
+            dom.appendChild(img);
             const content = document.createElement('p');
             content.innerText = `Description: ${collection["description"]}`;
             dom.appendChild(content);
@@ -53,9 +60,14 @@ fetch('/api/1.0/collections/get?userId=1')
             dom.appendChild(lineBreak);
             button.addEventListener('click', () => {
                 selectedCollection = collection["id"];
+                selectedCollectionName = collection["collectionName"]
                 const apiList = document.getElementById('api-list');
                 apiList.innerText = '';
                 showAPIData(collection)
+            });
+            img.addEventListener('click', () => {
+                selectedCollectionName = collection["collectionName"]
+                deleteCollection(selectedCollectionName);
             });
         });
     })
@@ -79,13 +91,21 @@ function showAPIData(collection) {
             const button = document.createElement('button');
             button.innerText = api["apiurl"];
             apiList.appendChild(button);
+            const img = document.createElement('img');
+            img.setAttribute("src", "/delete.png")
+            img.setAttribute("width", "20");
+            img.setAttribute("height", "20");
+            apiList.appendChild(img);
             const lineBreak = document.createElement('br');
             apiList.appendChild(lineBreak);
-
             button.addEventListener('click', () => {
                 selectedAPI = api;
                 const queryString = `?selectedAPI=${encodeURIComponent(JSON.stringify(selectedAPI))}`;
                 window.location.href = "/APITest.html" + queryString;
+            });
+            img.addEventListener('click', () => {
+                selectedRequestId = api["id"]
+                deleteAPI(selectedCollectionName, selectedRequestId);
             });
         });
     }
@@ -125,4 +145,40 @@ async function addAPI() {
                 });
         });
     }
+}
+
+function deleteCollection(selectedCollectionName) {
+    fetch('/api/1.0/collections/delete?userId=1&collectionName=' + selectedCollectionName, {
+        method: 'DELETE'
+    })
+        .then(response => {
+            console.log(response)
+            if (!response.ok) {
+                alert("Failed to delete!");
+            } else {
+                window.location.href = "/api/1.0/collections";
+                alert("Delete Successfully!");
+            }
+        })
+        .catch(error => {
+            console.error('Error submitting form:', error);
+        });
+}
+
+function deleteAPI(selectedCollectionName, selectedRequestId) {
+    fetch('/api/1.0/collections/delete?userId=1&collectionName=' + selectedCollectionName +
+        "&requestId=" + selectedRequestId, {
+        method: 'DELETE'
+    })
+        .then(response => {
+            if (!response.ok) {
+                alert("Failed to delete!");
+            } else {
+                window.location.href = "/api/1.0/collections";
+                alert("Delete Successfully!");
+            }
+        })
+        .catch(error => {
+            console.error('Error submitting form:', error);
+        });
 }

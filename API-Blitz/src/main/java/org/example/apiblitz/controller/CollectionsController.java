@@ -65,8 +65,6 @@ public class CollectionsController {
 			@ModelAttribute Collections collection,
 			BindingResult bindingResult) throws BindException {
 
-		System.out.println(collection);
-
 		if (bindingResult.hasErrors()) {
 			throw new BindException(bindingResult);
 		}
@@ -107,10 +105,10 @@ public class CollectionsController {
 	public ResponseEntity<?> deleteCollection(
 			Integer userId,
 			String collectionName,
-			@RequestParam(required = false) String requestName) {
+			@RequestParam(required = false) Integer requestId) {
 
 		try {
-			collectionService.delete(userId, collectionName, requestName);
+			collectionService.delete(userId, collectionName, requestId);
 			return ResponseEntity
 					.ok()
 					.build();
