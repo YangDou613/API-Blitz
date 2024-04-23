@@ -2,7 +2,7 @@ package org.example.apiblitz.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.example.apiblitz.model.*;
-import org.example.apiblitz.repository.CollectionRepository;
+import org.example.apiblitz.repository.CollectionsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,13 +12,13 @@ import java.util.Map;
 
 @Service
 @Slf4j
-public class CollectionService {
+public class CollectionsService {
 
 	@Autowired
 	APIService apiService;
 
 	@Autowired
-	CollectionRepository collectionRepository;
+	CollectionsRepository collectionRepository;
 
 	public List<Map<String, Object>> get(Integer userId) {
 
@@ -30,12 +30,7 @@ public class CollectionService {
 		}
 	}
 
-	public void create(Integer userId, Collection collection) {
-
-		// Package API data into http request
-		APIData apiData = setAPIData(collection);
-		Request request = apiService.httpRequest(apiData);
-		collection.setRequest(request);
+	public void create(Integer userId, Collections collection) {
 
 		try {
 			collectionRepository.insertToCollectionsTable(userId, collection);
@@ -44,7 +39,7 @@ public class CollectionService {
 		}
 	}
 
-	public void update(Integer collectionId, Collection collection) {
+	public void update(Integer collectionId, Collections collection) {
 
 		// Package API data into http request
 		APIData apiData = setAPIData(collection);
@@ -58,7 +53,7 @@ public class CollectionService {
 		}
 	}
 
-	public void add(Integer collectionId, Collection collection) {
+	public void add(Integer collectionId, Collections collection) {
 
 		// Package API data into http request
 		APIData apiData = setAPIData(collection);
@@ -81,7 +76,7 @@ public class CollectionService {
 		}
 	}
 
-	public APIData setAPIData(Collection collection) {
+	public APIData setAPIData(Collections collection) {
 
 		APIData apiData = new APIData();
 

@@ -97,7 +97,3 @@ header {
     gap: 100px;
     padding: 50px;
 }
-
-.content {
-    grid-column: 1;
-}

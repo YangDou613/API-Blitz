@@ -9,159 +9,165 @@
 
     <body>
 
-    <header>
+        <header>
 
-        <div class="nav">
-            <a href="http://localhost:8080/APITest.html">
-                <img id="logo" src="/logo.png" alt="Logo">
-            </a>
+            <div class="nav">
+                <a href="/APITest.html">
+                    <img id="logo" src="/logo.png" alt="Logo">
+                </a>
 
-            <h1>API Blitz</h1>
-        </div>
+                <h1>API Blitz</h1>
+            </div>
 
-    </header>
+        </header>
 
-    <div class="content-wrapper">
+        <div class="content-wrapper">
 
-        <div class="sidebar">
+            <div class="sidebar">
 
-            <br><br>
-            <a href="http://localhost:8080/APITest.html" class="sidebar-link">
-                <img id="test" src="/test.png" alt="test">
-                <p>API Test</p>
-            </a>
+                <br><br>
+                <a href="http://localhost:8080/APITest.html" class="sidebar-link">
+                    <img id="test" src="/test.png" alt="test">
+                    <p>API Test</p>
+                </a>
 
-            <br><br>
-            <a href="/api/1.0/testCase" class="sidebar-link">
-                <img id="auto-test" src="/auto-test.png" alt="test">
-                <p>Automated Testing</p>
-            </a>
+                <br><br>
+                <a href="/api/1.0/testCase" class="sidebar-link">
+                    <img id="auto-test" src="/auto-test.png" alt="test">
+                    <p>Automated Testing</p>
+                </a>
 
-            <br><br>
-            <a href="/api/1.0/testCase/modifyTestCase" class="sidebar-link">
-                <img id="my-test-case" src="/myTestCase.png" alt="test">
-                <p>My Test Case</p>
-            </a>
+                <br><br>
+                <a href="/api/1.0/testCase/modifyTestCase" class="sidebar-link">
+                    <img id="my-test-case" src="/myTestCase.png" alt="test">
+                    <p>My Test Case</p>
+                </a>
 
-            <br><br>
-            <a href="/api/1.0/autoTest/monitor" class="sidebar-link">
-                <img id="monitor" src="/monitor.png" alt="test">
-                <p>Monitor</p>
-            </a>
+                <br><br>
+                <a href="/api/1.0/autoTest/monitor" class="sidebar-link">
+                    <img id="monitor" src="/monitor.png" alt="test">
+                    <p>Monitor</p>
+                </a>
 
-        </div>
+                <br><br>
+                <a href="/api/1.0/collections" class="sidebar-link">
+                    <img id="collections" src="/collections.png" alt="test">
+                    <p>Collections</p>
+                </a>
 
-        <div id="container">
+            </div>
 
-            <div class="content">
+            <div id="container">
 
-                <h2>Test Case</h2>
-                <form action="/api/1.0/testCase/create" method="post" onsubmit="return validateFormAndSubmit()">
+                <div class="content">
 
-                    <label for="method"></label>
-                    <select name="method" id="method">
-                        <option value="GET">GET</option>
-                        <option value="POST">POST</option>
-                        <option value="PUT">PUT</option>
-                        <option value="DELETE">DELETE</option>
-                        <option value="HEAD">HEAD</option>
-                        <option value="PATCH">PATCH</option>
-                        <option value="OPTIONS">OPTIONS</option>
-                    </select>
+                    <h2>Test Case</h2>
+                    <form action="/api/1.0/testCase/create" method="post" onsubmit="return validateFormAndSubmit()">
 
-                    <label for="url"></label>
-                    <input type="text" id="url" name="url" placeholder="URL" style="width: 300px;">
-                    <br><br>
+                        <label for="method"></label>
+                        <select name="method" id="method">
+                            <option value="GET">GET</option>
+                            <option value="POST">POST</option>
+                            <option value="PUT">PUT</option>
+                            <option value="DELETE">DELETE</option>
+                            <option value="HEAD">HEAD</option>
+                            <option value="PATCH">PATCH</option>
+                            <option value="OPTIONS">OPTIONS</option>
+                        </select>
 
-                    <div id="queryParams">
-                        <label for="queryParams">Query Params:</label><br>
-                        <input type="text" name="paramsKey" placeholder="Key">
-                        <input type="text" name="paramsValue" placeholder="Value">
+                        <label for="url"></label>
+                        <input type="text" id="url" name="url" placeholder="URL" style="width: 300px;">
+                        <br><br>
+
+                        <div id="queryParams">
+                            <label for="queryParams">Query Params:</label><br>
+                            <input type="text" name="paramsKey" placeholder="Key">
+                            <input type="text" name="paramsValue" placeholder="Value">
+                            <br>
+                        </div>
+                        <button type="button" onclick="addQueryParam()">Add Query Param</button>
+                        <br><br>
+
+    <!--                    <div id="queryParams">-->
+    <!--                        <label for="queryParams">Query Params:</label><br>-->
+    <!--                        <input type="text" class="dynamic-input" name="paramsKey" placeholder="Key" oninput="addQueryParamsInputOfTestCase(event)">-->
+    <!--                        <input type="text" class="dynamic-input" name="paramsValue" placeholder="Value" oninput="addQueryParamsInputOfTestCase(event)">-->
+    <!--                    </div>-->
+    <!--                    <br><br>-->
+
+                        <div id="authorization">
+                            <label for="authorization">Authorization:</label><br>
+                            <input type="text" name="authorizationKey" placeholder="Key">
+                            <input type="text" name="authorizationValue" placeholder="Value">
+                            <br>
+                        </div>
                         <br>
-                    </div>
-                    <button type="button" onclick="addQueryParam()">Add Query Param</button>
-                    <br><br>
 
-<!--                    <div id="queryParams">-->
-<!--                        <label for="queryParams">Query Params:</label><br>-->
-<!--                        <input type="text" class="dynamic-input" name="paramsKey" placeholder="Key" oninput="addQueryParamsInputOfTestCase(event)">-->
-<!--                        <input type="text" class="dynamic-input" name="paramsValue" placeholder="Value" oninput="addQueryParamsInputOfTestCase(event)">-->
-<!--                    </div>-->
-<!--                    <br><br>-->
+                        <div id="headers">
+                            <label for="headers">Headers:</label><br>
+                            <input type="text" name="headersKey" placeholder="Key">
+                            <input type="text" name="headersValue" placeholder="Value">
+                            <br>
+                        </div>
+                        <button type="button" onclick="addHeader()">Add Header</button>
+                        <br><br>
 
-                    <div id="authorization">
-                        <label for="authorization">Authorization:</label><br>
-                        <input type="text" name="authorizationKey" placeholder="Key">
-                        <input type="text" name="authorizationValue" placeholder="Value">
-                        <br>
-                    </div>
-                    <br>
+    <!--                    <div id="headers">-->
+    <!--                        <label for="headers">Headers:</label><br>-->
+    <!--                        <input type="text" class="headers-input" name="headersKey" placeholder="Key" oninput="addHeadersInputOfTestCase(event)">-->
+    <!--                        <input type="text" class="headers-input" name="headersValue" placeholder="Value" oninput="addHeadersInputOfTestCase(event)">-->
+    <!--                    </div>-->
+    <!--                    <br><br>-->
 
-                    <div id="headers">
-                        <label for="headers">Headers:</label><br>
-                        <input type="text" name="headersKey" placeholder="Key">
-                        <input type="text" name="headersValue" placeholder="Value">
-                        <br>
-                    </div>
-                    <button type="button" onclick="addHeader()">Add Header</button>
-                    <br><br>
+                        <label for="body">Body:</label><br>
+                        <textarea id="body" name="body" rows="5" cols="40"></textarea>
+                        <br><br>
 
-<!--                    <div id="headers">-->
-<!--                        <label for="headers">Headers:</label><br>-->
-<!--                        <input type="text" class="headers-input" name="headersKey" placeholder="Key" oninput="addHeadersInputOfTestCase(event)">-->
-<!--                        <input type="text" class="headers-input" name="headersValue" placeholder="Value" oninput="addHeadersInputOfTestCase(event)">-->
-<!--                    </div>-->
-<!--                    <br><br>-->
+                        <label for="statusCode">Status Code:</label><br>
+                        <input type="text" id="statusCode" name="statusCode">
+                        <br><br>
 
-                    <label for="body">Body:</label><br>
-                    <textarea id="body" name="body" rows="5" cols="40"></textarea>
-                    <br><br>
+                        <label for="expectedResponseBody">Expected Response Body:</label><br>
+                        <textarea id="expectedResponseBody" name="expectedResponseBody" rows="5" cols="40"></textarea>
+                        <br><br>
 
-                    <label for="statusCode">Status Code:</label><br>
-                    <input type="text" id="statusCode" name="statusCode">
-                    <br><br>
+                        <label for="intervalsTimeUnit">Intervals Time Unit:</label>
+                        <select name="intervalsTimeUnit" id="intervalsTimeUnit">
+                            <option value="Hour">Hour</option>
+                            <option value="Day">Day</option>
+                            <option value="Sec">Sec</option>
+                        </select>
+                        <br><br>
 
-                    <label for="expectedResponseBody">Expected Response Body:</label><br>
-                    <textarea id="expectedResponseBody" name="expectedResponseBody" rows="5" cols="40"></textarea>
-                    <br><br>
+                        <label for="intervalsTimeValue">Intervals Time Value:</label><br>
+                        <input type="number" id="intervalsTimeValue" name="intervalsTimeValue">
+                        <br><br>
 
-                    <label for="intervalsTimeUnit">Intervals Time Unit:</label>
-                    <select name="intervalsTimeUnit" id="intervalsTimeUnit">
-                        <option value="Hour">Hour</option>
-                        <option value="Day">Day</option>
-                        <option value="Sec">Sec</option>
-                    </select>
-                    <br><br>
+                        <label for="notification">Notification:</label><br>
+                        <select name="notification" id="notification">
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                        <br><br>
 
-                    <label for="intervalsTimeValue">Intervals Time Value:</label><br>
-                    <input type="number" id="intervalsTimeValue" name="intervalsTimeValue">
-                    <br><br>
+                        <div id="recipientEmail">
+                            <label for="recipientEmail">Recipient Email:</label><br>
+                            <input id="email" type="text" name="email" placeholder="Email">
+                            <br>
+                        </div>
+                        <button id="emailButton" type="button" onclick="addRecipientEmail()">Add Recipient Email</button>
+                        <br><br>
 
-                    <label for="notification">Notification:</label><br>
-                    <select name="notification" id="notification">
-                        <option value="Yes">Yes</option>
-                        <option value="No">No</option>
-                    </select>
-                    <br><br>
+                        <input type="submit" value="Add New Test Case">
+                    </form>
 
-                    <div id="recipientEmail">
-                        <label for="recipientEmail">Recipient Email:</label><br>
-                        <input id="email" type="text" name="email" placeholder="Email">
-                        <br>
-                    </div>
-                    <button id="emailButton" type="button" onclick="addRecipientEmail()">Add Recipient Email</button>
-                    <br><br>
-
-                    <input type="submit" value="Add New Test Case">
-                </form>
+                </div>
 
             </div>
 
         </div>
 
-    </div>
-
-    <script src="/testCase.js"></script>
+        <script src="/testCase.js"></script>
 
     </body>
 </html>

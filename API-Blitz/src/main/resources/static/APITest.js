@@ -1,18 +1,18 @@
 let selectedAPI = null;
+let method = null;
 
 document.getElementById('api-form').addEventListener('submit', function(event) {
     event.preventDefault();
 
     let formData = new FormData(this);
+    method = formData.get("method");
 
     let xhr = new XMLHttpRequest();
     xhr.open('POST', '/APITest.html');
     xhr.onload = function() {
         let response = JSON.parse(xhr.responseText);
-
         storedResponse = response;
         displayResponse(response);
-
     };
     xhr.send(formData);
 });
@@ -64,9 +64,13 @@ function displayResponse() {
 
     let responseBody = document.getElementById('response');
     responseBody.innerHTML = '';
-    let responseBodyText = formatJSON(response.body);
-    let responseBodyHtml = `Response Body: <pre><code>${responseBodyText}</code></pre>`;
-    responseBody.insertAdjacentHTML('beforeend', responseBodyHtml);
+    if (response.body == null) {
+        responseBody.innerHTML = 'There is no response body.';
+    } else {
+        let responseBodyText = formatJSON(response.body);
+        let responseBodyHtml = `Response Body: <pre><code>${responseBodyText}</code></pre>`;
+        responseBody.insertAdjacentHTML('beforeend', responseBodyHtml);
+    }
 }
 
 function displayHeader() {
@@ -90,30 +94,38 @@ function displayHeader() {
 
     let optionButton = document.getElementById('option-button');
     optionButton.innerHTML = '';
-    optionButton.insertAdjacentHTML('beforeend','<button id="show-response-body" onclick="displayResponse()">Body</button>');
+    optionButton.insertAdjacentHTML('beforeend', '<button id="show-response-body" onclick="displayResponse()">Body</button>');
 
     let responseHeader = document.getElementById('response');
     responseHeader.innerHTML = '';
     let TitleHtml = `Response Header:`;
-    let connectionHtml = `Connection: ${response.headers["Connection"]}`;
-    let contentTypeHtml = `Content-Length: ${response.headers["Content-Length"]}`;
-    let dateHtml = `Date: ${response.headers["Date"]}`;
     let serverHtml = `Server: ${response.headers["Server"]}`;
-    let transferEncodingHtml = `Transformer-Encoding: ${response.headers["Transformer-Encoding"]}`;
-    let varyHtml = `Vary: ${response.headers["Vary"]}`;
+    let dateHtml = `Date: ${response.headers["Date"]}`;
+    let contentTypeHtml = `Content-Type: ${response.headers["Content-Type"]}`;
+
     responseHeader.insertAdjacentHTML('beforeend', TitleHtml);
     responseHeader.insertAdjacentHTML('beforeend', '<br><br>');
-    responseHeader.insertAdjacentHTML('beforeend', connectionHtml);
-    responseHeader.insertAdjacentHTML('beforeend', '<br>');
-    responseHeader.insertAdjacentHTML('beforeend', contentTypeHtml);
+    responseHeader.insertAdjacentHTML('beforeend', serverHtml);
     responseHeader.insertAdjacentHTML('beforeend', '<br>');
     responseHeader.insertAdjacentHTML('beforeend', dateHtml);
     responseHeader.insertAdjacentHTML('beforeend', '<br>');
-    responseHeader.insertAdjacentHTML('beforeend', serverHtml);
+    responseHeader.insertAdjacentHTML('beforeend', contentTypeHtml);
     responseHeader.insertAdjacentHTML('beforeend', '<br>');
-    responseHeader.insertAdjacentHTML('beforeend', transferEncodingHtml);
-    responseHeader.insertAdjacentHTML('beforeend', '<br>');
-    responseHeader.insertAdjacentHTML('beforeend', varyHtml);
+
+    if (method !== "OPTIONS") {
+        let transferEncodingHtml = `Transfer-Encoding: ${response.headers["Transfer-Encoding"]}`;
+        let connectionHtml = `Connection: ${response.headers["Connection"]}`;
+        let varyHtml = `Vary: ${response.headers["Vary"]}`;
+
+        responseHeader.insertAdjacentHTML('beforeend', transferEncodingHtml);
+        responseHeader.insertAdjacentHTML('beforeend', '<br>');
+        responseHeader.insertAdjacentHTML('beforeend', connectionHtml);
+        responseHeader.insertAdjacentHTML('beforeend', '<br>');
+        responseHeader.insertAdjacentHTML('beforeend', varyHtml);
+    } else {
+        let allowHtml = `Allow: ${response.headers["Allow"]}`;
+        responseHeader.insertAdjacentHTML('beforeend', allowHtml);
+    }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -172,6 +184,13 @@ function showHistory() {
                 console.error('There was an error!', error);
             });
     }
+}
+
+let urlParams = new URLSearchParams(window.location.search);
+if (urlParams.has("selectedAPI")) {
+    let api = urlParams.get("selectedAPI");
+    selectedAPI = JSON.parse(api);
+    insertData(selectedAPI);
 }
 
 function insertData(selectedAPI) {

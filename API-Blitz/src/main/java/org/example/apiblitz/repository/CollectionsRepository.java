@@ -1,24 +1,20 @@
 package org.example.apiblitz.repository;
 
 import lombok.extern.slf4j.Slf4j;
-import org.example.apiblitz.model.Collection;
+import org.example.apiblitz.model.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
 
 @Repository
 @Slf4j
 @Transactional
-public class CollectionRepository {
+public class CollectionsRepository {
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
@@ -29,7 +25,7 @@ public class CollectionRepository {
 				"SELECT JSON_ARRAYAGG(" +
 				"JSON_OBJECT(" +
 				"'requestName', requestName," +
-				"'APIUrl', APIUrl," +
+				"'apiurl', apiurl," +
 				"'method', method," +
 				"'queryParams', IFNULL(queryParams, 'null')," +
 				"'headers', IFNULL(headers, 'null')," +
@@ -39,33 +35,24 @@ public class CollectionRepository {
 		return jdbcTemplate.queryForList(getCollectionSql, userId);
 	}
 
-	public void insertToCollectionsTable(Integer userId, Collection collection) throws SQLException {
+	public void insertToCollectionsTable(Integer userId, Collections collection) throws SQLException {
 
 		String insertToCollectionTableSql = "INSERT INTO collections (collectionName, description, userId) " +
 				"VALUES (?, ?, ?)";
 
-		KeyHolder keyHolder = new GeneratedKeyHolder();
-
-		jdbcTemplate.update(connection -> {
-			PreparedStatement ps = connection.prepareStatement(insertToCollectionTableSql, Statement.RETURN_GENERATED_KEYS);
-			ps.setString(1, collection.getCollectionName());
-			ps.setString(2, collection.getDescription());
-			ps.setInt(3, userId);
-			return ps;
-		}, keyHolder);
-
-		// Get collection id
-		Integer collectionId = keyHolder.getKey().intValue();
-		insertToCollectionDetailsTable(collectionId, collection);
+		jdbcTemplate.update(insertToCollectionTableSql,
+				collection.getCollectionName(),
+				collection.getDescription(),
+				userId);
 
 		log.info("Successfully insert to collections table!");
 	}
 
-	public void insertToCollectionDetailsTable(Integer collectionId, Collection collection) {
+	public void addAPIToCollection(Integer collectionId, Collections collection) throws SQLException {
 
-		String insertToCollectionDetailsTableSql = "INSERT INTO collectionDetails (collectionId, requestName, " +
-				"APIUrl, method, queryParams, headers, body) VALUES (?, ?, ?, ?, ?, ?)";
-		jdbcTemplate.update(insertToCollectionDetailsTableSql,
+		String addAPISql = "INSERT INTO collectionDetails (collectionId, requestName, APIUrl, method, " +
+				"queryParams, headers, body) VALUES (?, ?, ?, ?, ?, ?, ?)";
+		jdbcTemplate.update(addAPISql,
 				collectionId,
 				collection.getRequestName(),
 				collection.getRequest().getAPIUrl(),
@@ -73,9 +60,11 @@ public class CollectionRepository {
 				collection.getRequest().getQueryParams(),
 				collection.getRequest().getHeaders(),
 				collection.getRequest().getBody());
+
+		log.info("Successfully added API to the collection!");
 	}
 
-	public void updateCollection(Integer collectionId, Collection collection) throws SQLException {
+	public void updateCollection(Integer collectionId, Collections collection) throws SQLException {
 
 		String updateCollectionSql = "UPDATE collections SET collectionName = ?, description = ? WHERE id = ?";
 		jdbcTemplate.update(updateCollectionSql,
@@ -92,20 +81,8 @@ public class CollectionRepository {
 				collection.getRequest().getHeaders(),
 				collection.getRequest().getBody(),
 				collectionId);
-	}
 
-	public void addAPIToCollection(Integer collectionId, Collection collection) throws SQLException {
-
-		String addCollectionSql = "UPDATE collectionDetails SET requestName = ?, APIUrl = ?, method = ?, " +
-				"queryParams = ?, headers = ?, body = ? WHERE collectionId = ?";
-		jdbcTemplate.update(addCollectionSql,
-				collection.getRequestName(),
-				collection.getRequest().getAPIUrl(),
-				collection.getRequest().getMethod(),
-				collection.getRequest().getQueryParams(),
-				collection.getRequest().getHeaders(),
-				collection.getBody(),
-				collectionId);
+		log.info("Update successfully!");
 	}
 
 	public void deleteCollection(Integer userId, String collectionName, String requestName) throws SQLException {
@@ -122,5 +99,7 @@ public class CollectionRepository {
 					"requestName = ?";
 			jdbcTemplate.update(deleteCollectionDetailsSql, collectionId, requestName);
 		}
+
+		log.info("Delete successfully!");
 	}
 }

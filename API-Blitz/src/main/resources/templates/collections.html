@@ -4,16 +4,15 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>API Blitz</title>
-        <link rel="stylesheet" href="APITest.css">
+        <link rel="stylesheet" href="/collections.css">
     </head>
-
     <body>
 
         <header>
 
             <div class="nav">
-                <a href="APITest.html">
-                    <img id="logo" src="logo.png" alt="Logo">
+                <a href="/APITest.html">
+                    <img id="logo" src="/logo.png" alt="Logo">
                 </a>
 
                 <h1>API Blitz</h1>
@@ -27,25 +26,25 @@
 
                 <br><br>
                 <a href="APITest.html" class="sidebar-link">
-                    <img id="test" src="test.png" alt="test">
+                    <img id="test" src="/test.png" alt="test">
                     <p>API Test</p>
                 </a>
 
                 <br><br>
                 <a href="/api/1.0/testCase" class="sidebar-link">
-                    <img id="auto-test" src="auto-test.png" alt="test">
+                    <img id="auto-test" src="/auto-test.png" alt="test">
                     <p>Automated Testing</p>
                 </a>
 
                 <br><br>
                 <a href="/api/1.0/testCase/modifyTestCase" class="sidebar-link">
-                    <img id="my-test-case" src="myTestCase.png" alt="test">
+                    <img id="my-test-case" src="/myTestCase.png" alt="test">
                     <p>My Test Case</p>
                 </a>
 
                 <br><br>
                 <a href="/api/1.0/autoTest/monitor" class="sidebar-link">
-                    <img id="monitor" src="monitor.png" alt="test">
+                    <img id="monitor" src="/monitor.png" alt="test">
                     <p>Monitor</p>
                 </a>
 
@@ -59,15 +58,43 @@
 
             <div id="container">
 
-                <div class="content">
-                    <h1>API Data</h1><br>
+                <div class="collection-container">
 
-                    <button id="show-history" onclick="showHistory()">API History</button>
+                    <h1>Collections</h1><br>
+
+                    <button id="create-collection" onclick="createCollection()">Create Collection</button>
                     <br><br>
 
-                    <div id="api-history-list" style="display: none"></div>
+                    <form id="collection-form" method="post" style="display: none">
 
-                    <form id="api-form" action="/APITest.html" method="post">
+                        <label for="collectionName">Collection Name:</label><br>
+                        <input type="text" id="collectionName" name="collectionName" style="width: 300px;">
+                        <br><br>
+
+                        <label for="description">Description:</label><br>
+                        <textarea id="description" name="description" rows="5" cols="40"></textarea>
+                        <br><br>
+
+                        <input id="collection-button" type="submit" value="Create">
+                    </form>
+                    <br><br>
+
+                    <div id="collection-list"></div>
+
+                </div>
+
+                <div id="api-form-container">
+
+                    <h1>API Data</h1><br>
+
+                    <button id="add-api" onclick="addAPI()">Add API</button>
+                    <br><br>
+
+                    <form id="api-form" method="post" style="display: none">
+
+                        <label for="requestName">Request Name:</label><br>
+                        <input type="text" id="requestName" name="requestName" style="width: 300px;">
+                        <br><br>
 
                         <label for="method"></label>
                         <select name="method" id="method">
@@ -93,12 +120,12 @@
                         <button id="queryParamsButton" type="button" onclick="addQueryParam()">Add Query Param</button>
                         <br><br>
 
-    <!--                    <div id="queryParams">-->
-    <!--                        <label for="queryParams">Query Params:</label><br>-->
-    <!--                        <input type="text" class="dynamic-input" name="paramsKey" placeholder="Key" oninput="addQueryParamsInput(event)">-->
-    <!--                        <input type="text" class="dynamic-input" name="paramsValue" placeholder="Value" oninput="addQueryParamsInput(event)">-->
-    <!--                    </div>-->
-    <!--                    <br><br>-->
+                        <!--                    <div id="queryParams">-->
+                        <!--                        <label for="queryParams">Query Params:</label><br>-->
+                        <!--                        <input type="text" class="dynamic-input" name="paramsKey" placeholder="Key" oninput="addQueryParamsInput(event)">-->
+                        <!--                        <input type="text" class="dynamic-input" name="paramsValue" placeholder="Value" oninput="addQueryParamsInput(event)">-->
+                        <!--                    </div>-->
+                        <!--                    <br><br>-->
 
                         <div id="authorization">
                             <label for="authorization">Authorization:</label><br>
@@ -117,36 +144,29 @@
                         <button id="headersButton" type="button" onclick="addHeader()">Add Header</button>
                         <br><br>
 
-    <!--                    <div id="headers">-->
-    <!--                        <label for="headers">Headers:</label><br>-->
-    <!--                        <input type="text" class="headers-input" name="headersKey" placeholder="Key" oninput="addHeadersInput(event)">-->
-    <!--                        <input type="text" class="headers-input" name="headersValue" placeholder="Value" oninput="addHeadersInput(event)">-->
-    <!--                    </div>-->
-    <!--                    <br><br>-->
+                        <!--                    <div id="headers">-->
+                        <!--                        <label for="headers">Headers:</label><br>-->
+                        <!--                        <input type="text" class="headers-input" name="headersKey" placeholder="Key" oninput="addHeadersInput(event)">-->
+                        <!--                        <input type="text" class="headers-input" name="headersValue" placeholder="Value" oninput="addHeadersInput(event)">-->
+                        <!--                    </div>-->
+                        <!--                    <br><br>-->
 
                         <label for="body">Body:</label><br>
                         <textarea id="body" name="body" rows="5" cols="40"></textarea>
                         <br><br>
 
-                        <input type="submit" value="Send">
+                        <input type="submit" value="Add">
                     </form>
-                    <br><br>
-                </div>
 
-                <div id="response-container">
-                    <h1>Response<br></h1>
-                    <div id="status-code"></div>
-                    <div id="response-time"> </div>
-                    <div id="response-size"></div>
-                    <div id="option-button"></div>
-                    <div id="response"></div>
+                    <div id="api-list"></div>
+
                 </div>
 
             </div>
 
         </div>
 
-        <script src="APITest.js"></script>
+        <script src="/collections.js"></script>
 
     </body>
 </html>

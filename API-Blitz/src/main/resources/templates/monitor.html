@@ -10,59 +10,65 @@
 
     <body>
 
-    <header>
+        <header>
 
-        <div class="nav">
-            <a href="/APITest.html">
-                <img id="logo" src="/logo.png" alt="Logo">
-            </a>
+            <div class="nav">
+                <a href="/APITest.html">
+                    <img id="logo" src="/logo.png" alt="Logo">
+                </a>
 
-            <h1>API Blitz</h1>
+                <h1>API Blitz</h1>
+            </div>
+
+        </header>
+
+        <div class="content-wrapper">
+
+            <div class="sidebar">
+
+                <br><br>
+                <a href="/APITest.html" class="sidebar-link">
+                    <img id="test" src="/test.png" alt="test">
+                    <p>API Test</p>
+                </a>
+
+                <br><br>
+                <a href="/api/1.0/testCase" class="sidebar-link">
+                    <img id="auto-test" src="/auto-test.png" alt="test">
+                    <p>Automated Testing</p>
+                </a>
+
+                <br><br>
+                <a href="/api/1.0/testCase/modifyTestCase" class="sidebar-link">
+                    <img id="my-test-case" src="/myTestCase.png" alt="test">
+                    <p>My Test Case</p>
+                </a>
+
+                <br><br>
+                <a href="/api/1.0/autoTest/monitor" class="sidebar-link">
+                    <img id="monitor" src="/monitor.png" alt="test">
+                    <p>Monitor</p>
+                </a>
+
+                <br><br>
+                <a href="/api/1.0/collections" class="sidebar-link">
+                    <img id="collections" src="/collections.png" alt="test">
+                    <p>Collections</p>
+                </a>
+
+            </div>
+
+            <div id="container">
+
+                <div id="test-case-id-list"></div>
+                <div id='test-result-dashboard'></div>
+                <div id="test-result"></div>
+
+            </div>
+
         </div>
 
-    </header>
-
-    <div class="content-wrapper">
-
-        <div class="sidebar">
-
-            <br><br>
-            <a href="/APITest.html" class="sidebar-link">
-                <img id="test" src="/test.png" alt="test">
-                <p>API Test</p>
-            </a>
-
-            <br><br>
-            <a href="/api/1.0/testCase" class="sidebar-link">
-                <img id="auto-test" src="/auto-test.png" alt="test">
-                <p>Automated Testing</p>
-            </a>
-
-            <br><br>
-            <a href="/api/1.0/testCase/modifyTestCase" class="sidebar-link">
-                <img id="my-test-case" src="/myTestCase.png" alt="test">
-                <p>My Test Case</p>
-            </a>
-
-            <br><br>
-            <a href="/api/1.0/autoTest/monitor" class="sidebar-link">
-                <img id="monitor" src="/monitor.png" alt="test">
-                <p>Monitor</p>
-            </a>
-
-        </div>
-
-        <div id="container">
-
-            <div id="test-case-id-list"></div>
-            <div id='test-result-dashboard'></div>
-            <div id="test-result"></div>
-
-        </div>
-
-    </div>
-
-    <script src="/monitor.js"></script>
+        <script src="/monitor.js"></script>
 
     </body>
 </html>

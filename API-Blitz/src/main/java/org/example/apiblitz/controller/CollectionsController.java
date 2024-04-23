@@ -1,8 +1,8 @@
 package org.example.apiblitz.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.example.apiblitz.model.Collection;
-import org.example.apiblitz.service.CollectionService;
+import org.example.apiblitz.model.Collections;
+import org.example.apiblitz.service.CollectionsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,11 +16,16 @@ import java.util.Map;
 
 @Controller
 @Slf4j
-@RequestMapping("/api/1.0/collection")
-public class CollectionController {
+@RequestMapping("/api/1.0/collections")
+public class CollectionsController {
 
 	@Autowired
-	CollectionService collectionService;
+	CollectionsService collectionService;
+
+	@GetMapping
+	public String collectionsPage() {
+		return "collections";
+	}
 
 	@GetMapping(path = "/get")
 	public ResponseEntity<?> getCollections(Integer userId) {
@@ -39,7 +44,7 @@ public class CollectionController {
 	@PostMapping(path = "/create")
 	public String createCollection(
 			Integer userId,
-			@ModelAttribute Collection collection,
+			@ModelAttribute Collections collection,
 			BindingResult bindingResult) throws BindException {
 
 		if (bindingResult.hasErrors()) {
@@ -51,21 +56,23 @@ public class CollectionController {
 		} catch (Exception e) {
 			log.error(e.getMessage());
 		}
-		return "redirect:/api/1.0/collection";
+		return "redirect:/api/1.0/collections";
 	}
 
-	@PostMapping(path = "/update")
-	public ResponseEntity<?> updateCollection(
+	@PostMapping(path = "/create/addAPI")
+	public ResponseEntity<?> addAPIToCollection(
 			Integer collectionId,
-			@ModelAttribute Collection collection,
+			@ModelAttribute Collections collection,
 			BindingResult bindingResult) throws BindException {
+
+		System.out.println(collection);
 
 		if (bindingResult.hasErrors()) {
 			throw new BindException(bindingResult);
 		}
 
 		try {
-			collectionService.update(collectionId, collection);
+			collectionService.add(collectionId, collection);
 			return ResponseEntity
 					.ok()
 					.build();
@@ -75,10 +82,10 @@ public class CollectionController {
 		}
 	}
 
-	@PostMapping(path = "/update/addAPI")
-	public ResponseEntity<?> addAPIToCollection(
+	@PostMapping(path = "/update")
+	public ResponseEntity<?> updateCollection(
 			Integer collectionId,
-			@ModelAttribute Collection collection,
+			@ModelAttribute Collections collection,
 			BindingResult bindingResult) throws BindException {
 
 		if (bindingResult.hasErrors()) {
@@ -86,7 +93,7 @@ public class CollectionController {
 		}
 
 		try {
-			collectionService.add(collectionId, collection);
+			collectionService.update(collectionId, collection);
 			return ResponseEntity
 					.ok()
 					.build();
