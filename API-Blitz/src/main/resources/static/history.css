@@ -90,20 +90,6 @@ header {
     margin-top: 150px;
 }
 
-pre {
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 14px;
-    line-height: 1.5;
-    color: #333;
-    max-height: 500px;
-    overflow-y: auto;
-}
-
 .sidebar-link {
     text-decoration: none;
     color: black;
@@ -112,11 +98,7 @@ pre {
 }
 
 #container {
-    display: flex;
-    justify-content: space-around;
-    flex: 1;
-    gap: 100px;
-    padding: 50px;
+    padding: 100px;
 }
 
 .content {
@@ -126,4 +108,9 @@ pre {
 #response-container {
     grid-column: 2;
     flex-basis: 1000px;
+}
+
+#api {
+    border: 2px solid black;
+    padding: 20px;
 }

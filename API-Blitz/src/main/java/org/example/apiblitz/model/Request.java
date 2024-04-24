@@ -8,6 +8,7 @@ import lombok.Data;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Request {
 	private String APIUrl;
+	private String apiurl;
 	private String method;
 	private Object queryParams;
 	@Column(name = "headers")

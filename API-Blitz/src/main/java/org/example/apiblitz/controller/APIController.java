@@ -41,6 +41,11 @@ public class APIController {
 		}
 	}
 
+	@GetMapping ("/history")
+	public String historyPage() {
+		return "history";
+	}
+
 	@GetMapping("/APITest/history")
 	public ResponseEntity<?> getHistory(@RequestParam Integer userId) {
 		List<Request> historyList = apiService.getAllHistory(userId);

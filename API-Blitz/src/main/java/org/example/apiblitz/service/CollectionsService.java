@@ -55,9 +55,20 @@ public class CollectionsService {
 
 	public void add(Integer collectionId, Collections collection) {
 
+		Request request = new Request();
+
 		// Package API data into http request
-		APIData apiData = setAPIData(collection);
-		Request request = apiService.httpRequest(apiData);
+		if (collection.getParamsKey() != null) {
+			APIData apiData = setAPIData(collection);
+			request = apiService.httpRequest(apiData);
+		} else {
+			request.setAPIUrl(collection.getApiurl());
+			request.setMethod(collection.getMethod());
+			request.setQueryParams(collection.getQueryParams());
+			request.setHeaders(collection.getHeaders());
+			request.setBody(collection.getBody());
+		}
+
 		collection.setRequest(request);
 
 		try {

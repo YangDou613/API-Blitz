@@ -4,10 +4,8 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>API Blitz</title>
-        <link rel="stylesheet" href="/monitor.css">
-        <script src='https://cdn.plot.ly/plotly-2.31.1.min.js'></script>
+        <link rel="stylesheet" href="/history.css">
     </head>
-
     <body>
 
         <header>
@@ -27,7 +25,7 @@
             <div class="sidebar">
 
                 <br><br>
-                <a href="/APITest.html" class="sidebar-link">
+                <a href="APITest.html" class="sidebar-link">
                     <img id="test" src="/test.png" alt="test">
                     <p>API Test</p>
                 </a>
@@ -66,15 +64,17 @@
 
             <div id="container">
 
-                <div id="test-case-id-list"></div>
-                <div id='test-result-dashboard'></div>
-                <div id="test-result"></div>
+                <h1>API Test History</h1><br>
+
+                <div id="collection-list"></div>
+
+                <div id="api-list"></div>
 
             </div>
 
         </div>
 
-        <script src="/monitor.js"></script>
+        <script src="/history.js"></script>
 
     </body>
 </html>

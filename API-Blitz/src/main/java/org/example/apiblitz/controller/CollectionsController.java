@@ -80,6 +80,27 @@ public class CollectionsController {
 		}
 	}
 
+	@PostMapping(path = "/create/addHistoryAPI")
+	public ResponseEntity<?> addHistoryAPIToCollection(
+			Integer collectionId,
+			@RequestBody Collections collection,
+			BindingResult bindingResult) throws BindException {
+
+		if (bindingResult.hasErrors()) {
+			throw new BindException(bindingResult);
+		}
+
+		try {
+			collectionService.add(collectionId, collection);
+			return ResponseEntity
+					.ok()
+					.build();
+		} catch (Exception e) {
+			log.info(e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error");
+		}
+	}
+
 	@PostMapping(path = "/update")
 	public ResponseEntity<?> updateCollection(
 			Integer collectionId,

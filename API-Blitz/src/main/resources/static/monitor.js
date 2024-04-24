@@ -51,7 +51,7 @@ function dashboard(data) {
     let additionalData = [];
     data.forEach(testResult => {
         x.push(testResult["testTime"])
-        y.push(testResult["executionDuration"]/1000)
+        y.push(testResult["executionDuration"])
         additionalData.push(testResult);
         if (testResult["result"].toString() === "failed") {
             color.push('rgba(222,45,38,0.8)')
@@ -76,7 +76,7 @@ function dashboard(data) {
             title: 'Test Time',
         },
         yaxis: {
-            title: 'Execution Duration (s)',
+            title: 'Execution Duration (ms)',
         }
 
     };

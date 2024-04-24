@@ -12,12 +12,15 @@ public class Collections {
 	private String collectionName;
 	private String description;
 	private String requestName;
+	private String apiurl;
 	private String url;
 	private String method;
+	private Object queryParams;
 	private ArrayList<Object> paramsKey;
 	private ArrayList<Object> paramsValue;
 	private String authorizationKey;
 	private String authorizationValue;
+	private String headers;
 	private ArrayList<String> headersKey;
 	private ArrayList<String> headersValue;
 	private String body;

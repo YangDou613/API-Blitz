@@ -88,6 +88,9 @@ function showAPIData(collection) {
             const method = document.createElement('p');
             method.innerHTML = api["method"];
             apiList.appendChild(method);
+            const requestName = document.createElement('p');
+            requestName.innerHTML = api["requestName"];
+            apiList.appendChild(requestName);
             const button = document.createElement('button');
             button.innerText = api["apiurl"];
             apiList.appendChild(button);
