@@ -1,3 +1,4 @@
+let response = null;
 let selectedAPI = null;
 let method = null;
 
@@ -10,9 +11,8 @@ document.getElementById('api-form').addEventListener('submit', function(event) {
     let xhr = new XMLHttpRequest();
     xhr.open('POST', '/APITest.html');
     xhr.onload = function() {
-        let response = JSON.parse(xhr.responseText);
-        storedResponse = response;
-        displayResponse(response);
+        response = JSON.parse(xhr.responseText);
+        displayResponse();
     };
     xhr.send(formData);
 });
@@ -41,8 +41,6 @@ function addHeader() {
 
 function displayResponse() {
 
-    let response = storedResponse;
-
     let statusCode = document.getElementById('status-code');
     statusCode.innerHTML = '';
     let responseCodeHtml = `Status Code: ${response.statusCodeValue}`;
@@ -64,8 +62,17 @@ function displayResponse() {
 
     let responseBody = document.getElementById('response');
     responseBody.innerHTML = '';
+
+    let contentType = getContentType();
+
     if (response.body == null) {
         responseBody.innerHTML = 'There is no response body.';
+    } else if (contentType === "image") {
+        const imageURL = btoa(response.body);
+        let img = document.createElement("img");
+        img.src = `data:image/bmp;base64, ${imageURL}`;
+        responseBody.insertAdjacentHTML("beforeend", "<br>");
+        responseBody.appendChild(img);
     } else {
         let responseBodyText = formatJSON(response.body);
         let responseBodyHtml = `Response Body: <pre><code>${responseBodyText}</code></pre>`;
@@ -73,9 +80,12 @@ function displayResponse() {
     }
 }
 
-function displayHeader() {
+function getContentType() {
+    let contentType = response.headers["Content-Type"];
+    return contentType[0].split("/")[0];
+}
 
-    let response = storedResponse;
+function displayHeader() {
 
     let statusCode = document.getElementById('status-code');
     statusCode.innerHTML = '';
