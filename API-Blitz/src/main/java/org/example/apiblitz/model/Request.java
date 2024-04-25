@@ -17,4 +17,5 @@ public class Request {
 	@Column(name = "body")
 	private Object requestBody;
 	private String body;
+	private Integer collectionDetailsId;
 }

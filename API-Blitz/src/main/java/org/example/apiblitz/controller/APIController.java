@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.example.apiblitz.model.*;
 import org.example.apiblitz.service.APIService;
+import org.example.apiblitz.service.AutoTestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
@@ -19,6 +20,9 @@ public class APIController {
 
 	@Autowired
 	APIService apiService;
+
+	@Autowired
+	AutoTestService autoTestService;
 
 	@GetMapping ("/APITest.html")
 	public String APITestPage() {

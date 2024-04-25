@@ -1,12 +1,14 @@
 package org.example.apiblitz.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.example.apiblitz.model.APIData;
 import org.example.apiblitz.model.Request;
 import org.example.apiblitz.repository.APIRepository;
+import org.example.apiblitz.repository.CollectionsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -16,10 +18,11 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,6 +37,9 @@ public class APIService {
 
 	@Autowired
 	APIRepository apiRepository;
+
+	@Autowired
+	CollectionsRepository collectionsRepository;
 
 	public ResponseEntity<?> APITest(APIData apiData) {
 
@@ -81,7 +87,7 @@ public class APIService {
 			// API url
 			String APIUrl;
 			if (apiData.getParamsKey() != null) {
-				APIUrl = AddParamsToAPIUrl(apiData.getUrl(), apiData.getParamsKey(), apiData.getParamsValue());
+				APIUrl = addParamsToAPIUrl(apiData.getUrl(), apiData.getParamsKey(), apiData.getParamsValue());
 			} else {
 				APIUrl = apiData.getUrl();
 			}
@@ -190,7 +196,87 @@ public class APIService {
 		}
 	}
 
-	public String AddParamsToAPIUrl(String APIUrl, ArrayList<Object> paramsKey, ArrayList<Object> paramsValue) {
+	public List<ResponseEntity<?>> sendRequestAtSameTime(Integer collectionId, List<Request> requests) {
+
+		ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
+		List<Callable<Map.Entry<Integer, ResponseEntity<?>>>> callables = new ArrayList<>();
+
+		// Test Date
+		LocalDate testDate = LocalDate.now();
+
+		// Test time
+		LocalTime testTime = LocalTime.now();
+
+		try {
+			for (Request request : requests) {
+
+				if (request.getQueryParams() != null) {
+					request.setAPIUrl(addParams(request.getAPIUrl(), request.getQueryParams()));
+				}
+
+				if (request.getBody() != null) {
+					request.setRequestBody(objectMapper.readValue(request.getBody(), Object.class));
+				}
+
+				// Header
+				HttpHeaders headers = new HttpHeaders();
+				headers.setContentType(MediaType.APPLICATION_JSON);
+				Object requestHeaders = objectMapper.writeValueAsString(headers);
+				request.setRequestHeaders(requestHeaders);
+
+				Integer collectionDetailsId = request.getCollectionDetailsId();
+
+				callables.add(() -> {
+					String threadName = Thread.currentThread().getName();
+					Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+					System.out.println(timestamp + "  Sending request in thread: " + threadName);
+					ResponseEntity<?> responseEntity = sendRequest(request);
+					return new AbstractMap.SimpleEntry<>(collectionDetailsId, responseEntity);
+				});
+			}
+
+			List<Future<Map.Entry<Integer, ResponseEntity<?>>>> futures = cachedThreadPool.invokeAll(callables);
+
+			List<ResponseEntity<?>> responseList = new ArrayList<>();
+			for (Future<Map.Entry<Integer, ResponseEntity<?>>> future : futures) {
+				Map.Entry<Integer, ResponseEntity<?>> entry = future.get();
+				Integer collectionDetailsId = entry.getKey();
+				ResponseEntity<?> responseEntity = entry.getValue();
+				collectionsRepository.insertToCollectionTestResult(
+						collectionId, collectionDetailsId, testDate, testTime, responseEntity);
+				responseList.add(responseEntity);
+			}
+			return responseList;
+		} catch (JsonProcessingException | InterruptedException | ExecutionException e) {
+			log.error(e.getMessage());
+			return null;
+		} finally {
+			cachedThreadPool.shutdown();
+		}
+	}
+
+	public String addParams(String APIUrl, Object getQueryParams) throws JsonProcessingException {
+
+		boolean isFirstIteration = true;
+
+		Map<String, Object> queryParams = objectMapper.readValue(getQueryParams.toString(), new TypeReference<>() {});
+
+		for (Map.Entry<String, Object> queryParam : queryParams.entrySet()) {
+			String key = queryParam.getKey();
+			Object value = queryParam.getValue();
+			String param = key + "=" + value;
+			if (isFirstIteration) {
+				APIUrl += "?";
+				isFirstIteration = false;
+			} else {
+				APIUrl += "&";
+			}
+			APIUrl += param;
+		}
+		return APIUrl;
+	}
+
+	public String addParamsToAPIUrl(String APIUrl, ArrayList<Object> paramsKey, ArrayList<Object> paramsValue) {
 
 		for (int i = 0; i < paramsKey.size(); i++) {
 			String param = paramsKey.get(i) + "=" + paramsValue.get(i);
@@ -237,7 +323,6 @@ public class APIService {
 	public HttpEntity<?> getHttpEntity(Request request) {
 
 		MultiValueMap<String, String> requestHeaders = convertJsonToMultiValueMap((String) request.getRequestHeaders());
-
 		return new HttpEntity<>(request.getRequestBody(), requestHeaders);
 	}
 

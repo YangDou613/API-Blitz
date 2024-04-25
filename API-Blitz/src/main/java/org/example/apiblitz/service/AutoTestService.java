@@ -46,7 +46,7 @@ public class AutoTestService {
 		// Set API url
 		String APIUrl;
 		if (request.getQueryParams() != null) {
-			APIUrl = AddParamsToAPIUrl(request.getAPIUrl(), request.getQueryParams());
+			APIUrl = addParamsToAPIUrl(request.getAPIUrl(), request.getQueryParams());
 		} else {
 			APIUrl = request.getAPIUrl();
 		}
@@ -127,7 +127,7 @@ public class AutoTestService {
 		return "pass";
 	}
 
-	public String AddParamsToAPIUrl(String APIUrl, Object getQueryParams) throws JsonProcessingException {
+	public String addParamsToAPIUrl(String APIUrl, Object getQueryParams) throws JsonProcessingException {
 
 		boolean isFirstIteration = true;
 

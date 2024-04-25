@@ -87,6 +87,16 @@ public class CollectionsService {
 		}
 	}
 
+	public List<Request> getAPIList(Integer collectionId) {
+
+		try {
+			return collectionRepository.getAllAPIFromCollection(collectionId);
+		} catch (SQLException e) {
+			log.error(e.getMessage());
+			return null;
+		}
+	}
+
 	public APIData setAPIData(Collections collection) {
 
 		APIData apiData = new APIData();

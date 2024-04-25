@@ -2,6 +2,8 @@ package org.example.apiblitz.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.example.apiblitz.model.Collections;
+import org.example.apiblitz.model.Request;
+import org.example.apiblitz.service.APIService;
 import org.example.apiblitz.service.CollectionsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,6 +23,9 @@ public class CollectionsController {
 
 	@Autowired
 	CollectionsService collectionService;
+
+	@Autowired
+	APIService apiService;
 
 	@GetMapping
 	public String collectionsPage() {
@@ -135,6 +140,37 @@ public class CollectionsController {
 					.build();
 		} catch (Exception e) {
 			log.info(e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error");
+		}
+	}
+
+	@GetMapping(path = "/getAllAPI")
+	public ResponseEntity<List<Request>> getAllAPI(Integer collectionId) {
+
+		List<Request> apiList = collectionService.getAPIList(collectionId);
+
+		if (apiList != null) {
+			return ResponseEntity.ok().body(apiList);
+		} else {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		}
+	}
+
+	@PostMapping("/runAll")
+	public ResponseEntity<?> getResponseAtSameTime(
+			Integer collectionId,
+			@RequestBody List<Request> requests) {
+
+		try {
+			List<ResponseEntity<?>> responseList = apiService.sendRequestAtSameTime(collectionId, requests);
+
+			if (responseList == null) {
+				return ResponseEntity.badRequest().build();
+			}
+
+			return ResponseEntity.ok(responseList);
+		} catch (Exception e) {
+			log.error(e.getMessage());
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error");
 		}
 	}

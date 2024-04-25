@@ -2,6 +2,7 @@ let selectedAPI;
 let selectedCollection;
 let selectedCollectionName;
 let selectedRequestId;
+let apiArray;
 
 function createCollection() {
     const dom = document.getElementById("collection-form")
@@ -77,13 +78,18 @@ fetch('/api/1.0/collections/get?userId=1')
 
 function showAPIData(collection) {
 
-    const apiArray = JSON.parse(collection["collectionDetails"]);
+    apiArray = JSON.parse(collection["collectionDetails"]);
 
     const apiList = document.getElementById('api-list');
 
     if (apiArray === null) {
         apiList.innerText = "You don't have any API data yet.";
     } else {
+
+        const runAllButton = document.createElement("button");
+        runAllButton.innerText = "Run All";
+        apiList.appendChild(runAllButton);
+
         apiArray.forEach(api => {
             const method = document.createElement('p');
             method.innerHTML = api["method"];
@@ -111,7 +117,51 @@ function showAPIData(collection) {
                 deleteAPI(selectedCollectionName, selectedRequestId);
             });
         });
+        runAllButton.addEventListener("click", () => {
+            getAPIList(selectedCollection);
+        })
     }
+}
+
+function getAPIList(selectedCollection) {
+    fetch('/api/1.0/collections/getAllAPI?collectionId=' + selectedCollection, {
+        method: 'GET'
+    })
+        .then(response => response.json())
+        .then(apiList => {
+            for (let i = 0; i < apiList.length; i++) {
+                let api = apiList[i];
+                api.collectionDetailsId = apiArray[i].id;
+            }
+            testAllAPI(apiList)
+        })
+        .catch(error => {
+            console.error('Error submitting form:', error);
+        });
+}
+
+function testAllAPI(apiList) {
+
+    const requestHeader = {
+        'Content-Type': 'application/json'
+    };
+
+    fetch('/api/1.0/collections/runAll?collectionId=' + selectedCollection, {
+        method: 'POST',
+        headers: requestHeader,
+        body: JSON.stringify(apiList)
+    })
+        .then(response => {
+            if (!response.ok) {
+                console.log(response);
+                alert("Test failed!");
+            } else {
+                alert("All API test completed!");
+            }
+        })
+        .catch(error => {
+            console.error('Error submitting form:', error);
+        });
 }
 
 async function addAPI() {

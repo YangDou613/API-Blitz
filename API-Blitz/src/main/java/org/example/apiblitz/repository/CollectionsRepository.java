@@ -1,13 +1,20 @@
 package org.example.apiblitz.repository;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.example.apiblitz.model.Collections;
+import org.example.apiblitz.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +25,9 @@ public class CollectionsRepository {
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
+
+	@Autowired
+	ObjectMapper objectMapper;
 
 	public List<Map<String, Object>> getCollectionsList(Integer userId) throws SQLException {
 
@@ -101,5 +111,47 @@ public class CollectionsRepository {
 		}
 
 		log.info("Delete successfully!");
+	}
+
+	public List<Request> getAllAPIFromCollection(Integer collectionId) throws SQLException {
+
+		String getCollectionSql = "SELECT apiurl, method, queryParams, headers, body " +
+				"FROM collectionDetails WHERE collectionId = ?";
+
+		return jdbcTemplate.query(getCollectionSql, new BeanPropertyRowMapper<>(Request.class), collectionId);
+	}
+
+	public void insertToCollectionTestResult(Integer collectionId,
+	                                         Integer collectionDetailsId,
+	                                         LocalDate testDate,
+	                                         LocalTime testTime,
+	                                         ResponseEntity<?> responseEntity) throws JsonProcessingException {
+
+		String result = "";
+		if (responseEntity.getStatusCode().is2xxSuccessful()) {
+			result = "pass";
+		} else {
+			result = "failed";
+		}
+
+		String insertToCollectionTestResultSql = "INSERT INTO collectionTestResult (" +
+				"collectionId, collectionDetailsId, testOptions, testDate, testTime, statusCode, " +
+				"executionDuration, contentLength, responseHeaders, responseBody, result) " +
+				"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+		jdbcTemplate.update(insertToCollectionTestResultSql,
+				collectionId,
+				collectionDetailsId,
+				"Run all",
+				testDate,
+				testTime,
+				responseEntity.getStatusCode().value(),
+				responseEntity.getHeaders().getFirst("Execution-Duration"),
+				responseEntity.getHeaders().getContentLength(),
+				objectMapper.writeValueAsString(responseEntity.getHeaders()),
+				responseEntity.getBody(),
+				result);
+
+		log.info("Successfully insert to collectionTestResult table!");
 	}
 }
