@@ -11,10 +11,8 @@ import org.springframework.validation.annotation.Validated;
 public class UserSignIn {
 	@Id
 	private Integer id;
-	private String provider;
 	private String name;
 	private String email;
 	private String password;
-	private String picture;
 	private String access_token;
 }
