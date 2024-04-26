@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.example.apiblitz.model.APIData;
 import org.example.apiblitz.model.Request;
@@ -242,8 +243,11 @@ public class APIService {
 				Map.Entry<Integer, ResponseEntity<?>> entry = future.get();
 				Integer collectionDetailsId = entry.getKey();
 				ResponseEntity<?> responseEntity = entry.getValue();
-				collectionsRepository.insertToCollectionTestResult(
+				Integer collectionTestResultId = collectionsRepository.insertToCollectionTestResult(
 						collectionId, collectionDetailsId, testDate, testTime, responseEntity);
+				if (!responseEntity.getStatusCode().is2xxSuccessful()) {
+					retest(collectionDetailsId, collectionTestResultId);
+				}
 				responseList.add(responseEntity);
 			}
 			return responseList;
@@ -252,6 +256,17 @@ public class APIService {
 			return null;
 		} finally {
 			cachedThreadPool.shutdown();
+		}
+	}
+
+	public void retest(Integer collectionDetailsId, Integer collectionTestResultId) throws JsonProcessingException {
+
+		// Retest 3 times
+		for (int i = 0; i < 3; i++) {
+			// Get API data from collectionTestResultId
+			Request request = collectionsRepository.getAPIDataFromCollectionDetailsId(collectionDetailsId);
+			ResponseEntity<?> responseEntity = sendRequest(request);
+			collectionsRepository.insertToCollectionTestResultException(collectionTestResultId, responseEntity);
 		}
 	}
 
