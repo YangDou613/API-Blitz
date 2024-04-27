@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.example.apiblitz.model.APIData;
 import org.example.apiblitz.model.Request;
@@ -19,11 +18,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.*;
-import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -194,79 +189,6 @@ public class APIService {
 			newHeaders.set("Execution-Duration", String.valueOf(executionDuration));
 
 			return new ResponseEntity<>(e.getResponseBodyAsString(), newHeaders, e.getStatusCode());
-		}
-	}
-
-	public List<ResponseEntity<?>> sendRequestAtSameTime(Integer collectionId, List<Request> requests) {
-
-		ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
-		List<Callable<Map.Entry<Integer, ResponseEntity<?>>>> callables = new ArrayList<>();
-
-		// Test Date
-		LocalDate testDate = LocalDate.now();
-
-		// Test time
-		LocalTime testTime = LocalTime.now();
-
-		try {
-			for (Request request : requests) {
-
-				if (request.getQueryParams() != null) {
-					request.setAPIUrl(addParams(request.getAPIUrl(), request.getQueryParams()));
-				}
-
-				if (request.getBody() != null) {
-					request.setRequestBody(objectMapper.readValue(request.getBody(), Object.class));
-				}
-
-				// Header
-				HttpHeaders headers = new HttpHeaders();
-				headers.setContentType(MediaType.APPLICATION_JSON);
-				Object requestHeaders = objectMapper.writeValueAsString(headers);
-				request.setRequestHeaders(requestHeaders);
-
-				Integer collectionDetailsId = request.getCollectionDetailsId();
-
-				callables.add(() -> {
-					String threadName = Thread.currentThread().getName();
-					Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-					System.out.println(timestamp + "  Sending request in thread: " + threadName);
-					ResponseEntity<?> responseEntity = sendRequest(request);
-					return new AbstractMap.SimpleEntry<>(collectionDetailsId, responseEntity);
-				});
-			}
-
-			List<Future<Map.Entry<Integer, ResponseEntity<?>>>> futures = cachedThreadPool.invokeAll(callables);
-
-			List<ResponseEntity<?>> responseList = new ArrayList<>();
-			for (Future<Map.Entry<Integer, ResponseEntity<?>>> future : futures) {
-				Map.Entry<Integer, ResponseEntity<?>> entry = future.get();
-				Integer collectionDetailsId = entry.getKey();
-				ResponseEntity<?> responseEntity = entry.getValue();
-				Integer collectionTestResultId = collectionsRepository.insertToCollectionTestResult(
-						collectionId, collectionDetailsId, testDate, testTime, responseEntity);
-				if (!responseEntity.getStatusCode().is2xxSuccessful()) {
-					retest(collectionDetailsId, collectionTestResultId);
-				}
-				responseList.add(responseEntity);
-			}
-			return responseList;
-		} catch (JsonProcessingException | InterruptedException | ExecutionException e) {
-			log.error(e.getMessage());
-			return null;
-		} finally {
-			cachedThreadPool.shutdown();
-		}
-	}
-
-	public void retest(Integer collectionDetailsId, Integer collectionTestResultId) throws JsonProcessingException {
-
-		// Retest 3 times
-		for (int i = 0; i < 3; i++) {
-			// Get API data from collectionTestResultId
-			Request request = collectionsRepository.getAPIDataFromCollectionDetailsId(collectionDetailsId);
-			ResponseEntity<?> responseEntity = sendRequest(request);
-			collectionsRepository.insertToCollectionTestResultException(collectionTestResultId, responseEntity);
 		}
 	}
 

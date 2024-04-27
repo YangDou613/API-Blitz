@@ -1,14 +1,25 @@
 package org.example.apiblitz.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.example.apiblitz.model.*;
 import org.example.apiblitz.repository.CollectionsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.*;
 
 @Service
 @Slf4j
@@ -18,12 +29,18 @@ public class CollectionsService {
 	APIService apiService;
 
 	@Autowired
-	CollectionsRepository collectionRepository;
+	ObjectMapper objectMapper;
+
+	@Autowired
+	CollectionsRepository collectionsRepository;
+
+	private static final long INITIAL_DELAY_MS = 60000;
+	private static final double BACKOFF_MULTIPLIER = 2.0;
 
 	public List<Map<String, Object>> get(Integer userId) {
 
 		try {
-			return collectionRepository.getCollectionsList(userId);
+			return collectionsRepository.getCollectionsList(userId);
 		} catch (SQLException e) {
 			log.error(e.getMessage());
 			return null;
@@ -33,7 +50,7 @@ public class CollectionsService {
 	public void create(Integer userId, Collections collection) {
 
 		try {
-			collectionRepository.insertToCollectionsTable(userId, collection);
+			collectionsRepository.insertToCollectionsTable(userId, collection);
 		} catch (SQLException e) {
 			log.error(e.getMessage());
 		}
@@ -47,7 +64,7 @@ public class CollectionsService {
 		collection.setRequest(request);
 
 		try {
-			collectionRepository.updateCollection(collectionId, collection);
+			collectionsRepository.updateCollection(collectionId, collection);
 		} catch (SQLException e) {
 			log.error(e.getMessage());
 		}
@@ -72,7 +89,7 @@ public class CollectionsService {
 		collection.setRequest(request);
 
 		try {
-			collectionRepository.addAPIToCollection(collectionId, collection);
+			collectionsRepository.addAPIToCollection(collectionId, collection);
 		} catch (SQLException e) {
 			log.error(e.getMessage());
 		}
@@ -81,8 +98,117 @@ public class CollectionsService {
 	public void delete(Integer userId, String collectionName, Integer requestId) {
 
 		try {
-			collectionRepository.deleteCollection(userId, collectionName, requestId);
+			collectionsRepository.deleteCollection(userId, collectionName, requestId);
 		} catch (SQLException e) {
+			log.error(e.getMessage());
+		}
+	}
+
+	public List<ResponseEntity<?>> sendRequestAtSameTime(Integer collectionId, List<Request> requests) {
+
+		ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
+		List<Callable<Map.Entry<Integer, ResponseEntity<?>>>> callables = new ArrayList<>();
+
+		// Test Date
+		LocalDate testDate = LocalDate.now();
+
+		// Test time
+		LocalTime testTime = LocalTime.now();
+
+		try {
+			for (Request request : requests) {
+
+				if (request.getQueryParams() != null) {
+					request.setAPIUrl(apiService.addParams(request.getAPIUrl(), request.getQueryParams()));
+				}
+
+				if (request.getBody() != null) {
+					request.setRequestBody(objectMapper.readValue(request.getBody(), Object.class));
+				}
+
+				// Header
+				HttpHeaders headers = new HttpHeaders();
+				headers.setContentType(MediaType.APPLICATION_JSON);
+				Object requestHeaders = objectMapper.writeValueAsString(headers);
+				request.setRequestHeaders(requestHeaders);
+
+				Integer collectionDetailsId = request.getCollectionDetailsId();
+
+				callables.add(() -> {
+					String threadName = Thread.currentThread().getName();
+					Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+					log.info(timestamp + "  Sending request in thread: " + threadName);
+					ResponseEntity<?> responseEntity = apiService.sendRequest(request);
+					return new AbstractMap.SimpleEntry<>(collectionDetailsId, responseEntity);
+				});
+			}
+
+			List<Future<Map.Entry<Integer, ResponseEntity<?>>>> futures = cachedThreadPool.invokeAll(callables);
+
+			List<ResponseEntity<?>> responseList = new ArrayList<>();
+			for (Future<Map.Entry<Integer, ResponseEntity<?>>> future : futures) {
+				Map.Entry<Integer, ResponseEntity<?>> entry = future.get();
+				Integer collectionDetailsId = entry.getKey();
+				ResponseEntity<?> responseEntity = entry.getValue();
+				Integer collectionTestResultId = collectionsRepository.insertToCollectionTestResult(
+						collectionId, collectionDetailsId, testDate, testTime, responseEntity);
+				if (!responseEntity.getStatusCode().is2xxSuccessful()) {
+					CompletableFuture.runAsync(() -> {
+						retest(collectionDetailsId, collectionTestResultId);
+					});
+				}
+				responseList.add(responseEntity);
+			}
+			return responseList;
+		} catch (JsonProcessingException | InterruptedException | ExecutionException e) {
+			log.error(e.getMessage());
+			return null;
+		} finally {
+			cachedThreadPool.shutdown();
+		}
+	}
+
+	public void retest(Integer collectionDetailsId, Integer collectionTestResultId) {
+
+		long delay = INITIAL_DELAY_MS;
+
+		try {
+			// Retest 3 times
+			for (int i = 1; i <= 3; i++) {
+
+				// Get API data from collectionTestResultId
+				Request request = collectionsRepository.getAPIDataFromCollectionDetailsId(collectionDetailsId);
+
+				if (request.getQueryParams() != null) {
+					request.setAPIUrl(apiService.addParams(request.getAPIUrl(), request.getQueryParams()));
+				}
+
+				if (request.getBody() != null) {
+					request.setRequestBody(objectMapper.readValue(request.getBody(), Object.class));
+				}
+
+				// Header
+				HttpHeaders headers = new HttpHeaders();
+				headers.setContentType(MediaType.APPLICATION_JSON);
+				Object requestHeaders = objectMapper.writeValueAsString(headers);
+				request.setRequestHeaders(requestHeaders);
+
+				Thread.sleep(delay);
+
+				// Test Date
+				LocalDate testDate = LocalDate.now();
+
+				// Test time
+				LocalTime testTime = LocalTime.now();
+
+				ResponseEntity<?> responseEntity = apiService.sendRequest(request);
+				collectionsRepository.insertToCollectionTestResultException(
+						collectionTestResultId, testDate, testTime, responseEntity);
+
+				delay = (long) (INITIAL_DELAY_MS * Math.pow(BACKOFF_MULTIPLIER, i));
+			}
+			log.info("Collection Test Result ID: " + collectionTestResultId + " Retest Finished!");
+		} catch (JsonProcessingException | InterruptedException e) {
 			log.error(e.getMessage());
 		}
 	}
@@ -90,7 +216,7 @@ public class CollectionsService {
 	public List<Request> getAPIList(Integer collectionId) {
 
 		try {
-			return collectionRepository.getAllAPIFromCollection(collectionId);
+			return collectionsRepository.getAllAPIFromCollection(collectionId);
 		} catch (SQLException e) {
 			log.error(e.getMessage());
 			return null;

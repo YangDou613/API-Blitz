@@ -162,7 +162,7 @@ public class CollectionsController {
 			@RequestBody List<Request> requests) {
 
 		try {
-			List<ResponseEntity<?>> responseList = apiService.sendRequestAtSameTime(collectionId, requests);
+			List<ResponseEntity<?>> responseList = collectionService.sendRequestAtSameTime(collectionId, requests);
 
 			if (responseList == null) {
 				return ResponseEntity.badRequest().build();

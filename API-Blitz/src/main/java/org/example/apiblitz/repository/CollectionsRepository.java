@@ -178,16 +178,20 @@ public class CollectionsRepository {
 
 	public void insertToCollectionTestResultException(
 			Integer collectionTestResultId,
+			LocalDate testDate,
+			LocalTime testTime,
 			ResponseEntity<?> responseEntity) throws JsonProcessingException {
 
 		String result = responseEntity.getStatusCode().is2xxSuccessful() ? "pass" : "failed";
 
 		String insertToCollectionTestResultExceptionSql = "INSERT INTO collectionTestResultException (" +
-				"collectionTestResultId, statusCode, executionDuration, contentLength, responseHeaders, " +
-				"responseBody, result) VALUES (?, ?, ?, ?, ?, ?, ?)";
+				"collectionTestResultId, testDate, testTime, statusCode, executionDuration, contentLength, " +
+				"responseHeaders, responseBody, result) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 		jdbcTemplate.update(insertToCollectionTestResultExceptionSql,
 				collectionTestResultId,
+				testDate,
+				testTime,
 				responseEntity.getStatusCode().value(),
 				responseEntity.getHeaders().getFirst("Execution-Duration"),
 				responseEntity.getHeaders().getContentLength(),
