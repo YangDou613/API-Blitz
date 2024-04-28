@@ -34,7 +34,7 @@ public class TestCaseRepository {
 
 		Integer notification = testCase.getNotification().equals("Yes") ? 1 : 0;
 
-		Object email = objectMapper.writeValueAsString(testCase.getRecipientEmail());
+		Object email = objectMapper.writeValueAsString(testCase.getEmail());
 
 		String insertToTestCaseSql = "INSERT INTO testCase (userId, APIUrl, method, queryParams, headers, body, " +
 				"statusCode, expectedResponseBody, intervalsTimeUnit, intervalsTimeValue, notification, " +

@@ -25,37 +25,37 @@
 
             <div class="sidebar">
 
-                <br><br>
+                <br>
                 <a href="http://localhost:8080/APITest.html" class="sidebar-link">
                     <img id="test" src="/test.png" alt="test">
                     <p>API Test</p>
                 </a>
 
-                <br><br>
+                <br>
                 <a href="/history" class="sidebar-link">
                     <img id="history" src="/history.png" alt="test">
                     <p>History</p>
                 </a>
 
-                <br><br>
+                <br>
                 <a href="/api/1.0/testCase" class="sidebar-link">
                     <img id="auto-test" src="/auto-test.png" alt="test">
                     <p>Automated Testing</p>
                 </a>
 
-                <br><br>
+                <br>
                 <a href="/api/1.0/testCase/modifyTestCase" class="sidebar-link">
                     <img id="my-test-case" src="/myTestCase.png" alt="test">
                     <p>My Test Case</p>
                 </a>
 
-                <br><br>
+                <br>
                 <a href="/api/1.0/autoTest/monitor" class="sidebar-link">
                     <img id="monitor" src="/monitor.png" alt="test">
                     <p>Monitor</p>
                 </a>
 
-                <br><br>
+                <br>
                 <a href="/api/1.0/collections" class="sidebar-link">
                     <img id="collections" src="/collections.png" alt="test">
                     <p>Collections</p>
@@ -66,8 +66,8 @@
             <div id="container">
 
                 <div class="content">
+                    <h3>Test Case</h3>
 
-                    <h2>Test Case</h2>
                     <form action="/api/1.0/testCase/create" method="post" onsubmit="return validateFormAndSubmit()">
 
                         <label for="method"></label>
@@ -82,59 +82,74 @@
                         </select>
 
                         <label for="url"></label>
-                        <input type="text" id="url" name="url" placeholder="URL" style="width: 300px;">
-                        <br><br>
+                        <input type="text" id="url" name="url" placeholder="Enter URL or paste text" style="width: 500px;" required>
+                        <br><br><br>
+
+<!--                        <div id="queryParams">-->
+<!--                            <label for="queryParams">Query Params:</label><br>-->
+<!--                            <input type="text" name="paramsKey" placeholder="Key">-->
+<!--                            <input type="text" name="paramsValue" placeholder="Value">-->
+<!--                            <br>-->
+<!--                        </div>-->
+<!--                        <button type="button" onclick="addQueryParam()">Add Query Param</button>-->
+<!--                        <br><br>-->
 
                         <div id="queryParams">
-                            <label for="queryParams">Query Params:</label><br>
-                            <input type="text" name="paramsKey" placeholder="Key">
-                            <input type="text" name="paramsValue" placeholder="Value">
-                            <br>
+                            <label for="queryParams">Query Params</label><br>
+                            <input id="paramsKey" type="text" class="dynamic-input paramsKey" name="paramsKey" placeholder="Key" oninput="addQueryParamsInput(event)">
+                            <input id="paramsValue" type="text" class="dynamic-input paramsValue" name="paramsValue" placeholder="Value" oninput="addQueryParamsInput(event)">
                         </div>
-                        <button type="button" onclick="addQueryParam()">Add Query Param</button>
                         <br><br>
-
-    <!--                    <div id="queryParams">-->
-    <!--                        <label for="queryParams">Query Params:</label><br>-->
-    <!--                        <input type="text" class="dynamic-input" name="paramsKey" placeholder="Key" oninput="addQueryParamsInputOfTestCase(event)">-->
-    <!--                        <input type="text" class="dynamic-input" name="paramsValue" placeholder="Value" oninput="addQueryParamsInputOfTestCase(event)">-->
-    <!--                    </div>-->
-    <!--                    <br><br>-->
 
                         <div id="authorization">
-                            <label for="authorization">Authorization:</label><br>
-                            <input type="text" name="authorizationKey" placeholder="Key">
-                            <input type="text" name="authorizationValue" placeholder="Value">
+                            <label for="authorization">Authorization</label><br>
+                            <select name="authorizationKey" id="authorizationKey">
+                                <option value="No Auth">No Auth</option>
+                                <option value="Basic Auth">Basic Auth</option>
+                                <option value="Bearer Token">Bearer Token</option>
+                                <option value="JWT Bearer">JWT Bearer</option>
+                                <option value="Digest Auth">Digest Auth</option>
+                                <option value="OAuth 1.0">OAuth 1.0</option>
+                                <option value="OAuth 2.0">OAuth 2.0</option>
+                                <option value="Hawk Authentication">Hawk Authentication</option>
+                                <option value="AWS Signature">AWS Signature</option>
+                                <option value="NTLM Authentication [Beta]">NTLM Authentication [Beta]</option>
+                                <option value="API Key">API Key</option>
+                                <option value="Akamai EdgeGrid">Akamai EdgeGrid</option>
+                                <option value="ASAP (Atlassian)">ASAP (Atlassian)</option>
+                                <option value="Inherit auth from parent">Inherit auth from parent</option>
+                            </select>
+                            <input id="authorizationValue" type="text" name="authorizationValue" placeholder="Value">
                             <br>
                         </div>
-                        <br>
-
-                        <div id="headers">
-                            <label for="headers">Headers:</label><br>
-                            <input type="text" name="headersKey" placeholder="Key">
-                            <input type="text" name="headersValue" placeholder="Value">
-                            <br>
-                        </div>
-                        <button type="button" onclick="addHeader()">Add Header</button>
                         <br><br>
 
-    <!--                    <div id="headers">-->
-    <!--                        <label for="headers">Headers:</label><br>-->
-    <!--                        <input type="text" class="headers-input" name="headersKey" placeholder="Key" oninput="addHeadersInputOfTestCase(event)">-->
-    <!--                        <input type="text" class="headers-input" name="headersValue" placeholder="Value" oninput="addHeadersInputOfTestCase(event)">-->
-    <!--                    </div>-->
-    <!--                    <br><br>-->
+<!--                        <div id="headers">-->
+<!--                            <label for="headers">Headers:</label><br>-->
+<!--                            <input type="text" name="headersKey" placeholder="Key">-->
+<!--                            <input type="text" name="headersValue" placeholder="Value">-->
+<!--                            <br>-->
+<!--                        </div>-->
+<!--                        <button type="button" onclick="addHeader()">Add Header</button>-->
+<!--                        <br><br>-->
 
-                        <label for="body">Body:</label><br>
-                        <textarea id="body" name="body" rows="5" cols="40"></textarea>
+                        <div id="headers">
+                            <label for="headers">Headers</label><br>
+                            <input id="headersKey" type="text" class="headers-input" name="headersKey" placeholder="Key" oninput="addHeadersInput(event)">
+                            <input id="headersValue" type="text" class="headers-input" name="headersValue" placeholder="Value" oninput="addHeadersInput(event)">
+                        </div>
+                        <br><br>
+
+                        <label for="body">Body</label><br>
+                        <textarea id="body" name="body" rows="10" cols="80"></textarea>
                         <br><br>
 
                         <label for="statusCode">Status Code:</label><br>
-                        <input type="text" id="statusCode" name="statusCode">
+                        <input type="text" id="statusCode" name="statusCode" required>
                         <br><br>
 
                         <label for="expectedResponseBody">Expected Response Body:</label><br>
-                        <textarea id="expectedResponseBody" name="expectedResponseBody" rows="5" cols="40"></textarea>
+                        <textarea id="expectedResponseBody" name="expectedResponseBody" rows="10" cols="80" required></textarea>
                         <br><br>
 
                         <label for="intervalsTimeUnit">Intervals Time Unit:</label>
@@ -146,7 +161,7 @@
                         <br><br>
 
                         <label for="intervalsTimeValue">Intervals Time Value:</label><br>
-                        <input type="number" id="intervalsTimeValue" name="intervalsTimeValue">
+                        <input type="number" id="intervalsTimeValue" name="intervalsTimeValue" style="width: 200px;" min="1" max="23" required>
                         <br><br>
 
                         <label for="notification">Notification:</label><br>
@@ -156,15 +171,16 @@
                         </select>
                         <br><br>
 
-                        <div id="recipientEmail">
+                        <div id="recipientEmail" style="display: none">
                             <label for="recipientEmail">Recipient Email:</label><br>
                             <input id="email" type="text" name="email" placeholder="Email">
                             <br>
                         </div>
-                        <button id="emailButton" type="button" onclick="addRecipientEmail()">Add Recipient Email</button>
-                        <br><br>
+                        <input id="emailButton" type="button" onclick="addRecipientEmail()" value="Add Recipient Email" style="display: none">
+                        <br><br><br>
 
                         <input type="submit" value="Add New Test Case">
+
                     </form>
 
                 </div>

@@ -29,5 +29,5 @@ public class TestCase {
 	private Integer intervalsTimeValue;
 	@NotBlank
 	private String notification;
-	private ArrayList<Object> recipientEmail;
+	private ArrayList<String> email;
 }
