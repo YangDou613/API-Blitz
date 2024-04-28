@@ -3,7 +3,7 @@ header {
     top: 0;
     left: 0;
     width: 100%;
-    background-color: #f9f9f9;
+    background-color: #F9F9F9;
     z-index: 1000;
     height: 150px;
 }
@@ -11,17 +11,17 @@ header {
 #logo {
     width: 80px;
     height: 80px;
-    margin: 20px;
+    margin: 30px;
 }
 
 .sidebar {
-    position: relative;
+    position: fixed;
     display: flex;
     flex-direction: column;
-    width: 130px;
+    width: 150px;
     align-items: center;
-    height: calc(100vh - 150px);
-    background-color: #f9f9f9;
+    height: 100%;
+    background-color: #F9F9F9;
 }
 
 .sidebar-link a {
@@ -30,12 +30,17 @@ header {
 
 .sidebar-link p {
     text-align: center;
+    font-family: "Baloo Chettan 2";
+    font-size: 14pt;
+    font-weight: bold;
+    color: #4C4C4C;
 }
 
 #test {
     width: 35px;
     height: 35px;
-    margin: 20px;
+    margin: auto;
+    display: block;
 }
 
 #history {
@@ -74,7 +79,7 @@ header {
 }
 
 .nav {
-    background-color: #f9f9f9;
+    background-color: #F9F9F9;
     display: flex;
     align-items: center;
 }
@@ -82,6 +87,13 @@ header {
 .nav h1 {
     font-family: "Baloo Chettan 2";
     font-size: 40pt;
+    color: #4C4C4C;
+}
+
+form label{
+    font-family: "Baloo Chettan 2";
+    font-size: 14pt;
+    font-weight: bold;
     color: #4C4C4C;
 }
 
@@ -112,18 +124,102 @@ pre {
 }
 
 #container {
-    display: flex;
     justify-content: space-around;
     flex: 1;
     gap: 100px;
-    padding: 50px;
+    padding: 0 50px;
+    margin-left: 200px;
 }
 
 .content {
     grid-column: 1;
 }
 
+.content::after {
+    content: "";
+    display: block;
+    height: 1px;
+    width: 50%;
+    background-color: #ccc;
+}
+
 #response-container {
     grid-column: 2;
     flex-basis: 1000px;
+}
+
+select,
+input {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #F9F9F9;
+    font-size: 16px;
+    font-family: "Baloo Chettan 2";
+}
+
+input[type="text"]::placeholder {
+    font-size: 14px;
+    color: #999;
+    padding-left: 5px;
+    font-family: "Baloo Chettan 2";
+}
+
+input[type="submit"]:hover {
+    background-color: #ddd;
+}
+
+input[type="submit"] {
+    font-family: "Baloo Chettan 2";
+}
+
+h3 {
+    font-family: "Baloo Chettan 2";
+    font-size: 20pt;
+    color: #4C4C4C;
+}
+
+#response-container {
+    font-family: "Baloo Chettan 2";
+    font-size: 14pt;
+    color: #4C4C4C;
+    width: 800px;
+    height: 800px;
+}
+
+.tab-container {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+.tablinks {
+    background-color: #f1f1f1;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 10px 15px;
+    transition: 0.3s;
+}
+
+.tablinks:hover {
+    background-color: #ddd;
+}
+
+.headers-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.headers-table td, .headers-table th {
+    border: 2px solid #ddd;
+    padding: 8px;
+}
+
+.headers-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.headers-table tr:hover {
+    background-color: #ddd;
 }

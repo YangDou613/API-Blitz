@@ -44,13 +44,13 @@ public class AutoTestService {
 		Request request = autoTestRepository.getAPIData(testCaseId);
 
 		// Set API url
-		String APIUrl;
-		if (request.getQueryParams() != null) {
-			APIUrl = addParamsToAPIUrl(request.getAPIUrl(), request.getQueryParams());
-		} else {
-			APIUrl = request.getAPIUrl();
-		}
-		request.setAPIUrl(APIUrl);
+//		String APIUrl;
+//		if (request.getQueryParams() != null) {
+//			APIUrl = addParamsToAPIUrl(request.getAPIUrl(), request.getQueryParams());
+//		} else {
+//			APIUrl = request.getAPIUrl();
+//		}
+//		request.setAPIUrl(APIUrl);
 
 		// Send Request
 		ResponseEntity<?> response = apiService.sendRequest(request);
@@ -127,26 +127,26 @@ public class AutoTestService {
 		return "pass";
 	}
 
-	public String addParamsToAPIUrl(String APIUrl, Object getQueryParams) throws JsonProcessingException {
-
-		boolean isFirstIteration = true;
-
-		Map<String, Object> queryParams = objectMapper.readValue(getQueryParams.toString(), new TypeReference<>() {});
-
-		for (Map.Entry<String, Object> queryParam : queryParams.entrySet()) {
-			String key = queryParam.getKey();
-			Object value = queryParam.getValue();
-			String param = key + "=" + value;
-			if (isFirstIteration) {
-				APIUrl += "?";
-				isFirstIteration = false;
-			} else {
-				APIUrl += "&";
-			}
-			APIUrl += param;
-		}
-		return APIUrl;
-	}
+//	public String addParamsToAPIUrl(String APIUrl, Object getQueryParams) throws JsonProcessingException {
+//
+//		boolean isFirstIteration = true;
+//
+//		Map<String, Object> queryParams = objectMapper.readValue(getQueryParams.toString(), new TypeReference<>() {});
+//
+//		for (Map.Entry<String, Object> queryParam : queryParams.entrySet()) {
+//			String key = queryParam.getKey();
+//			Object value = queryParam.getValue();
+//			String param = key + "=" + value;
+//			if (isFirstIteration) {
+//				APIUrl += "?";
+//				isFirstIteration = false;
+//			} else {
+//				APIUrl += "&";
+//			}
+//			APIUrl += param;
+//		}
+//		return APIUrl;
+//	}
 
 	public List<Integer> getAllTestCaseId(Integer userId) {
 		return autoTestRepository.getAllTestCaseIdByUserId(userId);

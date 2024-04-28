@@ -72,19 +72,23 @@ public class CollectionsService {
 
 	public void add(Integer collectionId, Collections collection) {
 
-		Request request = new Request();
+//		Request request = new Request();
 
 		// Package API data into http request
-		if (collection.getParamsKey() != null) {
-			APIData apiData = setAPIData(collection);
-			request = apiService.httpRequest(apiData);
-		} else {
-			request.setAPIUrl(collection.getApiurl());
-			request.setMethod(collection.getMethod());
-			request.setQueryParams(collection.getQueryParams());
-			request.setHeaders(collection.getHeaders());
-			request.setBody(collection.getBody());
-		}
+//		if (collection.getParamsKey() != null) {
+//			APIData apiData = setAPIData(collection);
+//			request = apiService.httpRequest(apiData);
+//		} else {
+//			request.setAPIUrl(collection.getApiurl());
+//			request.setMethod(collection.getMethod());
+//			request.setQueryParams(collection.getQueryParams());
+//			request.setHeaders(collection.getHeaders());
+//			request.setBody(collection.getBody());
+//		}
+
+		// Package API data into http request
+		APIData apiData = setAPIData(collection);
+		Request request = apiService.httpRequest(apiData);
 
 		collection.setRequest(request);
 
@@ -118,9 +122,9 @@ public class CollectionsService {
 		try {
 			for (Request request : requests) {
 
-				if (request.getQueryParams() != null) {
-					request.setAPIUrl(apiService.addParams(request.getAPIUrl(), request.getQueryParams()));
-				}
+//				if (request.getQueryParams() != null) {
+//					request.setAPIUrl(apiService.addParams(request.getAPIUrl(), request.getQueryParams()));
+//				}
 
 				if (request.getBody() != null) {
 					request.setRequestBody(objectMapper.readValue(request.getBody(), Object.class));
@@ -179,9 +183,9 @@ public class CollectionsService {
 				// Get API data from collectionTestResultId
 				Request request = collectionsRepository.getAPIDataFromCollectionDetailsId(collectionDetailsId);
 
-				if (request.getQueryParams() != null) {
-					request.setAPIUrl(apiService.addParams(request.getAPIUrl(), request.getQueryParams()));
-				}
+//				if (request.getQueryParams() != null) {
+//					request.setAPIUrl(apiService.addParams(request.getAPIUrl(), request.getQueryParams()));
+//				}
 
 				if (request.getBody() != null) {
 					request.setRequestBody(objectMapper.readValue(request.getBody(), Object.class));

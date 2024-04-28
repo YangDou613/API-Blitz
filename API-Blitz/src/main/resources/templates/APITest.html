@@ -25,37 +25,37 @@
 
             <div class="sidebar">
 
-                <br><br>
+                <br>
                 <a href="APITest.html" class="sidebar-link">
                     <img id="test" src="test.png" alt="test">
                     <p>API Test</p>
                 </a>
 
-                <br><br>
+                <br>
                 <a href="/history" class="sidebar-link">
                     <img id="history" src="history.png" alt="test">
                     <p>History</p>
                 </a>
 
-                <br><br>
+                <br>
                 <a href="/api/1.0/testCase" class="sidebar-link">
                     <img id="auto-test" src="auto-test.png" alt="test">
                     <p>Automated Testing</p>
                 </a>
 
-                <br><br>
+                <br>
                 <a href="/api/1.0/testCase/modifyTestCase" class="sidebar-link">
                     <img id="my-test-case" src="myTestCase.png" alt="test">
                     <p>My Test Case</p>
                 </a>
 
-                <br><br>
+                <br>
                 <a href="/api/1.0/autoTest/monitor" class="sidebar-link">
                     <img id="monitor" src="monitor.png" alt="test">
                     <p>Monitor</p>
                 </a>
 
-                <br><br>
+                <br>
                 <a href="/api/1.0/collections" class="sidebar-link">
                     <img id="collections" src="/collections.png" alt="test">
                     <p>Collections</p>
@@ -66,7 +66,7 @@
             <div id="container">
 
                 <div class="content">
-                    <h1>API Data</h1><br>
+                    <h3>API Data</h3><br>
 
                     <button id="show-history" onclick="showHistory()">API History</button>
                     <br><br>
@@ -87,65 +87,90 @@
                         </select>
 
                         <label for="url"></label>
-                        <input type="text" id="url" name="url" placeholder="URL" style="width: 300px;">
-                        <br><br>
+                        <input type="text" id="url" name="url" placeholder="Enter URL or paste text" style="width: 500px;">
+
+                        <input type="submit" value="Send">
+                        <br><br><br>
+
+<!--                        <div id="queryParams">-->
+<!--                            <label for="queryParams">Query Params:</label><br>-->
+<!--                            <input id="paramsKey" type="text" name="paramsKey" placeholder="Key">-->
+<!--                            <input id="paramsValue" type="text" name="paramsValue" placeholder="Value">-->
+<!--                            <br>-->
+<!--                        </div>-->
+<!--                        <button id="queryParamsButton" type="button" onclick="addQueryParam()">Add Query Param</button>-->
+<!--                        <br><br>-->
 
                         <div id="queryParams">
-                            <label for="queryParams">Query Params:</label><br>
-                            <input id="paramsKey" type="text" name="paramsKey" placeholder="Key">
-                            <input id="paramsValue" type="text" name="paramsValue" placeholder="Value">
-                            <br>
+                            <label for="queryParams">Query Params</label><br>
+                            <input id="paramsKey" type="text" class="dynamic-input paramsKey" name="paramsKey" placeholder="Key" oninput="addQueryParamsInput(event)">
+                            <input id="paramsValue" type="text" class="dynamic-input paramsValue" name="paramsValue" placeholder="Value" oninput="addQueryParamsInput(event)">
                         </div>
-                        <button id="queryParamsButton" type="button" onclick="addQueryParam()">Add Query Param</button>
                         <br><br>
 
-    <!--                    <div id="queryParams">-->
-    <!--                        <label for="queryParams">Query Params:</label><br>-->
-    <!--                        <input type="text" class="dynamic-input" name="paramsKey" placeholder="Key" oninput="addQueryParamsInput(event)">-->
-    <!--                        <input type="text" class="dynamic-input" name="paramsValue" placeholder="Value" oninput="addQueryParamsInput(event)">-->
-    <!--                    </div>-->
-    <!--                    <br><br>-->
-
                         <div id="authorization">
-                            <label for="authorization">Authorization:</label><br>
-                            <input id="authorizationKey" type="text" name="authorizationKey" placeholder="Key">
+                            <label for="authorization">Authorization</label><br>
+                            <select name="authorizationKey" id="authorizationKey">
+                                <option value="No Auth">No Auth</option>
+                                <option value="Basic Auth">Basic Auth</option>
+                                <option value="Bearer Token">Bearer Token</option>
+                                <option value="JWT Bearer">JWT Bearer</option>
+                                <option value="Digest Auth">Digest Auth</option>
+                                <option value="OAuth 1.0">OAuth 1.0</option>
+                                <option value="OAuth 2.0">OAuth 2.0</option>
+                                <option value="Hawk Authentication">Hawk Authentication</option>
+                                <option value="AWS Signature">AWS Signature</option>
+                                <option value="NTLM Authentication [Beta]">NTLM Authentication [Beta]</option>
+                                <option value="API Key">API Key</option>
+                                <option value="Akamai EdgeGrid">Akamai EdgeGrid</option>
+                                <option value="ASAP (Atlassian)">ASAP (Atlassian)</option>
+                                <option value="Inherit auth from parent">Inherit auth from parent</option>
+                            </select>
+<!--                            <input id="authorizationKey" type="text" name="authorizationKey" placeholder="Key">-->
                             <input id="authorizationValue" type="text" name="authorizationValue" placeholder="Value">
                             <br>
                         </div>
                         <br><br>
 
+<!--                        <div id="headers">-->
+<!--                            <label for="headers">Headers:</label><br>-->
+<!--                            <input id="headersKey" type="text" name="headersKey" placeholder="Key">-->
+<!--                            <input id="headersValue" type="text" name="headersValue" placeholder="Value">-->
+<!--                            <br>-->
+<!--                        </div>-->
+<!--                        <button id="headersButton" type="button" onclick="addHeader()">Add Header</button>-->
+<!--                        <br><br>-->
+
                         <div id="headers">
-                            <label for="headers">Headers:</label><br>
-                            <input id="headersKey" type="text" name="headersKey" placeholder="Key">
-                            <input id="headersValue" type="text" name="headersValue" placeholder="Value">
-                            <br>
+                            <label for="headers">Headers</label><br>
+                            <input id="headersKey" type="text" class="headers-input" name="headersKey" placeholder="Key" oninput="addHeadersInput(event)">
+                            <input id="headersValue" type="text" class="headers-input" name="headersValue" placeholder="Value" oninput="addHeadersInput(event)">
                         </div>
-                        <button id="headersButton" type="button" onclick="addHeader()">Add Header</button>
                         <br><br>
 
-    <!--                    <div id="headers">-->
-    <!--                        <label for="headers">Headers:</label><br>-->
-    <!--                        <input type="text" class="headers-input" name="headersKey" placeholder="Key" oninput="addHeadersInput(event)">-->
-    <!--                        <input type="text" class="headers-input" name="headersValue" placeholder="Value" oninput="addHeadersInput(event)">-->
-    <!--                    </div>-->
-    <!--                    <br><br>-->
+                        <label for="body">Body</label><br>
+                        <textarea id="body" name="body" rows="10" cols="80"></textarea>
 
-                        <label for="body">Body:</label><br>
-                        <textarea id="body" name="body" rows="5" cols="40"></textarea>
-                        <br><br>
-
-                        <input type="submit" value="Send">
                     </form>
                     <br><br>
                 </div>
 
                 <div id="response-container">
-                    <h1>Response<br></h1>
+                    <h3>Response<br></h3>
+
                     <div id="status-code"></div>
                     <div id="response-time"> </div>
                     <div id="response-size"></div>
                     <div id="option-button"></div>
+                    <br>
+                    <div class="tab-container">
+                        <button id="show-response-body" class="tablinks" onclick="displayResponse()" style="display: none">Body</button>
+                        <button id="show-response-header" class="tablinks" onclick="displayHeader()" style="display: none">Headers</button>
+                    </div>
+                    <br>
+<!--                    <div id="response" class="tabcontent"></div>-->
                     <div id="response"></div>
+
                 </div>
 
             </div>

@@ -81,13 +81,14 @@ public class APIService {
 
 		try {
 			// API url
-			String APIUrl;
-			if (apiData.getParamsKey() != null) {
-				APIUrl = addParamsToAPIUrl(apiData.getUrl(), apiData.getParamsKey(), apiData.getParamsValue());
-			} else {
-				APIUrl = apiData.getUrl();
-			}
-			request.setAPIUrl(APIUrl);
+//			String APIUrl;
+//			if (apiData.getParamsKey() != null) {
+//				APIUrl = addParamsToAPIUrl(apiData.getUrl(), apiData.getParamsKey(), apiData.getParamsValue());
+//			} else {
+//				APIUrl = apiData.getUrl();
+//			}
+//			request.setAPIUrl(APIUrl);
+			request.setAPIUrl(apiData.getUrl());
 
 			// Method
 			String method = apiData.getMethod();
@@ -192,47 +193,51 @@ public class APIService {
 		}
 	}
 
-	public String addParams(String APIUrl, Object getQueryParams) throws JsonProcessingException {
+//	public String addParams(String APIUrl, Object getQueryParams) throws JsonProcessingException {
+//
+//		boolean isFirstIteration = true;
+//
+//		Map<String, Object> queryParams = objectMapper.readValue(getQueryParams.toString(), new TypeReference<>() {});
+//
+//		for (Map.Entry<String, Object> queryParam : queryParams.entrySet()) {
+//			String key = queryParam.getKey();
+//			Object value = queryParam.getValue();
+//			String param = key + "=" + value;
+//			if (isFirstIteration) {
+//				APIUrl += "?";
+//				isFirstIteration = false;
+//			} else {
+//				APIUrl += "&";
+//			}
+//			APIUrl += param;
+//		}
+//		return APIUrl;
+//	}
 
-		boolean isFirstIteration = true;
-
-		Map<String, Object> queryParams = objectMapper.readValue(getQueryParams.toString(), new TypeReference<>() {});
-
-		for (Map.Entry<String, Object> queryParam : queryParams.entrySet()) {
-			String key = queryParam.getKey();
-			Object value = queryParam.getValue();
-			String param = key + "=" + value;
-			if (isFirstIteration) {
-				APIUrl += "?";
-				isFirstIteration = false;
-			} else {
-				APIUrl += "&";
-			}
-			APIUrl += param;
-		}
-		return APIUrl;
-	}
-
-	public String addParamsToAPIUrl(String APIUrl, ArrayList<Object> paramsKey, ArrayList<Object> paramsValue) {
-
-		for (int i = 0; i < paramsKey.size(); i++) {
-			String param = paramsKey.get(i) + "=" + paramsValue.get(i);
-			if (i == 0) {
-				APIUrl += "?";
-			} else {
-				APIUrl += "&";
-			}
-			APIUrl += param;
-		}
-		return APIUrl;
-	}
+//	public String addParamsToAPIUrl(String APIUrl, ArrayList<Object> paramsKey, ArrayList<Object> paramsValue) {
+//
+//		for (int i = 0; i < paramsKey.size(); i++) {
+//			if (paramsKey.get(i) != "" && paramsValue.get(i) != "") {
+//				String param = paramsKey.get(i) + "=" + paramsValue.get(i);
+//				if (i == 0) {
+//					APIUrl += "?";
+//				} else {
+//					APIUrl += "&";
+//				}
+//				APIUrl += param;
+//			}
+//		}
+//		return APIUrl;
+//	}
 
 	public String getQueryParams(ArrayList<Object> paramsKey, ArrayList<Object> paramsValue)
 			throws JsonProcessingException {
 
 		Map<Object, Object> queryParams = new HashMap<>();
 		for (int i = 0; i < paramsKey.size(); i++) {
-			queryParams.put(paramsKey.get(i), paramsValue.get(i));
+			if (!paramsKey.get(i).equals("") && !paramsValue.get(i).equals("")) {
+				queryParams.put(paramsKey.get(i), paramsValue.get(i));
+			}
 		}
 		return objectMapper.writeValueAsString(queryParams);
 	}
@@ -250,7 +255,7 @@ public class APIService {
 		}
 
 		// Authorization
-		if (!apiData.getAuthorizationKey().isEmpty()) {
+		if (!apiData.getAuthorizationKey().equals("No Auth")) {
 			headers.set("Authorization", apiData.getAuthorizationKey() + " " + apiData.getAuthorizationValue());
 		}
 

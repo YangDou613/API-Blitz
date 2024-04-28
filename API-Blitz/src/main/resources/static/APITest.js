@@ -2,6 +2,85 @@ let response = null;
 let selectedAPI = null;
 let method = null;
 
+function updateParamsFromUrl() {
+    let url = document.getElementById("url");
+    let allParamsKeysInput = document.querySelectorAll(".paramsKey");
+    let allParamsValueInput = document.querySelectorAll(".paramsValue");
+
+    let urlParams = url.value.split("?")[1] || "";
+    let paramsArray = urlParams.split("&");
+
+    paramsArray.forEach((param, index) => {
+        let keyValue = param.split("=");
+        let key = keyValue[0];
+        let value = keyValue[1] || '';
+
+        if (index >= allParamsKeysInput.length) {
+            addQueryParamsInput();
+            allParamsKeysInput = document.querySelectorAll(".paramsKey");
+            allParamsValueInput = document.querySelectorAll(".paramsValue");
+        }
+
+        allParamsKeysInput[index].value = key;
+
+        if (!param.includes("=")) {
+            let nextIndex = index + 1;
+            while (nextIndex < paramsArray.length && !paramsArray[nextIndex].includes("=")) {
+                nextIndex++;
+            }
+
+            if (nextIndex < paramsArray.length) {
+                let nextParam = paramsArray[nextIndex];
+                let nextKeyValue = nextParam.split("=");
+                allParamsValueInput[index].value = nextKeyValue[1] || '';
+                allParamsKeysInput[nextIndex].value = key;
+
+                allParamsValueInput[nextIndex].value = '';
+
+                if (nextKeyValue[0] === key) {
+                    allParamsKeysInput[nextIndex].value = '';
+                }
+            }
+        }
+        else {
+            allParamsValueInput[index].value = value;
+        }
+    });
+
+    if (paramsArray.length >= allParamsKeysInput.length) {
+        addQueryParamsInput();
+    }
+}
+
+function updateUrlFromParams() {
+    let url = document.getElementById("url");
+    let allParamsKeysInput = document.querySelectorAll(".paramsKey");
+    let allParamsValueInput = document.querySelectorAll(".paramsValue");
+
+    let queryString = "";
+    for (let i = 0; i < allParamsKeysInput.length; i++) {
+        let paramsKeysInputValue = allParamsKeysInput[i].value;
+        let paramsValueInputValue = allParamsValueInput[i].value;
+        if (paramsKeysInputValue) {
+            queryString += paramsKeysInputValue;
+            if (paramsValueInputValue) {
+                queryString += "=" + paramsValueInputValue;
+            }
+            queryString += "&";
+        }
+    }
+    queryString = queryString.slice(0, -1);
+    url.value = url.value.split("?")[0] + (queryString ? "?" + queryString : "");
+}
+
+document.getElementById("url").addEventListener("input", function(event) {
+    updateParamsFromUrl();
+});
+
+document.getElementById("queryParams").addEventListener("input", function(event) {
+    updateUrlFromParams();
+});
+
 document.getElementById('api-form').addEventListener('submit', function(event) {
     event.preventDefault();
 
@@ -12,7 +91,9 @@ document.getElementById('api-form').addEventListener('submit', function(event) {
     xhr.open('POST', '/APITest.html');
     xhr.onload = function() {
         response = JSON.parse(xhr.responseText);
+        console.log(response.body)
         displayResponse();
+
     };
     xhr.send(formData);
 });
@@ -56,9 +137,10 @@ function displayResponse() {
     let responseSizeHtml = `Response Size: ${response.headers["Content-Length"]} B`;
     responseSize.insertAdjacentHTML('beforeend', responseSizeHtml);
 
-    let optionButton = document.getElementById('option-button');
-    optionButton.innerHTML = '';
-    optionButton.insertAdjacentHTML('beforeend','<button id="show-response-header" onclick="displayHeader()">Header</button>');
+    let headerTab = document.getElementById("show-response-header");
+    headerTab.style.display = "block";
+    let bodyTab = document.getElementById("show-response-body");
+    bodyTab.style.display = "block";
 
     let responseBody = document.getElementById('response');
     responseBody.innerHTML = '';
@@ -75,7 +157,7 @@ function displayResponse() {
         responseBody.appendChild(img);
     } else {
         let responseBodyText = formatJSON(response.body);
-        let responseBodyHtml = `Response Body: <pre><code>${responseBodyText}</code></pre>`;
+        let responseBodyHtml = `<pre><code>${responseBodyText}</code></pre>`;
         responseBody.insertAdjacentHTML('beforeend', responseBodyHtml);
     }
 }
@@ -85,7 +167,7 @@ function getContentType() {
     return contentType[0].split("/")[0];
 }
 
-function displayHeader() {
+function displayHeaders() {
 
     let statusCode = document.getElementById('status-code');
     statusCode.innerHTML = '';
@@ -102,45 +184,28 @@ function displayHeader() {
     let responseSizeHtml = `Response Size: ${response.headers["Content-Length"]} B`;
     responseSize.insertAdjacentHTML('beforeend', responseSizeHtml);
 
-    let optionButton = document.getElementById('option-button');
-    optionButton.innerHTML = '';
-    optionButton.insertAdjacentHTML('beforeend', '<button id="show-response-body" onclick="displayResponse()">Body</button>');
+    let responseHeaders = document.getElementById('response');
+    responseHeaders.innerHTML = '';
 
-    let responseHeader = document.getElementById('response');
-    responseHeader.innerHTML = '';
-    let TitleHtml = `Response Header:`;
-    let serverHtml = `Server: ${response.headers["Server"]}`;
-    let dateHtml = `Date: ${response.headers["Date"]}`;
-    let contentTypeHtml = `Content-Type: ${response.headers["Content-Type"]}`;
+    const headersTable = document.createElement('table');
+    headersTable.classList.add('headers-table');
 
-    responseHeader.insertAdjacentHTML('beforeend', TitleHtml);
-    responseHeader.insertAdjacentHTML('beforeend', '<br><br>');
-    responseHeader.insertAdjacentHTML('beforeend', serverHtml);
-    responseHeader.insertAdjacentHTML('beforeend', '<br>');
-    responseHeader.insertAdjacentHTML('beforeend', dateHtml);
-    responseHeader.insertAdjacentHTML('beforeend', '<br>');
-    responseHeader.insertAdjacentHTML('beforeend', contentTypeHtml);
-    responseHeader.insertAdjacentHTML('beforeend', '<br>');
+    const headersMap = objectToMap(response.headers);
+    headersMap.forEach((value, key) => {
 
-    if (method !== "OPTIONS") {
-        let transferEncodingHtml = `Transfer-Encoding: ${response.headers["Transfer-Encoding"]}`;
-        let connectionHtml = `Connection: ${response.headers["Connection"]}`;
-        let varyHtml = `Vary: ${response.headers["Vary"]}`;
-
-        responseHeader.insertAdjacentHTML('beforeend', transferEncodingHtml);
-        responseHeader.insertAdjacentHTML('beforeend', '<br>');
-        responseHeader.insertAdjacentHTML('beforeend', connectionHtml);
-        responseHeader.insertAdjacentHTML('beforeend', '<br>');
-        responseHeader.insertAdjacentHTML('beforeend', varyHtml);
-    } else {
-        let allowHtml = `Allow: ${response.headers["Allow"]}`;
-        responseHeader.insertAdjacentHTML('beforeend', allowHtml);
-    }
+        const tr = document.createElement("tr");
+        let keyHtml = `<td>${key}</td>`;
+        let valueHtml = `<td>${value}</td>`;
+        tr.insertAdjacentHTML('beforeend', keyHtml);
+        tr.insertAdjacentHTML('beforeend', valueHtml);
+        headersTable.appendChild(tr);
+    });
+    responseHeaders.appendChild(headersTable);
 }
 
 document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('show-response-body').addEventListener('click', displayResponse);
-    document.getElementById('show-response-header').addEventListener('click', displayHeader);
+    document.getElementById('show-response-header').addEventListener('click', displayHeaders);
 });
 
 function formatJSON(json) {
@@ -334,74 +399,82 @@ function getAuthorization(headersMap) {
     });
 }
 
-// function addQueryParamsInput(event) {
-//
-//     let input = event.target;
-//
-//     const cursorPosition = input.selectionStart;
-//
-//     if (input.value.trim() !== "" &&
-//         !input.nextElementSibling?.classList.contains("dynamic-input")
-//     ) {
-//         const br = document.createElement("br");
-//
-//         const newKeyInput = document.createElement("input");
-//         newKeyInput.setAttribute("type", "text");
-//         newKeyInput.classList.add("dynamic-input");
-//         newKeyInput.setAttribute("name", "paramsKey");
-//         newKeyInput.setAttribute("placeholder", "Key");
-//         newKeyInput.setAttribute("oninput", "addQueryParamsInput(event)");
-//
-//         const newValueInput = document.createElement("input");
-//         newValueInput.setAttribute("type", "text");
-//         newValueInput.classList.add("dynamic-input");
-//         newValueInput.setAttribute("name", "paramsValue");
-//         newValueInput.setAttribute("placeholder", "Value");
-//         newValueInput.setAttribute("oninput", "addQueryParamsInput(event)");
-//
-//         if (!input.nextElementSibling || (input.nextElementSibling && input.nextElementSibling.value.trim() === "")) {
-//             input.parentNode.appendChild(br);
-//             input.parentNode.appendChild(newKeyInput);
-//             input.parentNode.appendChild(newValueInput);
-//         }
-//
-//         newKeyInput.selectionStart = cursorPosition;
-//         newKeyInput.selectionEnd = cursorPosition;
-//     }
-// }
-//
-// function addHeadersInput(event) {
-//
-//     let inputHeaders = event.target;
-//
-//     const cursorPositionHeaders = inputHeaders.selectionStart;
-//
-//     if (inputHeaders.value.trim() !== "" &&
-//         !inputHeaders.nextElementSibling?.classList.contains("headers-input")
-//     ) {
-//         const br = document.createElement("br");
-//
-//         const newHeadersKeyInput = document.createElement("input");
-//         newHeadersKeyInput.setAttribute("type", "text");
-//         newHeadersKeyInput.classList.add("headers-input");
-//         newHeadersKeyInput.setAttribute("name", "headersKey");
-//         newHeadersKeyInput.setAttribute("placeholder", "Key");
-//         newHeadersKeyInput.setAttribute("oninput", "addHeadersInput(event)");
-//
-//         const newHeadersValueInput = document.createElement("input");
-//         newHeadersValueInput.setAttribute("type", "text");
-//         newHeadersValueInput.classList.add("headers-input");
-//         newHeadersValueInput.setAttribute("name", "headersValue");
-//         newHeadersValueInput.setAttribute("placeholder", "Value");
-//         newHeadersValueInput.setAttribute("oninput", "addHeadersInput(event)");
-//
-//         if (!inputHeaders.nextElementSibling || inputHeaders.nextElementSibling && inputHeaders.nextElementSibling.value.trim() === "") {
-//             inputHeaders.parentNode.appendChild(br);
-//             inputHeaders.parentNode.appendChild(newHeadersKeyInput);
-//             inputHeaders.parentNode.appendChild(newHeadersValueInput);
-//         }
-//
-//         newHeadersKeyInput.selectionStart = cursorPositionHeaders;
-//         newHeadersKeyInput.selectionEnd = cursorPositionHeaders;
-//     }
-// }
+function addQueryParamsInput(event) {
+
+    let allParamsValueInput = document.querySelectorAll(".paramsValue");
+    let paramsValueInput = allParamsValueInput[allParamsValueInput.length - 1];
+
+    const cursorPosition = paramsValueInput.selectionStart;
+
+    if (paramsValueInput.value.trim() !== "" &&
+        !paramsValueInput.nextElementSibling?.classList.contains("dynamic-input")
+    ) {
+        const br = document.createElement("br");
+
+        const newKeyInput = document.createElement("input");
+        newKeyInput.setAttribute("type", "text");
+        newKeyInput.classList.add("dynamic-input");
+        newKeyInput.classList.add("paramsKey");
+        newKeyInput.setAttribute("name", "paramsKey");
+        newKeyInput.setAttribute("placeholder", "Key");
+        newKeyInput.setAttribute("oninput", "addQueryParamsInput(event)");
+
+        const newValueInput = document.createElement("input");
+        newValueInput.setAttribute("type", "text");
+        newValueInput.classList.add("dynamic-input");
+        newValueInput.classList.add("paramsValue");
+        newValueInput.setAttribute("name", "paramsValue");
+        newValueInput.setAttribute("placeholder", "Value");
+        newValueInput.setAttribute("oninput", "addQueryParamsInput(event)");
+
+        if (!paramsValueInput.nextElementSibling ||
+            (paramsValueInput.nextElementSibling &&
+                paramsValueInput.nextElementSibling.value
+                && paramsValueInput.nextElementSibling.value.trim() === "")) {
+            paramsValueInput.parentNode.appendChild(br);
+            paramsValueInput.parentNode.appendChild(newKeyInput);
+            paramsValueInput.parentNode.appendChild(newValueInput);
+        }
+
+        newKeyInput.selectionStart = cursorPosition;
+        newKeyInput.selectionEnd = cursorPosition;
+    }
+}
+
+function addHeadersInput(event) {
+
+    let inputHeaders = event.target;
+
+    const cursorPositionHeaders = inputHeaders.selectionStart;
+
+    if (inputHeaders.value.trim() !== "" &&
+        !inputHeaders.nextElementSibling?.classList.contains("headers-input")
+    ) {
+        const br = document.createElement("br");
+
+        const newHeadersKeyInput = document.createElement("input");
+        newHeadersKeyInput.id = "headersKey";
+        newHeadersKeyInput.setAttribute("type", "text");
+        newHeadersKeyInput.classList.add("headers-input");
+        newHeadersKeyInput.setAttribute("name", "headersKey");
+        newHeadersKeyInput.setAttribute("placeholder", "Key");
+        newHeadersKeyInput.setAttribute("oninput", "addHeadersInput(event)");
+
+        const newHeadersValueInput = document.createElement("input");
+        newHeadersValueInput.setAttribute("type", "text");
+        newHeadersValueInput.id = "headersValue";
+        newHeadersValueInput.classList.add("headers-input");
+        newHeadersValueInput.setAttribute("name", "headersValue");
+        newHeadersValueInput.setAttribute("placeholder", "Value");
+        newHeadersValueInput.setAttribute("oninput", "addHeadersInput(event)");
+
+        if (!inputHeaders.nextElementSibling || inputHeaders.nextElementSibling && inputHeaders.nextElementSibling.value.trim() === "") {
+            inputHeaders.parentNode.appendChild(br);
+            inputHeaders.parentNode.appendChild(newHeadersKeyInput);
+            inputHeaders.parentNode.appendChild(newHeadersValueInput);
+        }
+
+        newHeadersKeyInput.selectionStart = cursorPositionHeaders;
+        newHeadersKeyInput.selectionEnd = cursorPositionHeaders;
+    }
+}
