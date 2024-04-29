@@ -157,20 +157,21 @@ h3 {
     color: #4C4C4C;
 }
 
-.test-case-tale {
+.test-case-table {
     width: 100%;
     border-collapse: collapse;
+    text-align: center;
 }
 
-.test-case-tale td, .test-case-tale th {
+.test-case-table td, .test-case-table th {
     border: 2px solid #ddd;
     padding: 8px;
 }
 
-.test-case-tale tr:nth-child(even) {
+.test-case-table tr:nth-child(even) {
     background-color: #f2f2f2;
 }
 
-.test-case-tale tr:hover {
+.test-case-table tr:hover {
     background-color: #ddd;
 }

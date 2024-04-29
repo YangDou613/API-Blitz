@@ -28,8 +28,34 @@ fetch('/api/1.0/testCase/get?userId=1')
     })
     .then(data => {
         const form = document.getElementById('modify-form');
-        const table = document.getElementById('test-case-tale');
-        table.classList.add('test-case-tale')
+        const table = document.getElementById('test-case-table');
+        table.classList.add('test-case-table')
+
+        const thead = document.createElement("thead");
+        const tr = document.createElement("tr");
+
+        let testCaseId = "Test Case ID";
+        let method = "Method";
+        let url = "URL";
+        // let details = "Details";
+
+        let testCaseIdTitle = document.createElement("th");
+        let methodTitle = document.createElement("th");
+        let urlTitle = document.createElement("th");
+        // let detailsTitle = document.createElement("th");
+
+        testCaseIdTitle.textContent = testCaseId;
+        methodTitle.textContent = method;
+        urlTitle.textContent = url;
+        // detailsTitle.textContent = details;
+
+        tr.appendChild(testCaseIdTitle);
+        tr.appendChild(methodTitle);
+        tr.appendChild(urlTitle);
+        // tr.appendChild(detailsTitle)
+        thead.appendChild(tr);
+        table.appendChild(thead);
+
         let isResetTestCaseTitleExist = false;
         data.forEach(testCase => {
 
@@ -38,14 +64,16 @@ fetch('/api/1.0/testCase/get?userId=1')
             let inputHtml = `<input type="submit" name="id" value="${testCase["id"]}">`;
             let methodHtml = `<td>${testCase["method"]}</td>`;
             let urlHtml = `<td>${testCase["apiurl"]}</td>`;
+            let reportHtml = `<!--<input type="submit" name="id" value="View Report">-->`;
             tr.insertAdjacentHTML('beforeend', inputHtml);
             tr.insertAdjacentHTML('beforeend', methodHtml);
             tr.insertAdjacentHTML('beforeend', urlHtml);
+            // tr.insertAdjacentHTML('beforeend', reportHtml);
             table.appendChild(tr);
 
-            const input = tr.querySelector('input[type="submit"]');
+            const inputElement = tr.querySelectorAll('input[type="submit"]');
 
-            input.addEventListener('click', () => {
+            inputElement[0].addEventListener('click', () => {
                 table.style.display = "none";
                 if (!isResetTestCaseTitleExist) {
                     form.insertAdjacentHTML("beforebegin", '<h2>Reset Test Case</h2>');
@@ -53,6 +81,9 @@ fetch('/api/1.0/testCase/get?userId=1')
                 }
                 showTestCase(testCase)
             });
+            inputElement[1].addEventListener('click', () => {
+
+            })
         });
     })
     .catch(error => {

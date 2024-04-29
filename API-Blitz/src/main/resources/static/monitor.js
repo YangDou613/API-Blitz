@@ -9,16 +9,21 @@ fetch('/api/1.0/autoTest/monitor/testCase?userId=1')
         return response.json();
     })
     .then(data => {
-        const dom = document.getElementById('test-case-id-list');
+
+        const table = document.getElementById('test-case-table');
+        table.classList.add("test-case-table");
         data.forEach(testCaseId => {
-            const button = document.createElement('button');
-            button.innerText = testCaseId;
-            dom.appendChild(button);
-            const lineBreak = document.createElement('br');
-            dom.appendChild(lineBreak);
-            button.addEventListener('click', () => {
+
+            const input = document.createElement("input");
+            input.type = "submit";
+            input.id = "id";
+            input.value = testCaseId;
+
+            table.appendChild(input);
+
+            input.addEventListener('click', () => {
                 selectedTestCaseId = testCaseId;
-                dom.innerText = '';
+                table.innerText = '';
                 getResult(selectedTestCaseId)
             });
         });
@@ -113,7 +118,18 @@ function showDetails(selectedData) {
 
     const resultTr = document.createElement("tr");
     let resultKeyHtml = `<td>Result</td>`;
-    let resultValueHtml = `<td>${selectedData["result"]}</td>`;
+    let resultColor = "";
+    switch (selectedData["result"]) {
+        case "pass":
+            resultColor = "green";
+            break;
+        case "failed":
+            resultColor = "red";
+            break;
+        default:
+            resultColor = "black";
+    }
+    let resultValueHtml = `<td style="color: ${resultColor}; font-weight: bold;">${selectedData["result"]}</td>`;
     resultTr.insertAdjacentHTML('beforeend', resultKeyHtml);
     resultTr.insertAdjacentHTML('beforeend', resultValueHtml);
     detailTable.appendChild(resultTr);
