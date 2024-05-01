@@ -102,6 +102,9 @@ fetch('/api/1.0/collections/get?userId=1')
     });
 
 function createCollection() {
+
+    document.getElementById("collection-form").reset();
+
     const dom = document.getElementById("edit-container");
     dom.style.display = "block";
     const overlay = document.getElementById('overlay');
