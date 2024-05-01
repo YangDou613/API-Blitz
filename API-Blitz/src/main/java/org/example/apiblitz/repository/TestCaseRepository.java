@@ -38,8 +38,8 @@ public class TestCaseRepository {
 
 		String insertToTestCaseSql = "INSERT INTO testCase (userId, APIUrl, method, queryParams, headers, body, " +
 				"statusCode, expectedResponseBody, intervalsTimeUnit, intervalsTimeValue, notification, " +
-				"recipientEmail, resetStatus) " +
-				"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+				"recipientEmail, resetStatus, testItem) " +
+				"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -58,6 +58,7 @@ public class TestCaseRepository {
 			ps.setObject(11, notification);
 			ps.setObject(12, email);
 			ps.setInt(13, 0);
+			ps.setString(14, testCase.getTestItem());
 			return ps;
 		}, keyHolder);
 
@@ -78,7 +79,7 @@ public class TestCaseRepository {
 
 		String updateTestCaseSql = "UPDATE testCase SET userId = ?, APIUrl = ?, method = ?, queryParams = ?, " +
 				"headers = ?, body = ?, statusCode = ?, expectedResponseBody = ?, intervalsTimeUnit = ?, " +
-				"intervalsTimeValue = ?, notification = ?, recipientEmail = ?, resetStatus = ? WHERE id = ?";
+				"intervalsTimeValue = ?, notification = ?, recipientEmail = ?, resetStatus = ?, testItem = ? WHERE id = ?";
 
 		jdbcTemplate.update(updateTestCaseSql,
 				1,
@@ -94,11 +95,12 @@ public class TestCaseRepository {
 				notification,
 				email,
 				1,
+				resetTestCase.getTestItem(),
 				resetTestCase.getId());
 	}
 
 	public List<NextSchedule> getTestCase(Integer userId) throws SQLException {
-		String getTestCaseSql = "SELECT * FROM testCase WHERE userId = ?";
+		String getTestCaseSql = "SELECT * FROM testCase WHERE userId = ? AND resetStatus IS NOT NULL";
 		return jdbcTemplate.query(getTestCaseSql, new BeanPropertyRowMapper<>(NextSchedule.class), userId);
 	}
 

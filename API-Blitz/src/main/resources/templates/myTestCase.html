@@ -4,7 +4,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>API Blitz</title>
-        <link rel="stylesheet" href="/modifyTestCase.css">
+        <link rel="stylesheet" href="/myTestCase.css">
     </head>
 
     <body>
@@ -37,11 +37,11 @@
                     <p>History</p>
                 </a>
 
-                <br>
-                <a href="/api/1.0/testCase" class="sidebar-link">
-                    <img id="auto-test" src="/auto-test.png" alt="test">
-                    <p>Automated Testing</p>
-                </a>
+<!--                <br>-->
+<!--                <a href="/api/1.0/testCase" class="sidebar-link">-->
+<!--                    <img id="auto-test" src="/auto-test.png" alt="test">-->
+<!--                    <p>Automated Testing</p>-->
+<!--                </a>-->
 
                 <br>
                 <a href="/api/1.0/testCase/modifyTestCase" class="sidebar-link">
@@ -65,14 +65,20 @@
 
             <div id="container">
 
-                <div id="test-case-table"></div>
+                <div class="test-case-container" id="test-case-container"></div>
 
-                <div id="content">
+                <div id="overlay" class="overlay"></div>
 
-                    <form id="modify-form" method="post" style="display: none">
+                <div class="add-container popup" id="add-container" style="display: none">
+
+                    <form id="modify-form" method="post">
 
                         <label for="id">ID</label><br>
                         <input type="number" id="id" name="id">
+                        <br><br>
+
+                        <label for="testItem">Test Item</label><br>
+                        <input type="text" id="testItem" name="testItem" style="width: 600px;" required>
                         <br><br>
 
                         <label for="method"></label>
@@ -157,15 +163,15 @@
                         <textarea id="body" name="body" rows="10" cols="80"></textarea>
                         <br><br>
 
-                        <label for="statusCode">Status Code:</label><br>
+                        <label for="statusCode">Status Code</label><br>
                         <input type="text" id="statusCode" name="statusCode" required>
                         <br><br>
 
-                        <label for="expectedResponseBody">Expected Response Body:</label><br>
+                        <label for="expectedResponseBody">Expected Response Body</label><br>
                         <textarea id="expectedResponseBody" name="expectedResponseBody" rows="10" cols="80" required></textarea>
                         <br><br>
 
-                        <label for="intervalsTimeUnit">Intervals Time Unit:</label>
+                        <label for="intervalsTimeUnit">Intervals Time Unit</label>
                         <select name="intervalsTimeUnit" id="intervalsTimeUnit">
                             <option value="Hour">Hour</option>
                             <option value="Day">Day</option>
@@ -173,11 +179,11 @@
                         </select>
                         <br><br>
 
-                        <label for="intervalsTimeValue">Intervals Time Value:</label><br>
+                        <label for="intervalsTimeValue">Intervals Time Value</label><br>
                         <input type="number" id="intervalsTimeValue" name="intervalsTimeValue" style="width: 200px;" min="1" max="23" required>
                         <br><br>
 
-                        <label for="notification">Notification:</label><br>
+                        <label for="notification">Notification</label><br>
                         <select name="notification" id="notification">
                             <option value="No">No</option>
                             <option value="Yes">Yes</option>
@@ -185,14 +191,16 @@
                         <br><br>
 
                         <div id="recipientEmail" style="display: none">
-                            <label for="recipientEmail">Recipient Email:</label><br>
+                            <label for="recipientEmail">Recipient Email</label><br>
                             <input id="email" type="text" name="email" style="width: 300px;" placeholder="Email">
                             <br>
                         </div>
                         <input id="emailButton" type="button" onclick="addRecipientEmail()" value="Add Recipient Email" style="display: none">
                         <br><br><br>
 
-                        <input type="submit" value="Submit">
+                        <input id="test-case-button" type="submit" value="Submit">
+                        <input id="cancel-button" type="button" value="Cancel">
+
                     </form>
 
                 </div>
@@ -201,7 +209,8 @@
 
         </div>
 
-        <script src="/modifyTestCase.js"></script>
+        <script src="/myTestCase.js"></script>
 
     </body>
+
 </html>

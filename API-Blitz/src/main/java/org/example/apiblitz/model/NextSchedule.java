@@ -11,6 +11,7 @@ import java.time.LocalTime;
 public class NextSchedule {
 	private Integer testCaseId;
 	private Integer id;
+	private String testItem;
 	private String APIUrl;
 	private String method;
 	private Object queryParams;

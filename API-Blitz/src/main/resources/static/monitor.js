@@ -1,38 +1,46 @@
 let selectedTestCaseId;
 
-fetch('/api/1.0/autoTest/monitor/testCase?userId=1')
-    .then(response => {
-        if (!response.ok) {
-            console.log(response.status)
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
-    .then(data => {
+if (window.location.search !== "") {
+    let urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has("testCaseId")) {
+        selectedTestCaseId = urlParams.get("testCaseId");
+    }
+    getResult();
+}
 
-        const table = document.getElementById('test-case-table');
-        table.classList.add("test-case-table");
-        data.forEach(testCaseId => {
+// fetch('/api/1.0/autoTest/monitor/testCase?userId=1')
+//     .then(response => {
+//         if (!response.ok) {
+//             console.log(response.status)
+//             throw new Error('Network response was not ok');
+//         }
+//         return response.json();
+//     })
+//     .then(data => {
+//
+//         const table = document.getElementById('test-case-table');
+//         table.classList.add("test-case-table");
+//         data.forEach(testCaseId => {
+//
+//             const input = document.createElement("input");
+//             input.type = "submit";
+//             input.id = "id";
+//             input.value = testCaseId;
+//
+//             table.appendChild(input);
+//
+//             input.addEventListener('click', () => {
+//                 selectedTestCaseId = testCaseId;
+//                 table.innerText = '';
+//                 getResult(selectedTestCaseId)
+//             });
+//         });
+//     })
+//     .catch(error => {
+//         console.error('There was an error!', error);
+//     });
 
-            const input = document.createElement("input");
-            input.type = "submit";
-            input.id = "id";
-            input.value = testCaseId;
-
-            table.appendChild(input);
-
-            input.addEventListener('click', () => {
-                selectedTestCaseId = testCaseId;
-                table.innerText = '';
-                getResult(selectedTestCaseId)
-            });
-        });
-    })
-    .catch(error => {
-        console.error('There was an error!', error);
-    });
-
-function getResult(selectedTestCaseId) {
+function getResult() {
     fetch('/api/1.0/autoTest/monitor/testResult/' + selectedTestCaseId)
         .then(response => {
             if (!response.ok) {

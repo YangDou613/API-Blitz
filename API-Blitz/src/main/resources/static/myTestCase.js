@@ -1,22 +1,4 @@
-document.getElementById("modify-form").addEventListener("submit", function(event) {
-    event.preventDefault();
-    const formData = new FormData(this);
-    fetch('/api/1.0/testCase/update', {
-        method: 'POST',
-        body: formData
-    })
-        .then(response => {
-            if (!response.ok) {
-                alert("Please confirm whether the entered information is correct.");
-            } else {
-                window.location.href = "/api/1.0/testCase/modifyTestCase";
-                alert("Update Successfully!");
-            }
-        })
-        .catch(error => {
-            console.error('Error submitting form:', error);
-        });
-});
+let testCaseId;
 
 fetch('/api/1.0/testCase/get?userId=1')
     .then(response => {
@@ -27,68 +9,223 @@ fetch('/api/1.0/testCase/get?userId=1')
         return response.json();
     })
     .then(data => {
-        const form = document.getElementById('modify-form');
-        const table = document.getElementById('test-case-table');
-        table.classList.add('test-case-table')
 
-        const thead = document.createElement("thead");
-        const tr = document.createElement("tr");
+        const ul = document.createElement("ul");
+        ul.classList.add("test-case-table");
 
-        let testCaseId = "Test Case ID";
-        let method = "Method";
-        let url = "URL";
-        // let details = "Details";
+        const tableHeaderLi = document.createElement("li");
+        tableHeaderLi.classList.add("test-case-table-header");
+        tableHeaderLi.insertAdjacentHTML("beforeend", `<div class="col col-1 tableHeader">ID</div>`);
+        tableHeaderLi.insertAdjacentHTML("beforeend", `<div class="col col-2 tableHeader">Test Item</div>`);
+        tableHeaderLi.insertAdjacentHTML("beforeend", `<div class="col col-3 tableHeader">Method</div>`);
+        tableHeaderLi.insertAdjacentHTML("beforeend", `<div class="col col-4 tableHeader">URL</div>`);
+        tableHeaderLi.insertAdjacentHTML("beforeend", `<div class="col col-5 tableHeader">Details</div>`);
+        tableHeaderLi.insertAdjacentHTML("beforeend", `<div class="col col-6 tableHeader"></div>`);
 
-        let testCaseIdTitle = document.createElement("th");
-        let methodTitle = document.createElement("th");
-        let urlTitle = document.createElement("th");
-        // let detailsTitle = document.createElement("th");
+        ul.appendChild(tableHeaderLi);
 
-        testCaseIdTitle.textContent = testCaseId;
-        methodTitle.textContent = method;
-        urlTitle.textContent = url;
-        // detailsTitle.textContent = details;
-
-        tr.appendChild(testCaseIdTitle);
-        tr.appendChild(methodTitle);
-        tr.appendChild(urlTitle);
-        // tr.appendChild(detailsTitle)
-        thead.appendChild(tr);
-        table.appendChild(thead);
-
-        let isResetTestCaseTitleExist = false;
         data.forEach(testCase => {
 
-            const tr = document.createElement("tr");
+            const li = document.createElement("li");
+            li.classList.add("test-case-table-row");
+            li.insertAdjacentHTML("beforeend", `<div class="col col-1" data-label="ID">${testCase["id"]}</div>`);
+            li.insertAdjacentHTML("beforeend", `<div class="col col-2" data-label="Test Item">${testCase["testItem"]}</div>`);
+            li.insertAdjacentHTML("beforeend", `<div class="col col-3" data-label="Method">${testCase["method"]}</div>`);
+            li.insertAdjacentHTML("beforeend", `<div class="col col-4" data-label="URL">${testCase["apiurl"]}</div>`);
+            li.insertAdjacentHTML("beforeend",
+                `<div class="col col-5" data-label="Details"><a href="/api/1.0/autoTest/monitor?testCaseId=${testCase["id"]}">View Monitor ⮕</a></div>`);
 
-            let inputHtml = `<input type="submit" name="id" value="${testCase["id"]}">`;
-            let methodHtml = `<td>${testCase["method"]}</td>`;
-            let urlHtml = `<td>${testCase["apiurl"]}</td>`;
-            let reportHtml = `<!--<input type="submit" name="id" value="View Report">-->`;
-            tr.insertAdjacentHTML('beforeend', inputHtml);
-            tr.insertAdjacentHTML('beforeend', methodHtml);
-            tr.insertAdjacentHTML('beforeend', urlHtml);
-            // tr.insertAdjacentHTML('beforeend', reportHtml);
-            table.appendChild(tr);
+            const buttonDiv = document.createElement("div");
+            buttonDiv.classList.add("col", "col-6", "buttonDiv");
 
-            const inputElement = tr.querySelectorAll('input[type="submit"]');
+            const editButton = document.createElement("button");
+            editButton.type = "button";
+            editButton.classList.add("btn", "btn-primary", "btn-xs", "dt-edit");
+            editButton.style.backgroundImage = "url('/edit.png')";
+            editButton.style.backgroundSize = "contain";
+            editButton.style.backgroundRepeat = "no-repeat";
+            editButton.style.backgroundPosition = "center";
 
-            inputElement[0].addEventListener('click', () => {
-                table.style.display = "none";
-                if (!isResetTestCaseTitleExist) {
-                    form.insertAdjacentHTML("beforebegin", '<h2>Reset Test Case</h2>');
-                    isResetTestCaseTitleExist = true;
-                }
-                showTestCase(testCase)
+            const editIcon = document.createElement("span");
+            editIcon.classList.add("glyphicon", "glyphicon-pencil");
+            editIcon.setAttribute("aria-hidden", "true");
+
+            editButton.appendChild(editIcon);
+
+            const deleteButton = document.createElement("button");
+            deleteButton.type = "button";
+            deleteButton.classList.add("btn", "btn-primary", "btn-xs", "dt-delete");
+            deleteButton.style.backgroundImage = "url('/delete.png')";
+            deleteButton.style.backgroundSize = "contain";
+            deleteButton.style.backgroundRepeat = "no-repeat";
+            deleteButton.style.backgroundPosition = "center";
+
+            const deleteIcon = document.createElement("span");
+            deleteIcon.classList.add("glyphicon", "glyphicon-pencil");
+            deleteIcon.setAttribute("aria-hidden", "true");
+
+            deleteButton.appendChild(deleteIcon);
+
+            buttonDiv.appendChild(editButton);
+            buttonDiv.appendChild(deleteButton);
+
+            li.appendChild(buttonDiv);
+
+            ul.appendChild(li);
+
+            editButton.addEventListener('click', () => {
+                modifyTestCase(testCase);
             });
-            inputElement[1].addEventListener('click', () => {
-
-            })
+            deleteButton.addEventListener('click', () => {
+                testCaseId = testCase["id"];
+                deleteTestCase();
+            });
         });
+
+        const testCaseContainer = document.getElementById('test-case-container');
+        testCaseContainer.insertAdjacentHTML("beforeend",
+            ' <input id="add-button" type="submit" onclick="addTestCase()" value=" + Add">');
+        testCaseContainer.appendChild(ul);
+
     })
     .catch(error => {
         console.error('There was an error!', error);
     });
+
+function addTestCase() {
+
+    const recipientEmail = document.getElementById("recipientEmail");
+    recipientEmail.innerHTML = '';
+    recipientEmail.insertAdjacentHTML("beforeend", '<label for="recipientEmail">Recipient Email</label><br>');
+    recipientEmail.insertAdjacentHTML("beforeend", '<input id="email" type="text" name="email" style="width: 300px;" placeholder="Email">');
+    recipientEmail.insertAdjacentHTML("beforeend", '<br>')
+
+    document.getElementById("modify-form").reset();
+    document.querySelector('label[for="id"]').style.display = "none";
+    document.getElementById("id").style.display = "none";
+
+    document.getElementById('notification').value = "No";
+
+    recipientEmailDiv.style.display = "none";
+    emailButton.style.display = "none";
+
+    // Recipient email
+    const recipientEmailInputs = document.querySelectorAll('#recipientEmail input[name="email"]');
+
+    recipientEmailInputs.forEach((input, index) => {
+        if (index > 0) {
+            input.parentNode.removeChild(input);
+        } else {
+            input.value = '';
+        }
+    });
+
+    const dom = document.getElementById("add-container");
+    dom.style.display = "block";
+    const overlay = document.getElementById('overlay');
+    overlay.style.display = 'block'
+    overlay.addEventListener("click", (event) => {
+        event.preventDefault();
+        dom.style.display = "none";
+        overlay.style.display = "none";
+    })
+
+    const cancelButton = document.getElementById("cancel-button");
+    cancelButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        dom.style.display = "none";
+        document.getElementById('overlay').style.display = 'none';
+    })
+
+    document.getElementById("modify-form").addEventListener("submit", function (event) {
+        event.preventDefault();
+        const formData = new FormData(this);
+        fetch('/api/1.0/testCase/create', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => {
+                if (!response.ok) {
+                    alert("Please confirm whether the entered information is correct.");
+                } else {
+                    window.location.href = "/api/1.0/testCase/myTestCase";
+                    alert("Added Successfully!");
+                }
+            })
+            .catch(error => {
+                console.error('Error submitting form:', error);
+            });
+    });
+}
+
+function modifyTestCase(testCase) {
+
+    const recipientEmail = document.getElementById("recipientEmail");
+    recipientEmail.innerHTML = '';
+    recipientEmail.insertAdjacentHTML("beforeend", '<label for="recipientEmail">Recipient Email</label><br>');
+    recipientEmail.insertAdjacentHTML("beforeend", '<input id="email" type="text" name="email" style="width: 300px;" placeholder="Email">');
+    recipientEmail.insertAdjacentHTML("beforeend", '<br>')
+
+    document.querySelector('label[for="id"]').style.display = "block";
+    document.getElementById("id").style.display = "block";
+
+    showTestCase(testCase);
+
+    const dom = document.getElementById("add-container");
+    dom.style.display = "block";
+    const overlay = document.getElementById('overlay');
+    overlay.style.display = 'block'
+    overlay.addEventListener("click", (event) => {
+        event.preventDefault();
+        dom.style.display = "none";
+        overlay.style.display = "none";
+    })
+
+    const cancelButton = document.getElementById("cancel-button");
+    cancelButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        dom.style.display = "none";
+        document.getElementById('overlay').style.display = 'none';
+    })
+
+    document.getElementById("modify-form").addEventListener("submit", function (event) {
+        event.preventDefault();
+        const formData = new FormData(this);
+        fetch('/api/1.0/testCase/update', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => {
+                if (!response.ok) {
+                    alert("Please confirm whether the entered information is correct.");
+                } else {
+                    window.location.href = "/api/1.0/testCase/myTestCase";
+                    alert("Update Successfully!");
+                }
+            })
+            .catch(error => {
+                console.error('Error submitting form:', error);
+            });
+    });
+}
+
+function deleteTestCase() {
+
+    fetch('/api/1.0/testCase/delete?testCaseId=' + testCaseId, {
+        method: 'DELETE',
+    })
+        .then(response => {
+            if (!response.ok) {
+                alert("Failed to delete, please check!");
+            } else {
+                window.location.href = "/api/1.0/testCase/myTestCase";
+                alert("Delete Successfully!");
+            }
+        })
+        .catch(error => {
+            console.error('Error submitting form:', error);
+        });
+}
 
 function showTestCase(testCase) {
     const dom = document.getElementById('modify-form');
@@ -100,6 +237,9 @@ function insertData(testCase) {
 
     // Id
     document.getElementById('id').value = testCase["id"];
+
+    // Test item
+    document.getElementById('testItem').value = testCase["testItem"];
 
     // API url
     document.getElementById('url').value = testCase["apiurl"];
@@ -200,14 +340,16 @@ function insertData(testCase) {
     // Body
     document.getElementById('body').value = '';
     if (testCase["body"] != null) {
-        document.getElementById('body').value = testCase["body"];
+        let bodyText = JSON.parse(testCase["body"]);
+        document.getElementById('body').value = JSON.stringify(bodyText, null, 4);
     }
 
     // Status code
     document.getElementById('statusCode').value = testCase["statusCode"];
 
     // Expected response body
-    document.getElementById('expectedResponseBody').value = testCase["expectedResponseBody"];
+    let expectedResponseBodyText = JSON.parse(testCase["expectedResponseBody"]);
+    document.getElementById('expectedResponseBody').value = JSON.stringify(expectedResponseBodyText, null, 4);
 
     // Intervals time unit
     document.getElementById('intervalsTimeUnit').value = testCase["intervalsTimeUnit"];
@@ -261,7 +403,7 @@ function insertData(testCase) {
                         isFirstIteration = false;
                     } else {
                         // document.getElementById("emailButton").style.display = "none";
-                        let emailHtml = `<input id="email" type="text" name="email" style="width: 300px;" placeholder="Email" value=${email}>`;
+                        let emailHtml = `<input id="email" type="text" name="email" style="width: 300px;" placeholder="Email" value=${email}><br>`;
                         recipientEmail.insertAdjacentHTML("beforeend", emailHtml)
                     }
                 }
@@ -373,7 +515,7 @@ function addHeadersInput(event) {
 function addRecipientEmail() {
     const recipientEmailDiv = document.getElementById("recipientEmail");
     const inputDiv = document.createElement("div");
-    inputDiv.innerHTML = `<input id="email" type="text" name="email" style="width: 300px;" placeholder="Email">`;
+    inputDiv.innerHTML = `<input id="email" type="text" name="email" style="width: 300px;" placeholder="Email"><br>`;
     recipientEmailDiv.appendChild(inputDiv);
 }
 

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ResetTestCase {
 	private Integer id;
+	private String testItem;
 	private String method;
 	private String url;
 	private ArrayList<Object> paramsKey;

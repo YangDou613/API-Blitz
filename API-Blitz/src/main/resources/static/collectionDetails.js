@@ -37,9 +37,9 @@ function showAPIData() {
                 const button = document.createElement("div");
                 button.id = "button-div";
                 button.insertAdjacentHTML("beforeend",
-                    ' <input id="run-all-button" type="button" onclick="testAllAPI()" value="Test All">');
-                button.insertAdjacentHTML("beforeend",
                     ' <input id="add-button" type="submit" onclick="addAPI()" value=" + Add">');
+                button.insertAdjacentHTML("beforeend",
+                    ' <input id="run-all-button" type="button" onclick="testAllAPI()" value="Test All">');
                 container.appendChild(button);
 
                 const ul = document.createElement("ul");

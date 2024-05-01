@@ -10,6 +10,7 @@ import java.util.ArrayList;
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TestCase {
+	private String testItem;
 	private String method;
 	@NotBlank
 	private String url;
