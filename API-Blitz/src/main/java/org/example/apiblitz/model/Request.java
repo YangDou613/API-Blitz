@@ -7,6 +7,8 @@ import lombok.Data;
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Request {
+	private Integer id;
+	private String requestName;
 	private String APIUrl;
 	private String apiurl;
 	private String method;

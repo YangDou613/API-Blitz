@@ -32,6 +32,13 @@ public class CollectionsController {
 		return "collections";
 	}
 
+	@GetMapping(path = "/details")
+	public String collectionDetailsPage(
+			@RequestParam("collectionName") String collectionName,
+			@RequestParam("collectionId") Integer collectionId) {
+		return "collectionDetails";
+	}
+
 	@GetMapping(path = "/get")
 	public ResponseEntity<?> getCollections(Integer userId) {
 
@@ -156,7 +163,7 @@ public class CollectionsController {
 		}
 	}
 
-	@PostMapping("/runAll")
+	@PostMapping("/testAll")
 	public ResponseEntity<?> getResponseAtSameTime(
 			Integer collectionId,
 			@RequestBody List<Request> requests) {

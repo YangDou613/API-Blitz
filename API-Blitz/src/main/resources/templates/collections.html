@@ -6,6 +6,7 @@
         <title>API Blitz</title>
         <link rel="stylesheet" href="/collections.css">
     </head>
+
     <body>
 
         <header>
@@ -24,37 +25,37 @@
 
             <div class="sidebar">
 
-                <br><br>
+                <br>
                 <a href="/APITest.html" class="sidebar-link">
                     <img id="test" src="/test.png" alt="test">
                     <p>API Test</p>
                 </a>
 
-                <br><br>
+                <br>
                 <a href="/history" class="sidebar-link">
                     <img id="history" src="/history.png" alt="test">
                     <p>History</p>
                 </a>
 
-                <br><br>
+                <br>
                 <a href="/api/1.0/testCase" class="sidebar-link">
                     <img id="auto-test" src="/auto-test.png" alt="test">
                     <p>Automated Testing</p>
                 </a>
 
-                <br><br>
+                <br>
                 <a href="/api/1.0/testCase/modifyTestCase" class="sidebar-link">
                     <img id="my-test-case" src="/myTestCase.png" alt="test">
                     <p>My Test Case</p>
                 </a>
 
-                <br><br>
+                <br>
                 <a href="/api/1.0/autoTest/monitor" class="sidebar-link">
                     <img id="monitor" src="/monitor.png" alt="test">
                     <p>Monitor</p>
                 </a>
 
-                <br><br>
+                <br>
                 <a href="/api/1.0/collections" class="sidebar-link">
                     <img id="collections" src="/collections.png" alt="test">
                     <p>Collections</p>
@@ -64,107 +65,24 @@
 
             <div id="container">
 
-                <div class="collection-container">
+                <div id="overlay" class="overlay"></div>
 
-                    <h1>Collections</h1><br>
+                <div class="edit-container popup" id="edit-container" style="display: none">
 
-                    <button id="create-collection" onclick="createCollection()">Create Collection</button>
-                    <br><br>
+                    <form id="collection-form" method="post">
 
-                    <form id="collection-form" method="post" style="display: none">
-
-                        <label for="collectionName">Collection Name:</label><br>
-                        <input type="text" id="collectionName" name="collectionName" style="width: 300px;">
+                        <label for="collectionName">Collection Name</label><br>
+                        <input type="text" id="collectionName" name="collectionName" style="width: 300px;" required>
                         <br><br>
 
-                        <label for="description">Description:</label><br>
-                        <textarea id="description" name="description" rows="5" cols="40"></textarea>
+                        <label for="description">Description</label><br>
+                        <textarea id="description" name="description" rows="10" cols="80" required></textarea>
                         <br><br>
 
-                        <input id="collection-button" type="submit" value="Create">
+                        <input id="collection-button" type="submit" value="Submit">
+                        <input id="cancel-button" type="button" value="Cancel">
+
                     </form>
-                    <br><br>
-
-                    <div id="collection-list"></div>
-
-                </div>
-
-                <div id="api-form-container">
-
-                    <h1>API Data</h1><br>
-
-                    <button id="add-api" onclick="addAPI()">Add API</button>
-                    <br><br>
-
-                    <form id="api-form" method="post" style="display: none">
-
-                        <label for="requestName">Request Name:</label><br>
-                        <input type="text" id="requestName" name="requestName" style="width: 300px;">
-                        <br><br>
-
-                        <label for="method"></label>
-                        <select name="method" id="method">
-                            <option value="GET">GET</option>
-                            <option value="POST">POST</option>
-                            <option value="PUT">PUT</option>
-                            <option value="DELETE">DELETE</option>
-                            <option value="HEAD">HEAD</option>
-                            <option value="PATCH">PATCH</option>
-                            <option value="OPTIONS">OPTIONS</option>
-                        </select>
-
-                        <label for="url"></label>
-                        <input type="text" id="url" name="url" placeholder="URL" style="width: 300px;">
-                        <br><br>
-
-                        <div id="queryParams">
-                            <label for="queryParams">Query Params:</label><br>
-                            <input id="paramsKey" type="text" name="paramsKey" placeholder="Key">
-                            <input id="paramsValue" type="text" name="paramsValue" placeholder="Value">
-                            <br>
-                        </div>
-                        <button id="queryParamsButton" type="button" onclick="addQueryParam()">Add Query Param</button>
-                        <br><br>
-
-                        <!--                    <div id="queryParams">-->
-                        <!--                        <label for="queryParams">Query Params:</label><br>-->
-                        <!--                        <input type="text" class="dynamic-input" name="paramsKey" placeholder="Key" oninput="addQueryParamsInput(event)">-->
-                        <!--                        <input type="text" class="dynamic-input" name="paramsValue" placeholder="Value" oninput="addQueryParamsInput(event)">-->
-                        <!--                    </div>-->
-                        <!--                    <br><br>-->
-
-                        <div id="authorization">
-                            <label for="authorization">Authorization:</label><br>
-                            <input id="authorizationKey" type="text" name="authorizationKey" placeholder="Key">
-                            <input id="authorizationValue" type="text" name="authorizationValue" placeholder="Value">
-                            <br>
-                        </div>
-                        <br><br>
-
-                        <div id="headers">
-                            <label for="headers">Headers:</label><br>
-                            <input id="headersKey" type="text" name="headersKey" placeholder="Key">
-                            <input id="headersValue" type="text" name="headersValue" placeholder="Value">
-                            <br>
-                        </div>
-                        <button id="headersButton" type="button" onclick="addHeader()">Add Header</button>
-                        <br><br>
-
-                        <!--                    <div id="headers">-->
-                        <!--                        <label for="headers">Headers:</label><br>-->
-                        <!--                        <input type="text" class="headers-input" name="headersKey" placeholder="Key" oninput="addHeadersInput(event)">-->
-                        <!--                        <input type="text" class="headers-input" name="headersValue" placeholder="Value" oninput="addHeadersInput(event)">-->
-                        <!--                    </div>-->
-                        <!--                    <br><br>-->
-
-                        <label for="body">Body:</label><br>
-                        <textarea id="body" name="body" rows="5" cols="40"></textarea>
-                        <br><br>
-
-                        <input type="submit" value="Add">
-                    </form>
-
-                    <div id="api-list"></div>
 
                 </div>
 
@@ -175,4 +93,5 @@
         <script src="/collections.js"></script>
 
     </body>
+
 </html>

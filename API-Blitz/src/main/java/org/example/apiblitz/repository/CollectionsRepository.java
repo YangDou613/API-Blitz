@@ -65,6 +65,7 @@ public class CollectionsRepository {
 
 		String addAPISql = "INSERT INTO collectionDetails (collectionId, requestName, APIUrl, method, " +
 				"queryParams, headers, body) VALUES (?, ?, ?, ?, ?, ?, ?)";
+
 		jdbcTemplate.update(addAPISql,
 				collectionId,
 				collection.getRequestName(),
@@ -80,36 +81,38 @@ public class CollectionsRepository {
 	public void updateCollection(Integer collectionId, Collections collection) throws SQLException {
 
 		String updateCollectionSql = "UPDATE collections SET collectionName = ?, description = ? WHERE id = ?";
+
 		jdbcTemplate.update(updateCollectionSql,
 				collection.getCollectionName(),
-				collection.getDescription());
+				collection.getDescription(),
+				collection.getCollectionId());
 
-		String updateCollectionDetailsSql = "UPDATE collectionDetails SET requestName = ?, APIUrl = ?, method = ?," +
-				"queryParams = ?, headers = ?, body = ? WHERE collectionId = ?";
-		jdbcTemplate.update(updateCollectionDetailsSql,
-				collection.getRequestName(),
-				collection.getRequest().getAPIUrl(),
-				collection.getRequest().getMethod(),
-				collection.getRequest().getQueryParams(),
-				collection.getRequest().getHeaders(),
-				collection.getRequest().getBody(),
-				collectionId);
+		if (collection.getApiurl() != null) {
+
+			String updateCollectionDetailsSql = "UPDATE collectionDetails SET requestName = ?, APIUrl = ?, method = ?," +
+					"queryParams = ?, headers = ?, body = ? WHERE collectionId = ?";
+
+			jdbcTemplate.update(updateCollectionDetailsSql,
+					collection.getRequestName(),
+					collection.getRequest().getAPIUrl(),
+					collection.getRequest().getMethod(),
+					collection.getRequest().getQueryParams(),
+					collection.getRequest().getHeaders(),
+					collection.getRequest().getBody(),
+					collectionId);
+		}
 
 		log.info("Update successfully!");
 	}
 
 	public void deleteCollection(Integer userId, String collectionName, Integer requestId) throws SQLException {
 
-		// Get collection id
-		String getCollectionIdSql = "SELECT id FROM collections WHERE collectionName = ? AND userId = ?";
-		Integer collectionId = jdbcTemplate.queryForObject(getCollectionIdSql, Integer.class, collectionName, userId);
-
 		if (requestId == null) {
 			String deleteCollectionSql = "DELETE FROM collections WHERE collectionName = ? AND userId = ?";
 			jdbcTemplate.update(deleteCollectionSql, collectionName, userId);
 		} else {
-			String deleteCollectionDetailsSql = "DELETE FROM collectionDetails WHERE collectionId = ? AND id = ?";
-			jdbcTemplate.update(deleteCollectionDetailsSql, collectionId, requestId);
+			String deleteCollectionDetailsSql = "DELETE FROM collectionDetails WHERE id = ?";
+			jdbcTemplate.update(deleteCollectionDetailsSql, requestId);
 		}
 
 		log.info("Delete successfully!");
@@ -117,7 +120,7 @@ public class CollectionsRepository {
 
 	public List<Request> getAllAPIFromCollection(Integer collectionId) throws SQLException {
 
-		String getAllAPISql = "SELECT apiurl, method, queryParams, headers, body " +
+		String getAllAPISql = "SELECT id, requestName, apiurl, method, queryParams, headers, body " +
 				"FROM collectionDetails WHERE collectionId = ?";
 
 		return jdbcTemplate.query(getAllAPISql, new BeanPropertyRowMapper<>(Request.class), collectionId);

@@ -58,10 +58,12 @@ public class CollectionsService {
 
 	public void update(Integer collectionId, Collections collection) {
 
-		// Package API data into http request
-		APIData apiData = setAPIData(collection);
-		Request request = apiService.httpRequest(apiData);
-		collection.setRequest(request);
+		if (collection.getApiurl() != null) {
+			// Package API data into http request
+			APIData apiData = setAPIData(collection);
+			Request request = apiService.httpRequest(apiData);
+			collection.setRequest(request);
+		}
 
 		try {
 			collectionsRepository.updateCollection(collectionId, collection);
@@ -136,7 +138,7 @@ public class CollectionsService {
 				Object requestHeaders = objectMapper.writeValueAsString(headers);
 				request.setRequestHeaders(requestHeaders);
 
-				Integer collectionDetailsId = request.getCollectionDetailsId();
+				Integer collectionDetailsId = request.getId();
 
 				callables.add(() -> {
 					String threadName = Thread.currentThread().getName();

@@ -90,6 +90,13 @@ header {
     color: #4C4C4C;
 }
 
+form label{
+    font-family: "Baloo Chettan 2";
+    font-size: 14pt;
+    font-weight: bold;
+    color: #4C4C4C;
+}
+
 .content-wrapper {
     display: flex;
     margin-top: 150px;
@@ -107,49 +114,17 @@ header {
     flex: 1;
     gap: 100px;
     padding: 0 50px;
-    margin-left: 50px;
-    margin-top: 50px;
+    margin-left: 200px;
+    margin-top: 150px;
 }
 
-select,
-input {
-    padding: 5px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #F9F9F9;
-    font-size: 16px;
-    font-family: "Baloo Chettan 2";
-}
-
-input[type="text"]::placeholder {
-    font-size: 14px;
-    color: #999;
-    padding-left: 5px;
-    font-family: "Baloo Chettan 2";
-}
-
-input[type="submit"]:hover {
-    background-color: #ddd;
-}
-
-input[type="button"]:hover {
-    background-color: #ddd;
-}
-
-input[type="submit"] {
-    font-family: "Baloo Chettan 2";
-}
-
-h3 {
-    font-family: "Baloo Chettan 2";
-    font-size: 20pt;
-    color: #4C4C4C;
+.content {
+    grid-column: 1;
 }
 
 body {
     font-family: "lato", sans-serif;
 }
-
 .collection-container {
     max-width: 1000px;
     margin-left: auto;
@@ -158,7 +133,6 @@ body {
     padding-right: 10px;
 }
 
-.collection-table,
 .api-table {
     li {
         border-radius: 3px;
@@ -167,14 +141,12 @@ body {
         justify-content: space-between;
         margin-bottom: 25px;
     }
-    .collection-table-header,
     .api-table-header {
         background-color: #ddd;
         font-size: 14px;
         text-transform: uppercase;
         letter-spacing: 0.03em;
     }
-    .collection-table-row,
     .api-table-row {
         font-family: "Baloo Chettan 2";
         background-color: #ffffff;
@@ -183,24 +155,22 @@ body {
         box-shadow: 0px 0px 9px 0px rgba(0, 0, 0, 0.1);
     }
     .col-1 {
-        flex-basis: 10%;
+        flex-basis: 25%;
     }
     .col-2 {
-        flex-basis: 20%;
+        flex-basis: 15%;
     }
     .col-3 {
         flex-basis: 50%;
     }
     .col-4 {
-        flex-basis: 20%;
+        flex-basis: 10%;
     }
 
     @media all and (max-width: 767px) {
-        .collection-table-header,
         .api-table-header {
             display: none;
         }
-        .collection-table-row,
         .api-table-row {
         }
         li {
@@ -238,18 +208,14 @@ body {
     transform: scale(1.2);
 }
 
-.collection-table-row:hover,
 .api-table-row:hover {
-    cursor: pointer;
     background-color: #F9F9F9;
 }
 
-.collection-table-row:hover .btn,
 .api-table-row:hover .btn {
     background-color: #F9F9F9;
 }
 
-.collection-container,
 #api-list {
     font-family: "Baloo Chettan 2";
 }
@@ -260,7 +226,6 @@ body {
     vertical-align: top;
 }
 
-.collection-table-row .col,
 .api-table-row .col {
     vertical-align: top;
 }
@@ -269,10 +234,56 @@ body {
     display: block;
 }
 
-#create-button {
+#button-div {
+    display: flex;
+    justify-content: flex-end;
+    gap: 20px;
+}
+
+#add-button {
+    flex: 0 0 auto;
     font-weight: bold;
     font-size: 25px;
-    margin-left: 890px;
+}
+
+#run-all-button {
+    background-image: url('test-all.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: right center;
+    padding-right: 50px;
+    flex: 0 0 auto;
+    font-weight: bold;
+    font-size: 25px;
+}
+
+select,
+input {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #F9F9F9;
+    font-size: 16px;
+    font-family: "Baloo Chettan 2";
+}
+
+input[type="text"]::placeholder {
+    font-size: 14px;
+    color: #999;
+    padding-left: 5px;
+    font-family: "Baloo Chettan 2";
+}
+
+input[type="submit"]:hover {
+    background-color: #ddd;
+}
+
+input[type="button"]:hover {
+    background-color: #ddd;
+}
+
+input[type="submit"] {
+    font-family: "Baloo Chettan 2";
 }
 
 .overlay {
@@ -288,6 +299,7 @@ body {
 
 .popup {
     position: fixed;
+    margin-top: 100px;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -295,4 +307,8 @@ body {
     padding: 20px;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.buttonDiv {
+    display: block;
 }

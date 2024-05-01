@@ -96,7 +96,7 @@ public class APIService {
 
 			// Query params
 			Object queryParams;
-			if (apiData.getParamsKey().isEmpty()) {
+			if (apiData.getParamsKey() == null || apiData.getParamsKey().isEmpty()) {
 				queryParams = null;
 			} else {
 				queryParams = getQueryParams(apiData.getParamsKey(), apiData.getParamsValue());
@@ -248,7 +248,7 @@ public class APIService {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 
-		if (!apiData.getHeadersKey().isEmpty()) {
+		if (apiData.getHeadersKey() != null) {
 			for (int i = 0; i < apiData.getHeadersKey().size(); i++) {
 				headers.set(apiData.getHeadersKey().get(i), apiData.getHeadersValue().get(i));
 			}

@@ -23,32 +23,26 @@ function updateParamsFromUrl() {
 
         allParamsKeysInput[index].value = key;
 
-        if (!param.includes("=")) {
-            let nextIndex = index + 1;
-            while (nextIndex < paramsArray.length && !paramsArray[nextIndex].includes("=")) {
-                nextIndex++;
-            }
-
-            if (nextIndex < paramsArray.length) {
-                let nextParam = paramsArray[nextIndex];
-                let nextKeyValue = nextParam.split("=");
-                allParamsValueInput[index].value = nextKeyValue[1] || '';
-                allParamsKeysInput[nextIndex].value = key;
-
-                allParamsValueInput[nextIndex].value = '';
-
-                if (nextKeyValue[0] === key) {
-                    allParamsKeysInput[nextIndex].value = '';
-                }
-            }
+        if (paramsArray.length < allParamsKeysInput.length) {
+            allParamsKeysInput[index+1].value = '';
+            allParamsValueInput[index+1].value = '';
         }
-        else {
+
+        if (!param.includes("=")) {
+            allParamsValueInput[index].value = '';
+        } else {
             allParamsValueInput[index].value = value;
         }
     });
 
     if (paramsArray.length >= allParamsKeysInput.length) {
         addQueryParamsInput();
+        allParamsKeysInput = document.querySelectorAll(".paramsKey");
+        allParamsValueInput = document.querySelectorAll(".paramsValue");
+    }
+    let equalsArray = urlParams.split("=");
+    if (equalsArray.length - 1 > paramsArray.length) {
+        updateUrlFromParams();
     }
 }
 
@@ -58,6 +52,7 @@ function updateUrlFromParams() {
     let allParamsValueInput = document.querySelectorAll(".paramsValue");
 
     let queryString = "";
+    let count = 0;
     for (let i = 0; i < allParamsKeysInput.length; i++) {
         let paramsKeysInputValue = allParamsKeysInput[i].value;
         let paramsValueInputValue = allParamsValueInput[i].value;
@@ -67,9 +62,16 @@ function updateUrlFromParams() {
                 queryString += "=" + paramsValueInputValue;
             }
             queryString += "&";
+        } else {
+            if (paramsValueInputValue) {
+                queryString += "=" + paramsValueInputValue;
+            }
         }
+        count += 1;
     }
-    queryString = queryString.slice(0, -1);
+    if (queryString.charAt(queryString.length - 1) === "&") {
+        queryString = queryString.slice(0, -1);
+    }
     url.value = url.value.split("?")[0] + (queryString ? "?" + queryString : "");
 }
 
@@ -91,34 +93,10 @@ document.getElementById('api-form').addEventListener('submit', function(event) {
     xhr.open('POST', '/APITest.html');
     xhr.onload = function() {
         response = JSON.parse(xhr.responseText);
-        console.log(response.body)
         displayResponse();
-
     };
     xhr.send(formData);
 });
-
-function addQueryParam() {
-    const queryParamsDiv = document.getElementById("queryParams");
-    const inputDiv = document.createElement("div");
-    inputDiv.innerHTML = `
-                <input type="text" name="paramsKey" placeholder="Key">
-                <input type="text" name="paramsValue" placeholder="Value">
-                <br>
-            `;
-    queryParamsDiv.appendChild(inputDiv);
-}
-
-function addHeader() {
-    const headersDiv = document.getElementById("headers");
-    const inputDiv = document.createElement("div");
-    inputDiv.innerHTML = `
-                <input type="text" name="headerKey" placeholder="Key">
-                <input type="text" name="headerValue" placeholder="Value">
-                <br>
-            `;
-    headersDiv.appendChild(inputDiv);
-}
 
 function displayResponse() {
 
@@ -156,7 +134,7 @@ function displayResponse() {
         responseBody.insertAdjacentHTML("beforeend", "<br>");
         responseBody.appendChild(img);
     } else {
-        let responseBodyText = formatJSON(response.body);
+        let responseBodyText = formatJSON(JSON.parse(response.body));
         let responseBodyHtml = `<pre><code>${responseBodyText}</code></pre>`;
         responseBody.insertAdjacentHTML('beforeend', responseBodyHtml);
     }
@@ -192,7 +170,6 @@ function displayHeaders() {
 
     const headersMap = objectToMap(response.headers);
     headersMap.forEach((value, key) => {
-
         const tr = document.createElement("tr");
         let keyHtml = `<td>${key}</td>`;
         let valueHtml = `<td>${value}</td>`;
@@ -209,13 +186,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function formatJSON(json) {
-    return JSON.stringify(json, null, 2)
-        .replace(/^"|"$/g, '')
-        .replace(/\\/g, '')
-        .replace(/,/g, ',\n')
-        .replace(/(["{\[\]}])\n(?=.)/g, '$1\n')
-        .replace(/(".*?": )/g, '\n$1')
-        .replace(/\n/g, '\n    ');
+    return JSON.stringify(json, null, 4)
 }
 
 function showHistory() {
