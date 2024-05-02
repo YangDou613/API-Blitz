@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.example.apiblitz.model.*;
+import org.example.apiblitz.model.Collections;
 import org.example.apiblitz.repository.CollectionsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -15,10 +16,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.*;
 
 @Service
@@ -110,16 +108,20 @@ public class CollectionsService {
 		}
 	}
 
-	public List<ResponseEntity<?>> sendRequestAtSameTime(Integer collectionId, List<Request> requests) {
+	public Map<String, Object> sendRequestAtSameTime(Integer collectionId, List<Request> requests) {
+
+		Map<String, Object> collectionTestTime = new HashMap<>();
 
 		ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
 		List<Callable<Map.Entry<Integer, ResponseEntity<?>>>> callables = new ArrayList<>();
 
 		// Test Date
 		LocalDate testDate = LocalDate.now();
+		collectionTestTime.put("testDate", testDate);
 
 		// Test time
 		LocalTime testTime = LocalTime.now();
+		collectionTestTime.put("testTime", testTime);
 
 		try {
 			for (Request request : requests) {
@@ -165,7 +167,7 @@ public class CollectionsService {
 				}
 				responseList.add(responseEntity);
 			}
-			return responseList;
+			return collectionTestTime;
 		} catch (JsonProcessingException | InterruptedException | ExecutionException e) {
 			log.error(e.getMessage());
 			return null;
@@ -173,6 +175,70 @@ public class CollectionsService {
 			cachedThreadPool.shutdown();
 		}
 	}
+
+//	public List<ResponseEntity<?>> sendRequestAtSameTime(Integer collectionId, List<Request> requests) {
+//
+//		ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
+//		List<Callable<Map.Entry<Integer, ResponseEntity<?>>>> callables = new ArrayList<>();
+//
+//		// Test Date
+//		LocalDate testDate = LocalDate.now();
+//
+//		// Test time
+//		LocalTime testTime = LocalTime.now();
+//
+//		try {
+//			for (Request request : requests) {
+//
+////				if (request.getQueryParams() != null) {
+////					request.setAPIUrl(apiService.addParams(request.getAPIUrl(), request.getQueryParams()));
+////				}
+//
+//				if (request.getBody() != null) {
+//					request.setRequestBody(objectMapper.readValue(request.getBody(), Object.class));
+//				}
+//
+//				// Header
+//				HttpHeaders headers = new HttpHeaders();
+//				headers.setContentType(MediaType.APPLICATION_JSON);
+//				Object requestHeaders = objectMapper.writeValueAsString(headers);
+//				request.setRequestHeaders(requestHeaders);
+//
+//				Integer collectionDetailsId = request.getId();
+//
+//				callables.add(() -> {
+//					String threadName = Thread.currentThread().getName();
+//					Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+//					log.info(timestamp + "  Sending request in thread: " + threadName);
+//					ResponseEntity<?> responseEntity = apiService.sendRequest(request);
+//					return new AbstractMap.SimpleEntry<>(collectionDetailsId, responseEntity);
+//				});
+//			}
+//
+//			List<Future<Map.Entry<Integer, ResponseEntity<?>>>> futures = cachedThreadPool.invokeAll(callables);
+//
+//			List<ResponseEntity<?>> responseList = new ArrayList<>();
+//			for (Future<Map.Entry<Integer, ResponseEntity<?>>> future : futures) {
+//				Map.Entry<Integer, ResponseEntity<?>> entry = future.get();
+//				Integer collectionDetailsId = entry.getKey();
+//				ResponseEntity<?> responseEntity = entry.getValue();
+//				Integer collectionTestResultId = collectionsRepository.insertToCollectionTestResult(
+//						collectionId, collectionDetailsId, testDate, testTime, responseEntity);
+//				if (!responseEntity.getStatusCode().is2xxSuccessful()) {
+//					CompletableFuture.runAsync(() -> {
+//						retest(collectionDetailsId, collectionTestResultId);
+//					});
+//				}
+//				responseList.add(responseEntity);
+//			}
+//			return responseList;
+//		} catch (JsonProcessingException | InterruptedException | ExecutionException e) {
+//			log.error(e.getMessage());
+//			return null;
+//		} finally {
+//			cachedThreadPool.shutdown();
+//		}
+//	}
 
 	public void retest(Integer collectionDetailsId, Integer collectionTestResultId) {
 

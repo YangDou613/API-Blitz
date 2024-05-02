@@ -158,8 +158,7 @@ body {
     padding-right: 10px;
 }
 
-.collection-table,
-.api-table {
+.collection-table {
     li {
         border-radius: 3px;
         padding: 25px 30px;
@@ -167,19 +166,16 @@ body {
         justify-content: space-between;
         margin-bottom: 25px;
     }
-    .collection-table-header,
-    .api-table-header {
+    .collection-table-header {
         background-color: #ddd;
         font-size: 14px;
         text-transform: uppercase;
         letter-spacing: 0.03em;
     }
-    .collection-table-row,
-    .api-table-row {
+    .collection-table-row {
         font-family: "Baloo Chettan 2";
         background-color: #ffffff;
-        font-weight: bold;
-        font-size: 16px;
+        font-size: 18px;
         box-shadow: 0px 0px 9px 0px rgba(0, 0, 0, 0.1);
     }
     .col-1 {
@@ -195,13 +191,19 @@ body {
         flex-basis: 20%;
     }
 
+    .col-1, .col-2, .col-3 {
+        border-right: 2px solid #ccc;
+    }
+
+    .col-1, .col-2, .col-3, .col-4 {
+        padding-left: 30px;
+    }
+
     @media all and (max-width: 767px) {
-        .collection-table-header,
-        .api-table-header {
+        .collection-table-header {
             display: none;
         }
-        .collection-table-row,
-        .api-table-row {
+        .collection-table-row {
         }
         li {
             display: block;
@@ -238,19 +240,16 @@ body {
     transform: scale(1.2);
 }
 
-.collection-table-row:hover,
-.api-table-row:hover {
+.collection-table-row:hover {
     cursor: pointer;
     background-color: #F9F9F9;
 }
 
-.collection-table-row:hover .btn,
-.api-table-row:hover .btn {
+.collection-table-row:hover .btn {
     background-color: #F9F9F9;
 }
 
-.collection-container,
-#api-list {
+.collection-container {
     font-family: "Baloo Chettan 2";
 }
 

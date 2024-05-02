@@ -176,3 +176,90 @@ input[type="submit"] {
 .content {
     grid-column: 1;
 }
+
+.test-result-table {
+    li {
+        border-radius: 3px;
+        padding: 25px 30px;
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 25px;
+    }
+    .test-result-table-header {
+        background-color: #ddd;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+    .test-result-table-row {
+        font-family: "Baloo Chettan 2";
+        background-color: #ffffff;
+        font-weight: bold;
+        font-size: 18px;
+        box-shadow: 0px 0px 9px 0px rgba(0, 0, 0, 0.1);
+    }
+    .col-1 {
+        flex-basis: 20%;
+    }
+    .col-2 {
+        flex-basis: 10%;
+        text-align: center;
+        align-items: center;
+        justify-content: center;
+    }
+    .col-3 {
+        flex-basis: 15%;
+        text-align: center;
+        align-items: center;
+        justify-content: center;
+    }
+    .col-4 {
+        flex-basis: 15%;
+        text-align: center;
+        align-items: center;
+        justify-content: center;
+    }
+    .col-5 {
+        flex-basis: 40%;
+    }
+
+    @media all and (max-width: 767px) {
+        .test-result-table-header {
+            display: none;
+        }
+        .test-result-tablee-row {
+        }
+        li {
+            display: block;
+        }
+        .col {
+            flex-basis: 100%;
+        }
+        .col {
+            display: flex;
+            padding: 10px 0;
+            &:before {
+                color: #6c7a89;
+                padding-right: 10px;
+                content: attr(data-label);
+                flex-basis: 50%;
+                text-align: right;
+            }
+        }
+    }
+}
+
+.test-result-table-row:hover {
+    background-color: #F9F9F9;
+}
+
+.tableHeader {
+    font-weight: bold;
+    font-size: 25px;
+    vertical-align: top;
+    align-content: center;
+}
+
+.test-result-table-row .col {
+    vertical-align: top;
+}

@@ -124,6 +124,21 @@ function showAPIData() {
 
 async function addAPI() {
 
+    // Reset query params
+    const queryParams = document.getElementById("queryParams");
+    queryParams.innerHTML = '';
+    queryParams.insertAdjacentHTML("beforeend", '<label for="queryParams">Query Params</label><br>');
+    queryParams.insertAdjacentHTML("beforeend", '<input id="paramsKey" type="text" class="dynamic-input paramsKey" name="paramsKey" placeholder="Key" oninput="addQueryParamsInput(event)">');
+    queryParams.insertAdjacentHTML("beforeend", '<input id="paramsValue" type="text" class="dynamic-input paramsValue" name="paramsValue" placeholder="Value" oninput="addQueryParamsInput(event)">');
+
+    // Reset headers
+    const headers = document.getElementById("headers");
+    headers.innerHTML = '';
+    headers.insertAdjacentHTML("beforeend", '<label for="headers">Headers</label><br>');
+    headers.insertAdjacentHTML("beforeend", '<input id="headersKey" type="text" class="headers-input" name="headersKey" placeholder="Key" oninput="addHeadersInput(event)">');
+    headers.insertAdjacentHTML("beforeend", '<input id="headersValue" type="text" class="headers-input" name="headersValue" placeholder="Value" oninput="addHeadersInput(event)">');
+
+    // Reset other
     document.getElementById("api-form").reset();
 
     const dom = document.getElementById("api-form-container")
@@ -134,6 +149,11 @@ async function addAPI() {
         event.preventDefault();
         dom.style.display = "none";
         overlay.style.display = "none";
+    })
+
+    const body = document.getElementById("body");
+    body.addEventListener("input", () => {
+        body.value = JSON.stringify(JSON.parse(body.value), null, 4);
     })
 
     const cancelButton = document.getElementById("api-cancel-button");
@@ -281,8 +301,18 @@ function testAllAPI() {
             if (!response.ok) {
                 alert("Test failed!");
             } else {
-                alert("All API test completed!");
+                return response.json();
             }
+        })
+        .then(data => {
+            const testDate = data.testDate;
+            const testTime = (data.testTime).split(".")[0];
+            console.log("Test Time:", testTime);
+            window.location.href =
+                "/api/1.0/autoTest/monitor?collectionId=" + collectionId + "&testDate=" + testDate + "&testTime=" + testTime;
+            // window.location.href =
+            //     "/api/1.0/autoTest/monitor/testResult?collectionId=" + collectionId + "&testDate=" + testDate + "&testTime=" + testTime;
+            alert("All API test completed!");
         })
         .catch(error => {
             console.error('Error submitting form:', error);

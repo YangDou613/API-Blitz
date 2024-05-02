@@ -6,10 +6,12 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Data
-public class TestResult {
-	private Integer testCaseId;
+public class CollectionTestResult {
 	private Integer collectionId;
 	private Integer collectionDetailsId;
+	private String requestName;
+	private String method;
+	private String apiurl;
 	private String testOptions;
 	private LocalDate testDate;
 	private LocalTime testTime;

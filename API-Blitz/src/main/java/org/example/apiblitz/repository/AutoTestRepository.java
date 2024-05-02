@@ -1,6 +1,7 @@
 package org.example.apiblitz.repository;
 
 import lombok.extern.slf4j.Slf4j;
+import org.example.apiblitz.model.CollectionTestResult;
 import org.example.apiblitz.model.Request;
 import org.example.apiblitz.model.TestResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 @Slf4j
@@ -70,5 +73,39 @@ public class AutoTestRepository {
 		String getTestResultListSql = "SELECT * FROM ( SELECT * FROM testResult WHERE testCaseId = ? " +
 				"ORDER BY testDate DESC, testTime DESC LIMIT 10 ) AS subquery ORDER BY testTime ASC";
 		return jdbcTemplate.query(getTestResultListSql, new Object[]{testCaseId}, new BeanPropertyRowMapper<>(TestResult.class));
+	}
+
+	public List<Map<String, Object>> getAllTestTime(Integer testCaseId) {
+		String getTestTimeSql = "SELECT DISTINCT testDate, testTime FROM collectionTestResult WHERE collectionId = ?";
+		return jdbcTemplate.queryForList(getTestTimeSql, testCaseId);
+	}
+
+	public List<CollectionTestResult> getOnceTestResultByCollectionId(Integer collectionId, LocalDate testDate, LocalTime testTime) {
+
+		String getTestTimeSql = "SELECT cd.*, ctr.* FROM collectionDetails cd JOIN collectionTestResult ctr " +
+				"ON cd.id = ctr.collectionDetailsId WHERE testDate = ? AND testTime = ? AND cd.collectionId = ?";
+		return jdbcTemplate.query(getTestTimeSql, new BeanPropertyRowMapper<>(CollectionTestResult.class), testDate, testTime, collectionId);
+	}
+
+	public List<List<TestResult>> getAllTestResultByCollectionId(Integer collectionId) {
+
+		// Get test time
+		String getTestTimeSql = "SELECT DISTINCT testDate, testTime FROM collectionTestResult WHERE collectionId = ?";
+		List<Map<String, Object>> testTimeList = jdbcTemplate.queryForList(getTestTimeSql, collectionId);
+
+		// Get test result
+		List<List<TestResult>> testResultList = new ArrayList<>();
+
+		for (Map<String, Object> testTime : testTimeList) {
+			String getTestResultSql =
+					"SELECT * FROM collectionTestResult WHERE testDate = ? AND testTime = ? AND collectionId = ?";
+			List<TestResult> testResult = jdbcTemplate.query(getTestResultSql, new BeanPropertyRowMapper<>(TestResult.class),
+					testTime.get("testDate"),
+					testTime.get("testTime"),
+					collectionId);
+			testResultList.add(testResult);
+		}
+
+		return testResultList;
 	}
 }

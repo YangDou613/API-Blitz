@@ -124,8 +124,8 @@ pre {
 }
 
 #container {
+    display: flex;
     justify-content: space-around;
-    flex: 1;
     gap: 100px;
     padding: 0 50px;
     margin-left: 200px;
@@ -133,17 +133,11 @@ pre {
 
 .content {
     grid-column: 1;
-}
-
-.content::after {
-    content: "";
-    display: block;
-    height: 1px;
-    width: 50%;
-    background-color: #ccc;
+    flex: 1;
 }
 
 #response-container {
+    flex: 1;
     grid-column: 2;
     flex-basis: 1000px;
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import org.example.apiblitz.model.CollectionTestResult;
 import org.example.apiblitz.model.Request;
 import org.example.apiblitz.model.TestResult;
 import org.example.apiblitz.repository.AutoTestRepository;
@@ -154,5 +155,17 @@ public class AutoTestService {
 
 	public List<TestResult> getAllTestResult(Integer testCaseId) {
 		return autoTestRepository.getAllTestResultByTestCaseId(testCaseId);
+	}
+
+	public List<Map<String, Object>> getTestTime(Integer collectionId) {
+		return autoTestRepository.getAllTestTime(collectionId);
+	}
+
+	public List<CollectionTestResult> collectionOnceTestResult(Integer collectionId, LocalDate testDate, LocalTime testTime) {
+		return autoTestRepository.getOnceTestResultByCollectionId(collectionId, testDate, testTime);
+	}
+
+	public List<List<TestResult>> collectionAllTestResult(Integer collectionId) {
+		return autoTestRepository.getAllTestResultByCollectionId(collectionId);
 	}
 }

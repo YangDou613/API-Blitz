@@ -169,16 +169,35 @@ public class CollectionsController {
 			@RequestBody List<Request> requests) {
 
 		try {
-			List<ResponseEntity<?>> responseList = collectionService.sendRequestAtSameTime(collectionId, requests);
+			Map<String, Object> testTime = collectionService.sendRequestAtSameTime(collectionId, requests);
 
-			if (responseList == null) {
+			if (testTime == null) {
 				return ResponseEntity.badRequest().build();
 			}
 
-			return ResponseEntity.ok(responseList);
+			return ResponseEntity.status(200).body(testTime);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error");
 		}
 	}
+
+//	@PostMapping("/testAll")
+//	public ResponseEntity<?> getResponseAtSameTime(
+//			Integer collectionId,
+//			@RequestBody List<Request> requests) {
+//
+//		try {
+//			List<ResponseEntity<?>> responseList = collectionService.sendRequestAtSameTime(collectionId, requests);
+//
+//			if (responseList == null) {
+//				return ResponseEntity.badRequest().build();
+//			}
+//
+//			return ResponseEntity.ok(responseList);
+//		} catch (Exception e) {
+//			log.error(e.getMessage());
+//			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error");
+//		}
+//	}
 }

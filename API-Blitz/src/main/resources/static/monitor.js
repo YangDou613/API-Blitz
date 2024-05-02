@@ -1,12 +1,115 @@
 let selectedTestCaseId;
+let selectedCollectionId;
+let testDate;
+let testTime;
 
 if (window.location.search !== "") {
     let urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has("testCaseId")) {
         selectedTestCaseId = urlParams.get("testCaseId");
+        getTestCaseResult();
     }
-    getResult();
+    if (urlParams.has("collectionId") &&
+        urlParams.has("testDate") &&
+        urlParams.has("testTime")) {
+
+        console.log("yaaaaa")
+
+        selectedCollectionId = urlParams.get("collectionId");
+        testDate = urlParams.get("testDate");
+        testTime = urlParams.get("testTime");
+        getCollectionResult();
+    }
 }
+
+// fetch('/api/1.0/autoTest/monitor/testResult/all?collectionId=' + selectedCollectionId)
+//     .then(response => {
+//         if (!response.ok) {
+//             console.log(response.status)
+//             throw new Error('Network response was not ok');
+//         }
+//         return response.json();
+//     })
+//     .then(data => {
+//
+//         const ul = document.createElement("ul");
+//         ul.classList.add("api-table");
+//
+//         const tableHeaderLi = document.createElement("li");
+//         tableHeaderLi.classList.add("api-table-header");
+//         tableHeaderLi.insertAdjacentHTML("beforeend", `<div class="col col-1 tableHeader">Request Name</div>`);
+//         tableHeaderLi.insertAdjacentHTML("beforeend", `<div class="col col-2 tableHeader">Method</div>`);
+//         tableHeaderLi.insertAdjacentHTML("beforeend", `<div class="col col-3 tableHeader">URL</div>`);
+//         tableHeaderLi.insertAdjacentHTML("beforeend", `<div class="col col-4 tableHeader"></div>`);
+//
+//         ul.appendChild(tableHeaderLi);
+//
+//         data.forEach(api => {
+//
+//             const li = document.createElement("li");
+//             li.classList.add("api-table-row");
+//             li.insertAdjacentHTML("beforeend", `<div class="col col-1" data-label="Request Name">${api["requestName"]}</div>`);
+//             li.insertAdjacentHTML("beforeend", `<div class="col col-2" data-label="Method">${api["method"]}</div>`);
+//             li.insertAdjacentHTML("beforeend", `<div class="col col-3" data-label="URL">${api["apiurl"]}</div>`);
+//
+//             const buttonDiv = document.createElement("div");
+//             buttonDiv.classList.add("col", "col-4", "buttonDiv");
+//
+//             const testButton = document.createElement("button");
+//             testButton.type = "button";
+//             testButton.classList.add("btn", "btn-primary", "btn-xs", "dt-edit");
+//             testButton.style.marginRight = "16px";
+//             testButton.style.backgroundImage = "url('/test-all.png')";
+//             testButton.style.backgroundSize = "contain";
+//             testButton.style.backgroundRepeat = "no-repeat";
+//             testButton.style.backgroundPosition = "center";
+//
+//             const editIcon = document.createElement("span");
+//             editIcon.classList.add("glyphicon", "glyphicon-pencil");
+//             editIcon.setAttribute("aria-hidden", "true");
+//
+//             testButton.appendChild(editIcon);
+//
+//             const deleteButton = document.createElement("button");
+//             deleteButton.type = "button";
+//             deleteButton.classList.add("btn", "btn-primary", "btn-xs", "dt-delete");
+//             deleteButton.style.marginRight = "16px";
+//             deleteButton.style.backgroundImage = "url('/delete.png')";
+//             deleteButton.style.backgroundSize = "contain";
+//             deleteButton.style.backgroundRepeat = "no-repeat";
+//             deleteButton.style.backgroundPosition = "center";
+//
+//             const deleteIcon = document.createElement("span");
+//             deleteIcon.classList.add("glyphicon", "glyphicon-pencil");
+//             deleteIcon.setAttribute("aria-hidden", "true");
+//
+//             deleteButton.appendChild(deleteIcon);
+//
+//             buttonDiv.appendChild(testButton);
+//             buttonDiv.appendChild(deleteButton);
+//
+//             li.appendChild(buttonDiv);
+//
+//             ul.appendChild(li);
+//
+//             selectedCollectionName = api["requestName"];
+//             selectedRequestId = api["id"];
+//
+//             testButton.addEventListener("click", () => {
+//                 selectedAPI = api;
+//                 const queryString = `?selectedAPI=${encodeURIComponent(JSON.stringify(selectedAPI))}`;
+//                 window.location.href = "/APITest.html" + queryString;
+//             })
+//             deleteButton.addEventListener('click', () => {
+//                 deleteAPI();
+//             });
+//         });
+//         const container = document.getElementById("container");
+//         container.appendChild(ul);
+//     })
+//     .catch(error => {
+//         console.error('There was an error!', error);
+//     });
 
 // fetch('/api/1.0/autoTest/monitor/testCase?userId=1')
 //     .then(response => {
@@ -40,7 +143,9 @@ if (window.location.search !== "") {
 //         console.error('There was an error!', error);
 //     });
 
-function getResult() {
+function getTestCaseResult() {
+
+    console.log("hiii")
     fetch('/api/1.0/autoTest/monitor/testResult/' + selectedTestCaseId)
         .then(response => {
             if (!response.ok) {
@@ -51,6 +156,101 @@ function getResult() {
         })
         .then(data => {
             dashboard(data)
+        })
+        .catch(error => {
+            console.error('There was an error!', error);
+        });
+}
+
+function getCollectionResult() {
+    fetch("/api/1.0/autoTest/monitor/testResult?collectionId=" + selectedCollectionId + "&testDate=" + testDate + "&testTime=" + testTime)
+        .then(response => {
+            if (!response.ok) {
+                console.log(response.status)
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+
+            const container = document.getElementById('container');
+            container.insertAdjacentHTML("beforeend", `<h3>Test Date: ${data[0]["testDate"]}</h3>`);
+            container.insertAdjacentHTML("beforeend", `<h3>Test Date: ${data[0]["testTime"]}</h3>`);
+
+            const ul = document.createElement("ul");
+            ul.classList.add("test-result-table");
+
+            const tableHeaderLi = document.createElement("li");
+            tableHeaderLi.classList.add("test-result-table-header");
+            tableHeaderLi.insertAdjacentHTML("beforeend", `<div class="col col-1 tableHeader">Request<br>Name</div>`);
+            tableHeaderLi.insertAdjacentHTML("beforeend", `<div class="col col-2 tableHeader">Result</div>`);
+            tableHeaderLi.insertAdjacentHTML("beforeend", `<div class="col col-3 tableHeader">Status<br>Code</div>`);
+            tableHeaderLi.insertAdjacentHTML("beforeend", `<div class="col col-4 tableHeader">Method</div>`);
+            tableHeaderLi.insertAdjacentHTML("beforeend", `<div class="col col-5 tableHeader">URL</div>`);
+
+            ul.appendChild(tableHeaderLi);
+
+            data.forEach(apiTestResult => {
+
+                const li = document.createElement("li");
+                li.classList.add("test-result-table-row");
+                li.insertAdjacentHTML("beforeend", `<div class="col col-1" data-label="Request Name">${apiTestResult["requestName"]}</div>`);
+                if (apiTestResult["result"] === "pass") {
+                    li.insertAdjacentHTML("beforeend", `<div class="col col-2" data-label="Result" style="color: green;">${apiTestResult["result"]}</div>`);
+                } else if (apiTestResult["result"] === "failed") {
+                    li.insertAdjacentHTML("beforeend", `<div class="col col-2" data-label="Result" style="color: red;">${apiTestResult["result"]}</div>`);
+                }
+                li.insertAdjacentHTML("beforeend", `<div class="col col-3" data-label="Status Code">${apiTestResult["statusCode"]}</div>`);
+                li.insertAdjacentHTML("beforeend", `<div class="col col-4" data-label="Method">${apiTestResult["method"]}</div>`);
+                li.insertAdjacentHTML("beforeend", `<div class="col col-5" data-label="URL">${apiTestResult["apiurl"]}</div>`);
+
+
+                // li.insertAdjacentHTML("beforeend",
+                //     `<div class="col col-5" data-label="Details"><a href="/api/1.0/autoTest/monitor?testCaseId=${testCase["id"]}">View Monitor ⮕</a></div>`);
+
+                // const buttonDiv = document.createElement("div");
+                // buttonDiv.classList.add("col", "col-6", "buttonDiv");
+                //
+                // const editButton = document.createElement("button");
+                // editButton.type = "button";
+                // editButton.classList.add("btn", "btn-primary", "btn-xs", "dt-edit");
+                // editButton.style.backgroundImage = "url('/edit.png')";
+                // editButton.style.backgroundSize = "contain";
+                // editButton.style.backgroundRepeat = "no-repeat";
+                // editButton.style.backgroundPosition = "center";
+                //
+                // const editIcon = document.createElement("span");
+                // editIcon.classList.add("glyphicon", "glyphicon-pencil");
+                // editIcon.setAttribute("aria-hidden", "true");
+                //
+                // editButton.appendChild(editIcon);
+                //
+                // const deleteButton = document.createElement("button");
+                // deleteButton.type = "button";
+                // deleteButton.classList.add("btn", "btn-primary", "btn-xs", "dt-delete");
+                // deleteButton.style.backgroundImage = "url('/delete.png')";
+                // deleteButton.style.backgroundSize = "contain";
+                // deleteButton.style.backgroundRepeat = "no-repeat";
+                // deleteButton.style.backgroundPosition = "center";
+                //
+                // const deleteIcon = document.createElement("span");
+                // deleteIcon.classList.add("glyphicon", "glyphicon-pencil");
+                // deleteIcon.setAttribute("aria-hidden", "true");
+                //
+                // deleteButton.appendChild(deleteIcon);
+                //
+                // buttonDiv.appendChild(editButton);
+                // buttonDiv.appendChild(deleteButton);
+                //
+                // li.appendChild(buttonDiv);
+
+                ul.appendChild(li);
+            });
+
+            // const container = document.getElementById('container');
+            // container.insertAdjacentHTML("beforeend", `<h3>Test Date: ${apiTestResult["testDate"]}</h3>`);
+            container.appendChild(ul);
+
         })
         .catch(error => {
             console.error('There was an error!', error);
