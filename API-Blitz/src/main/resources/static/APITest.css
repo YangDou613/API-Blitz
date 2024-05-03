@@ -1,3 +1,59 @@
+/* Reset CSS */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, font, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    font-weight: inherit;
+    font-style: inherit;
+    font-size: 100%;
+    font-family: inherit;
+    vertical-align: baseline;
+}
+
+/* remember to define focus styles! */
+:focus {
+    outline: 0;
+}
+
+body {
+    line-height: 1;
+    color: black;
+    background: white;
+}
+
+ol, ul {
+    list-style: none;
+}
+
+/* tables still need 'cellspacing="0"' in the markup */
+table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+caption, th, td {
+    text-align: left;
+    font-weight: normal;
+}
+
+blockquote:before, blockquote:after,
+q:before, q:after {
+    content: "";
+}
+
+blockquote, q {
+    quotes: "" "";
+}
+
+/* Start setting */
 header {
     position: fixed;
     top: 0;
@@ -5,7 +61,7 @@ header {
     width: 100%;
     background-color: #F9F9F9;
     z-index: 1000;
-    height: 150px;
+    height: 140px;
 }
 
 #logo {
@@ -22,6 +78,8 @@ header {
     align-items: center;
     height: 100%;
     background-color: #F9F9F9;
+    gap: 30px;
+    padding: 15px;
 }
 
 .sidebar-link a {
@@ -31,9 +89,10 @@ header {
 .sidebar-link p {
     text-align: center;
     font-family: "Baloo Chettan 2";
-    font-size: 14pt;
+    font-size: 18pt;
     font-weight: bold;
     color: #4C4C4C;
+    margin-top: 10px;
 }
 
 #test {
@@ -86,20 +145,23 @@ header {
 
 .nav h1 {
     font-family: "Baloo Chettan 2";
+    font-weight: bold;
     font-size: 40pt;
     color: #4C4C4C;
 }
 
 form label{
     font-family: "Baloo Chettan 2";
-    font-size: 14pt;
+    font-size: 16pt;
     font-weight: bold;
     color: #4C4C4C;
+    margin-bottom: 10px;
 }
 
 .content-wrapper {
     display: flex;
-    margin-top: 150px;
+    margin-top: 140px;
+    height: calc(100% - 140px);
 }
 
 pre {
@@ -112,7 +174,7 @@ pre {
     font-size: 14px;
     line-height: 1.5;
     color: #333;
-    max-height: 500px;
+    max-height: 450px;
     overflow-y: auto;
 }
 
@@ -126,9 +188,10 @@ pre {
 #container {
     display: flex;
     justify-content: space-around;
-    gap: 100px;
-    padding: 0 50px;
-    margin-left: 200px;
+    gap: 60px;
+    padding: 25px 50px;
+    margin-left: 180px;
+    width: calc(100% - 180px);
 }
 
 .content {
@@ -139,11 +202,19 @@ pre {
 #response-container {
     flex: 1;
     grid-column: 2;
-    flex-basis: 1000px;
+    height: calc(100% - 100px);
+    position: relative;
 }
 
-select,
-input {
+#loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+textarea {
+    margin-top: 10px;
     padding: 5px;
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -152,8 +223,18 @@ input {
     font-family: "Baloo Chettan 2";
 }
 
+select,
+input {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #F9F9F9;
+    font-size: 18px;
+    font-family: "Baloo Chettan 2";
+}
+
 input[type="text"]::placeholder {
-    font-size: 14px;
+    font-size: 16px;
     color: #999;
     padding-left: 5px;
     font-family: "Baloo Chettan 2";
@@ -169,16 +250,15 @@ input[type="submit"] {
 
 h3 {
     font-family: "Baloo Chettan 2";
-    font-size: 20pt;
+    font-size: 25pt;
+    font-weight: bold;
     color: #4C4C4C;
 }
 
 #response-container {
     font-family: "Baloo Chettan 2";
-    font-size: 14pt;
+    font-size: 18px;
     color: #4C4C4C;
-    width: 800px;
-    height: 800px;
 }
 
 .tab-container {
@@ -203,11 +283,25 @@ h3 {
 .headers-table {
     width: 100%;
     border-collapse: collapse;
+    font-size: 14pt;
+    font-family: "Baloo Chettan 2";
 }
 
-.headers-table td, .headers-table th {
+#headers-table-title {
+    font-weight: bold;
+    width: 200px;
+}
+
+.headers-table td, .headers-table tr {
     border: 2px solid #ddd;
     padding: 8px;
+    text-align: left;
+    align-content: center;
+    height: 30px;
+}
+
+.headers-table tr {
+    width: 100px;
 }
 
 .headers-table tr:nth-child(even) {

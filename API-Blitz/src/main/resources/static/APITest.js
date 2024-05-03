@@ -2,6 +2,11 @@ let response = null;
 let selectedAPI = null;
 let method = null;
 
+const body = document.getElementById("body");
+body.addEventListener("input", () => {
+    body.value = JSON.stringify(JSON.parse(body.value), null, 4);
+})
+
 function updateParamsFromUrl() {
     let url = document.getElementById("url");
     let allParamsKeysInput = document.querySelectorAll(".paramsKey");
@@ -86,17 +91,42 @@ document.getElementById("queryParams").addEventListener("input", function(event)
 document.getElementById('api-form').addEventListener('submit', function(event) {
     event.preventDefault();
 
+    clear();
+
+    document.getElementById('loading').style.display = 'block';
+
     let formData = new FormData(this);
     method = formData.get("method");
 
     let xhr = new XMLHttpRequest();
     xhr.open('POST', '/APITest.html');
     xhr.onload = function() {
+        document.getElementById('loading').style.display = 'none';
         response = JSON.parse(xhr.responseText);
         displayResponse();
     };
     xhr.send(formData);
 });
+
+function clear() {
+    let statusCode = document.getElementById('status-code');
+    statusCode.innerHTML = '';
+
+    let responseTime = document.getElementById('response-time');
+    responseTime.innerHTML = '';
+
+    let responseSize = document.getElementById('response-size');
+    responseSize.innerHTML = '';
+
+    let headerTab = document.getElementById("show-response-header");
+    headerTab.style.display = "none";
+
+    let bodyTab = document.getElementById("show-response-body");
+    bodyTab.style.display = "none";
+
+    let responseBody = document.getElementById('response');
+    responseBody.innerHTML = '';
+}
 
 function displayResponse() {
 
@@ -169,10 +199,21 @@ function displayHeaders() {
     headersTable.classList.add('headers-table');
 
     const headersMap = objectToMap(response.headers);
+
+    let keyHtml;
+    let valueHtml;
     headersMap.forEach((value, key) => {
         const tr = document.createElement("tr");
-        let keyHtml = `<td>${key}</td>`;
-        let valueHtml = `<td>${value}</td>`;
+        if (key === "Content-Length") {
+            keyHtml = `<td id="headers-table-title">${key}</td>`;
+            valueHtml = `<td>${value} B</td>`;
+        } else if (key === "Execution-Duration") {
+            keyHtml = `<td id="headers-table-title">${key}</td>`;
+            valueHtml = `<td>${value} ms</td>`;
+        } else {
+            keyHtml = `<td id="headers-table-title">${key}</td>`;
+            valueHtml = `<td>${value}</td>`;
+        }
         tr.insertAdjacentHTML('beforeend', keyHtml);
         tr.insertAdjacentHTML('beforeend', valueHtml);
         headersTable.appendChild(tr);
@@ -320,6 +361,8 @@ function insertData(selectedAPI) {
         // Authorization
         if (headersMap.has("Authorization")) {
             getAuthorization(headersMap);
+        } else {
+                document.getElementById('authorizationKey').value = "No Auth";
         }
 
         // Headers
@@ -340,7 +383,6 @@ function insertData(selectedAPI) {
                 }
             }
         });
-        document.getElementById("headersButton").style.display = "block";
     }
 
     // Body
@@ -404,6 +446,7 @@ function addQueryParamsInput(event) {
                 && paramsValueInput.nextElementSibling.value.trim() === "")) {
             paramsValueInput.parentNode.appendChild(br);
             paramsValueInput.parentNode.appendChild(newKeyInput);
+            paramsValueInput.parentNode.appendChild(document.createTextNode(" "));
             paramsValueInput.parentNode.appendChild(newValueInput);
         }
 
@@ -442,6 +485,7 @@ function addHeadersInput(event) {
         if (!inputHeaders.nextElementSibling || inputHeaders.nextElementSibling && inputHeaders.nextElementSibling.value.trim() === "") {
             inputHeaders.parentNode.appendChild(br);
             inputHeaders.parentNode.appendChild(newHeadersKeyInput);
+            inputHeaders.parentNode.appendChild(document.createTextNode(" "));
             inputHeaders.parentNode.appendChild(newHeadersValueInput);
         }
 
