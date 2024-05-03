@@ -300,15 +300,22 @@ public class CollectionsService {
 		APIData apiData = new APIData();
 
 		apiData.setMethod(collection.getMethod());
-		apiData.setUrl(collection.getUrl());
+		apiData.setUrl(collection.getApiurl());
 		apiData.setParamsKey(collection.getParamsKey());
 		apiData.setParamsValue(collection.getParamsValue());
-		apiData.setAuthorizationKey(collection.getAuthorizationKey());
+		if (collection.getAuthorizationKey() == null) {
+			apiData.setAuthorizationKey("No Auth");
+		} else {
+			apiData.setAuthorizationKey(collection.getAuthorizationKey());
+		}
 		apiData.setAuthorizationValue(collection.getAuthorizationValue());
 		apiData.setHeadersKey(collection.getHeadersKey());
 		apiData.setHeadersValue(collection.getHeadersValue());
-		apiData.setBody(collection.getBody());
-
+		if (collection.getBody() == null) {
+			apiData.setBody("");
+		} else {
+			apiData.setBody(collection.getBody());
+		}
 		return apiData;
 	}
 }

@@ -74,11 +74,11 @@ function showAPIData() {
                     testButton.style.backgroundRepeat = "no-repeat";
                     testButton.style.backgroundPosition = "center";
 
-                    const editIcon = document.createElement("span");
-                    editIcon.classList.add("glyphicon", "glyphicon-pencil");
-                    editIcon.setAttribute("aria-hidden", "true");
+                    const testIcon = document.createElement("span");
+                    testIcon.classList.add("glyphicon", "glyphicon-pencil");
+                    testIcon.setAttribute("aria-hidden", "true");
 
-                    testButton.appendChild(editIcon);
+                    testButton.appendChild(testIcon);
 
                     const deleteButton = document.createElement("button");
                     deleteButton.type = "button";
