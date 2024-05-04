@@ -12,90 +12,140 @@ fetch('/api/1.0/collections/get?userId=1')
     })
     .then(data => {
 
-        const ul = document.createElement("ul");
-        ul.classList.add("collection-table");
+        const table = document.createElement("table");
+        table.classList.add("table");
+        table.classList.add("table-bordered");
 
-        const tableHeaderLi = document.createElement("li");
-        tableHeaderLi.classList.add("collection-table-header");
-        tableHeaderLi.insertAdjacentHTML("beforeend", `<div class="col col-1 tableHeader">ID</div>`);
-        tableHeaderLi.insertAdjacentHTML("beforeend", `<div class="col col-2 tableHeader">Name</div>`);
-        tableHeaderLi.insertAdjacentHTML("beforeend", `<div class="col col-3 tableHeader">Description</div>`);
-        tableHeaderLi.insertAdjacentHTML("beforeend", `<div class="col col-4 tableHeader"></div>`);
+        const thead = document.createElement("thead");
+        const theadTr = document.createElement("tr");
+        theadTr.insertAdjacentHTML("beforeend", "<th>ID</th>");
+        theadTr.insertAdjacentHTML("beforeend", "<th>Name</th>");
+        theadTr.insertAdjacentHTML("beforeend", "<th>Description</th>");
+        theadTr.insertAdjacentHTML("beforeend", "<th>Actions</th>");
+        thead.appendChild(theadTr);
 
-        ul.appendChild(tableHeaderLi);
+        const tbody = document.createElement("tbody");
+
+        // const ul = document.createElement("ul");
+        // ul.classList.add("collection-table");
+        //
+        // const tableHeaderLi = document.createElement("li");
+        // tableHeaderLi.classList.add("collection-table-header");
+        // tableHeaderLi.insertAdjacentHTML("beforeend", `<div class="col col-1 tableHeader">ID</div>`);
+        // tableHeaderLi.insertAdjacentHTML("beforeend", `<div class="col col-2 tableHeader">Name</div>`);
+        // tableHeaderLi.insertAdjacentHTML("beforeend", `<div class="col col-3 tableHeader">Description</div>`);
+        // tableHeaderLi.insertAdjacentHTML("beforeend", `<div class="col col-4 tableHeader"></div>`);
+        //
+        // ul.appendChild(tableHeaderLi);
 
         data.forEach(collection => {
 
-            const li = document.createElement("li");
-            li.classList.add("collection-table-row");
-            li.insertAdjacentHTML("beforeend", `<div class="col col-1" data-label="ID">${collection["id"]}</div>`);
-            li.insertAdjacentHTML("beforeend", `<div class="col col-2" data-label="Name">${collection["collectionName"]}</div>`);
-            li.insertAdjacentHTML("beforeend", `<div class="col col-3" data-label="Description">${collection["description"]}</div>`);
+            const tbodyTr = document.createElement("tr");
+            tbodyTr.insertAdjacentHTML("beforeend", `<td class="col col-1">${collection["id"]}</td>`);
+            tbodyTr.insertAdjacentHTML("beforeend", `<td class="col col-2">${collection["collectionName"]}</td>`);
+            tbodyTr.insertAdjacentHTML("beforeend", `<td class="col col-3">${collection["description"]}</td>`);
+            tbodyTr.insertAdjacentHTML("beforeend",
+                `<td class="col col-4"><button type="button" class="btn btn-block btn-edit">Edit</button>
+                        <button type="button" class="btn btn-block btn-delete">Delete</button></td>`)
 
-            const buttonDiv = document.createElement("div");
-            buttonDiv.classList.add("col", "col-4", "buttonDiv");
+            tbody.appendChild(tbodyTr);
 
-            const editButton = document.createElement("button");
-            editButton.type = "button";
-            editButton.classList.add("btn", "btn-primary", "btn-xs", "dt-edit");
-            editButton.style.marginRight = "16px";
-            editButton.style.backgroundImage = "url('/edit.png')";
-            editButton.style.backgroundSize = "contain";
-            editButton.style.backgroundRepeat = "no-repeat";
-            editButton.style.backgroundPosition = "center";
+            const editButton = tbodyTr.querySelector(".btn-edit");
+            const deleteButton = tbodyTr.querySelector(".btn-delete");
 
-            const editIcon = document.createElement("span");
-            editIcon.classList.add("glyphicon", "glyphicon-pencil");
-            editIcon.setAttribute("aria-hidden", "true");
-
-            editButton.appendChild(editIcon);
-
-            const deleteButton = document.createElement("button");
-            deleteButton.type = "button";
-            deleteButton.classList.add("btn", "btn-primary", "btn-xs", "dt-delete");
-            deleteButton.style.marginRight = "16px";
-            deleteButton.style.backgroundImage = "url('/delete.png')";
-            deleteButton.style.backgroundSize = "contain";
-            deleteButton.style.backgroundRepeat = "no-repeat";
-            deleteButton.style.backgroundPosition = "center";
-
-            const deleteIcon = document.createElement("span");
-            deleteIcon.classList.add("glyphicon", "glyphicon-pencil");
-            deleteIcon.setAttribute("aria-hidden", "true");
-
-            deleteButton.appendChild(deleteIcon);
-
-            buttonDiv.appendChild(editButton);
-            buttonDiv.appendChild(deleteButton);
-
-            li.appendChild(buttonDiv);
-
-            ul.appendChild(li);
-
-            li.addEventListener('click', () => {
+            tbodyTr.addEventListener('click', () => {
                 selectedCollection = collection["id"];
                 selectedCollectionName = collection["collectionName"]
                 window.location.href =
                     "/api/1.0/collections/details?collectionName=" + selectedCollectionName + "&collectionId=" + selectedCollection;
             });
-            editButton.addEventListener('click', (event) => {
+
+            editButton.addEventListener("click", (event) => {
                 event.stopPropagation();
                 selectedCollection = collection["id"];
                 selectedCollectionName = collection["collectionName"];
-                selectedCollectionDescription = collection["description"]
+                selectedCollectionDescription = collection["description"];
                 editCollection();
-            });
-            deleteButton.addEventListener('click', (event) => {
+            })
+            deleteButton.addEventListener("click", (event) => {
                 event.stopPropagation();
                 selectedCollection = collection["id"];
                 selectedCollectionName = collection["collectionName"];
                 deleteCollection(selectedCollectionName);
-            });
+            })
+
+            // const li = document.createElement("li");
+            // li.classList.add("collection-table-row");
+            // li.insertAdjacentHTML("beforeend", `<div class="col col-1" data-label="ID">${collection["id"]}</div>`);
+            // li.insertAdjacentHTML("beforeend", `<div class="col col-2" data-label="Name">${collection["collectionName"]}</div>`);
+            // li.insertAdjacentHTML("beforeend", `<div class="col col-3" data-label="Description">${collection["description"]}</div>`);
+            //
+            // const buttonDiv = document.createElement("div");
+            // buttonDiv.classList.add("col", "col-4", "buttonDiv");
+            //
+            // const editButton = document.createElement("button");
+            // editButton.type = "button";
+            // editButton.classList.add("btn", "btn-primary", "btn-xs", "dt-edit");
+            // editButton.style.marginRight = "16px";
+            // editButton.style.backgroundImage = "url('/edit.png')";
+            // editButton.style.backgroundSize = "contain";
+            // editButton.style.backgroundRepeat = "no-repeat";
+            // editButton.style.backgroundPosition = "center";
+            //
+            // const editIcon = document.createElement("span");
+            // editIcon.classList.add("glyphicon", "glyphicon-pencil");
+            // editIcon.setAttribute("aria-hidden", "true");
+            //
+            // editButton.appendChild(editIcon);
+            //
+            // const deleteButton = document.createElement("button");
+            // deleteButton.type = "button";
+            // deleteButton.classList.add("btn", "btn-primary", "btn-xs", "dt-delete");
+            // deleteButton.style.marginRight = "16px";
+            // deleteButton.style.backgroundImage = "url('/delete.png')";
+            // deleteButton.style.backgroundSize = "contain";
+            // deleteButton.style.backgroundRepeat = "no-repeat";
+            // deleteButton.style.backgroundPosition = "center";
+            //
+            // const deleteIcon = document.createElement("span");
+            // deleteIcon.classList.add("glyphicon", "glyphicon-pencil");
+            // deleteIcon.setAttribute("aria-hidden", "true");
+            //
+            // deleteButton.appendChild(deleteIcon);
+            //
+            // buttonDiv.appendChild(editButton);
+            // buttonDiv.appendChild(deleteButton);
+            //
+            // li.appendChild(buttonDiv);
+            //
+            // ul.appendChild(li);
+            //
+            // li.addEventListener('click', () => {
+            //     selectedCollection = collection["id"];
+            //     selectedCollectionName = collection["collectionName"]
+            //     window.location.href =
+            //         "/api/1.0/collections/details?collectionName=" + selectedCollectionName + "&collectionId=" + selectedCollection;
+            // });
+            // editButton.addEventListener('click', (event) => {
+            //     event.stopPropagation();
+            //     selectedCollection = collection["id"];
+            //     selectedCollectionName = collection["collectionName"];
+            //     selectedCollectionDescription = collection["description"]
+            //     editCollection();
+            // });
+            // deleteButton.addEventListener('click', (event) => {
+            //     event.stopPropagation();
+            //     selectedCollection = collection["id"];
+            //     selectedCollectionName = collection["collectionName"];
+            //     deleteCollection(selectedCollectionName);
+            // });
         });
+        table.appendChild(thead);
+        table.appendChild(tbody);
         const collectionContainer = document.getElementById('collection-container');
         collectionContainer.insertAdjacentHTML("beforeend",
-            ' <input id="create-button" type="submit" onclick="createCollection()" value=" + Create">');
-        collectionContainer.appendChild(ul);
+        '<button type="button" class="btn btn-block btn-add" onClick="createCollection()">+ Create</button>');
+        collectionContainer.appendChild(table);
     })
     .catch(error => {
         console.error('There was an error!', error);

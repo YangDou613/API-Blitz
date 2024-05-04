@@ -362,7 +362,7 @@ function insertData(selectedAPI) {
         if (headersMap.has("Authorization")) {
             getAuthorization(headersMap);
         } else {
-                document.getElementById('authorizationKey').value = "No Auth";
+            document.getElementById('authorizationKey').value = "No Auth";
         }
 
         // Headers

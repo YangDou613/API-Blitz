@@ -300,7 +300,7 @@ public class CollectionsService {
 		APIData apiData = new APIData();
 
 		apiData.setMethod(collection.getMethod());
-		apiData.setUrl(collection.getApiurl());
+		apiData.setUrl(collection.getUrl());
 		apiData.setParamsKey(collection.getParamsKey());
 		apiData.setParamsValue(collection.getParamsValue());
 		if (collection.getAuthorizationKey() == null) {

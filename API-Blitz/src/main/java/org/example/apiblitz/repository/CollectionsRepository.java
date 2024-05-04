@@ -63,7 +63,7 @@ public class CollectionsRepository {
 
 	public void addAPIToCollection(Integer collectionId, Collections collection) throws SQLException {
 
-		String addAPISql = "INSERT INTO collectionDetails (collectionId, requestName, APIUrl, method, " +
+		String addAPISql = "INSERT INTO collectionDetails (collectionId, requestName, apiurl, method, " +
 				"queryParams, headers, body) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
 		jdbcTemplate.update(addAPISql,
@@ -72,8 +72,8 @@ public class CollectionsRepository {
 				collection.getRequest().getAPIUrl(),
 				collection.getRequest().getMethod(),
 				collection.getRequest().getQueryParams(),
-				collection.getRequest().getHeaders(),
-				collection.getRequest().getBody());
+				collection.getRequest().getRequestHeaders(),
+				collection.getRequest().getRequestBody());
 
 		log.info("Successfully added API to the collection!");
 	}

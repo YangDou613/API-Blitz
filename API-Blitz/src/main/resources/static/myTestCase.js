@@ -141,22 +141,22 @@ function addTestCase() {
     const queryParams = document.getElementById("queryParams");
     queryParams.innerHTML = '';
     queryParams.insertAdjacentHTML("beforeend", '<label for="queryParams">Query Params</label><br>');
-    queryParams.insertAdjacentHTML("beforeend", '<input id="paramsKey" type="text" class="dynamic-input paramsKey" name="paramsKey" placeholder="Key" oninput="addQueryParamsInput(event)">');
+    queryParams.insertAdjacentHTML("beforeend", '<input id="paramsKey" type="text" class="dynamic-input paramsKey" name="paramsKey" placeholder="Key" style="margin-top: 10px; margin-top: 10px" oninput="addQueryParamsInput(event)">');
     queryParams.insertAdjacentHTML("beforeend"," ");
-    queryParams.insertAdjacentHTML("beforeend", '<input id="paramsValue" type="text" class="dynamic-input paramsValue" name="paramsValue" placeholder="Value" oninput="addQueryParamsInput(event)">');
+    queryParams.insertAdjacentHTML("beforeend", '<input id="paramsValue" type="text" class="dynamic-input paramsValue" name="paramsValue" placeholder="Value" style="margin-top: 10px; margin-top: 10px" oninput="addQueryParamsInput(event)">');
 
     // Reset headers
     const headers = document.getElementById("headers");
     headers.innerHTML = '';
     headers.insertAdjacentHTML("beforeend", '<label for="headers">Headers</label><br>');
-    headers.insertAdjacentHTML("beforeend", '<input id="headersKey" type="text" class="headers-input" name="headersKey" placeholder="Key" oninput="addHeadersInput(event)">');
+    headers.insertAdjacentHTML("beforeend", '<input id="headersKey" type="text" class="headers-input" name="headersKey" placeholder="Key" style="margin-top: 10px" oninput="addHeadersInput(event)">');
     headers.insertAdjacentHTML("beforeend"," ");
-    headers.insertAdjacentHTML("beforeend", '<input id="headersValue" type="text" class="headers-input" name="headersValue" placeholder="Value" oninput="addHeadersInput(event)">');
+    headers.insertAdjacentHTML("beforeend", '<input id="headersValue" type="text" class="headers-input" name="headersValue" placeholder="Value" style="margin-top: 10px" oninput="addHeadersInput(event)">');
 
     const recipientEmail = document.getElementById("recipientEmail");
     recipientEmail.innerHTML = '';
     recipientEmail.insertAdjacentHTML("beforeend", '<label for="recipientEmail">Recipient Email</label><br>');
-    recipientEmail.insertAdjacentHTML("beforeend", '<input id="email" type="text" name="email" style="width: 300px;" placeholder="Email">');
+    recipientEmail.insertAdjacentHTML("beforeend", '<input id="email" type="text" name="email" style="margin-top: 10px; width: 300px;" placeholder="Email">');
     recipientEmail.insertAdjacentHTML("beforeend", '<br>')
 
     document.getElementById("modify-form").reset();

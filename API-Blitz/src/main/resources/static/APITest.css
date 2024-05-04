@@ -226,6 +226,13 @@ textarea {
     font-family: "Baloo Chettan 2";
 }
 
+textarea::placeholder {
+    font-size: 16px;
+    color: #999;
+    padding-left: 5px;
+    font-family: "Baloo Chettan 2";
+}
+
 select,
 input {
     padding: 5px;
