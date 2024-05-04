@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,7 +16,6 @@
                 <a href="/APITest.html">
                     <img id="logo" src="/logo.png" alt="Logo">
                 </a>
-
                 <h1>API Blitz</h1>
             </div>
 
@@ -93,7 +93,7 @@
                         </select>
 
                         <label for="url"></label>
-                        <input type="text" id="url" name="url" placeholder="Enter URL or paste text" style="width: 500px;" required>
+                        <input type="text" id="url" name="url" placeholder="Enter URL or paste text" style="width: 470px;" required>
                         <br><br><br>
 
 <!--                        <div id="queryParams">-->
@@ -107,14 +107,14 @@
 
                         <div id="queryParams">
                             <label for="queryParams">Query Params</label><br>
-                            <input id="paramsKey" type="text" class="dynamic-input paramsKey" name="paramsKey" placeholder="Key" oninput="addQueryParamsInput(event)">
-                            <input id="paramsValue" type="text" class="dynamic-input paramsValue" name="paramsValue" placeholder="Value" oninput="addQueryParamsInput(event)">
+                            <input id="paramsKey paramsKey-first" type="text" class="dynamic-input paramsKey" name="paramsKey" placeholder="Key" style="margin-top: 10px" oninput="addQueryParamsInput(event)">
+                            <input id="paramsValue paramsValue-first" type="text" class="dynamic-input paramsValue" name="paramsValue" placeholder="Value" style="margin-top: 10px" oninput="addQueryParamsInput(event)">
                         </div>
                         <br><br>
 
                         <div id="authorization">
                             <label for="authorization">Authorization</label><br>
-                            <select name="authorizationKey" id="authorizationKey">
+                            <select name="authorizationKey" id="authorizationKey" style="margin-top: 10px">
                                 <option value="No Auth">No Auth</option>
                                 <option value="Basic Auth">Basic Auth</option>
                                 <option value="Bearer Token">Bearer Token</option>
@@ -154,13 +154,13 @@
 
                         <div id="headers">
                             <label for="headers">Headers</label><br>
-                            <input id="headersKey" type="text" class="headers-input" name="headersKey" placeholder="Key" oninput="addHeadersInput(event)">
-                            <input id="headersValue" type="text" class="headers-input" name="headersValue" placeholder="Value" oninput="addHeadersInput(event)">
+                            <input id="headersKey" type="text" class="headers-input" name="headersKey" placeholder="Key" style="margin-top: 10px" oninput="addHeadersInput(event)">
+                            <input id="headersValue" type="text" class="headers-input" name="headersValue" placeholder="Value" style="margin-top: 10px" oninput="addHeadersInput(event)">
                         </div>
                         <br><br>
 
                         <label for="body">Body</label><br>
-                        <textarea id="body" name="body" rows="7" cols="80"></textarea>
+                        <textarea id="body" name="body" rows="10" cols="80"></textarea>
                         <br><br>
 
                         <label for="statusCode">Status Code</label><br>
@@ -168,7 +168,7 @@
                         <br><br>
 
                         <label for="expectedResponseBody">Expected Response Body</label><br>
-                        <textarea id="expectedResponseBody" name="expectedResponseBody" rows="7" cols="80" required></textarea>
+                        <textarea id="expectedResponseBody" name="expectedResponseBody" rows="10" cols="80"></textarea>
                         <br><br>
 
                         <label for="intervalsTimeUnit">Intervals Time Unit</label>

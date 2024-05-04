@@ -34,6 +34,13 @@ public class TestCaseRepository {
 
 		Integer notification = testCase.getNotification().equals("Yes") ? 1 : 0;
 
+		Object expectedResponseBody;
+		if (!testCase.getExpectedResponseBody().isEmpty()) {
+			expectedResponseBody = testCase.getExpectedResponseBody();
+		} else {
+			expectedResponseBody = null;
+		}
+
 		Object email = objectMapper.writeValueAsString(testCase.getEmail());
 
 		String insertToTestCaseSql = "INSERT INTO testCase (userId, APIUrl, method, queryParams, headers, body, " +
@@ -52,7 +59,7 @@ public class TestCaseRepository {
 			ps.setObject(5, request.getRequestHeaders());
 			ps.setObject(6, request.getRequestBody());
 			ps.setObject(7, testCase.getStatusCode());
-			ps.setObject(8, testCase.getExpectedResponseBody());
+			ps.setObject(8, expectedResponseBody);
 			ps.setObject(9, testCase.getIntervalsTimeUnit());
 			ps.setObject(10, testCase.getIntervalsTimeValue());
 			ps.setObject(11, notification);

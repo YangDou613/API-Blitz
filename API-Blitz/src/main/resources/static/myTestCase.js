@@ -10,82 +10,125 @@ fetch('/api/1.0/testCase/get?userId=1')
     })
     .then(data => {
 
-        const ul = document.createElement("ul");
-        ul.classList.add("test-case-table");
+        const table = document.createElement("table");
+        table.classList.add("table");
+        table.classList.add("table-bordered");
 
-        const tableHeaderLi = document.createElement("li");
-        tableHeaderLi.classList.add("test-case-table-header");
-        tableHeaderLi.insertAdjacentHTML("beforeend", `<div class="col col-1 tableHeader">ID</div>`);
-        tableHeaderLi.insertAdjacentHTML("beforeend", `<div class="col col-2 tableHeader">Test Item</div>`);
-        tableHeaderLi.insertAdjacentHTML("beforeend", `<div class="col col-3 tableHeader">Method</div>`);
-        tableHeaderLi.insertAdjacentHTML("beforeend", `<div class="col col-4 tableHeader">URL</div>`);
-        tableHeaderLi.insertAdjacentHTML("beforeend", `<div class="col col-5 tableHeader">Details</div>`);
-        tableHeaderLi.insertAdjacentHTML("beforeend", `<div class="col col-6 tableHeader"></div>`);
+        const thead = document.createElement("thead");
+        const theadTr = document.createElement("tr");
+        theadTr.insertAdjacentHTML("beforeend", "<th>ID</th>");
+        theadTr.insertAdjacentHTML("beforeend", "<th>Test Item</th>");
+        theadTr.insertAdjacentHTML("beforeend", "<th>Method</th>");
+        theadTr.insertAdjacentHTML("beforeend", "<th>URL</th>");
+        theadTr.insertAdjacentHTML("beforeend", "<th>Details</th>");
+        theadTr.insertAdjacentHTML("beforeend", "<th>Actions</th>");
+        thead.appendChild(theadTr);
 
-        ul.appendChild(tableHeaderLi);
+        const tbody = document.createElement("tbody");
+
+        // const ul = document.createElement("ul");
+        // ul.classList.add("test-case-table");
+        //
+        // const tableHeaderLi = document.createElement("li");
+        // tableHeaderLi.classList.add("test-case-table-header");
+        // tableHeaderLi.insertAdjacentHTML("beforeend", `<div class="col col-1 tableHeader">ID</div>`);
+        // tableHeaderLi.insertAdjacentHTML("beforeend", `<div class="col col-2 tableHeader">Test Item</div>`);
+        // tableHeaderLi.insertAdjacentHTML("beforeend", `<div class="col col-3 tableHeader">Method</div>`);
+        // tableHeaderLi.insertAdjacentHTML("beforeend", `<div class="col col-4 tableHeader">URL</div>`);
+        // tableHeaderLi.insertAdjacentHTML("beforeend", `<div class="col col-5 tableHeader">Details</div>`);
+        // tableHeaderLi.insertAdjacentHTML("beforeend", `<div class="col col-6 tableHeader"></div>`);
+        //
+        // ul.appendChild(tableHeaderLi);
 
         data.forEach(testCase => {
 
-            const li = document.createElement("li");
-            li.classList.add("test-case-table-row");
-            li.insertAdjacentHTML("beforeend", `<div class="col col-1" data-label="ID">${testCase["id"]}</div>`);
-            li.insertAdjacentHTML("beforeend", `<div class="col col-2" data-label="Test Item">${testCase["testItem"]}</div>`);
-            li.insertAdjacentHTML("beforeend", `<div class="col col-3" data-label="Method">${testCase["method"]}</div>`);
-            li.insertAdjacentHTML("beforeend", `<div class="col col-4" data-label="URL">${testCase["apiurl"]}</div>`);
-            li.insertAdjacentHTML("beforeend",
-                `<div class="col col-5" data-label="Details"><a href="/api/1.0/autoTest/monitor?testCaseId=${testCase["id"]}">View Monitor ⮕</a></div>`);
+            const tbodyTr = document.createElement("tr");
+            tbodyTr.insertAdjacentHTML("beforeend", `<td class="col col-1">${testCase["id"]}</td>`);
+            tbodyTr.insertAdjacentHTML("beforeend", `<td class="col col-2">${testCase["testItem"]}</td>`);
+            tbodyTr.insertAdjacentHTML("beforeend", `<td class="col col-3">${testCase["method"]}</td>`);
 
-            const buttonDiv = document.createElement("div");
-            buttonDiv.classList.add("col", "col-6", "buttonDiv");
+            tbodyTr.insertAdjacentHTML("beforeend", `<td class="col col-4">${testCase["apiurl"]}</td>`);
+            tbodyTr.insertAdjacentHTML("beforeend", `<td class="col col-5"><a href="/api/1.0/autoTest/monitor?testCaseId=${testCase["id"]}">View Monitor ⮕</a></td>`);
+            tbodyTr.insertAdjacentHTML("beforeend",
+                `<td class="col col-6"><button type="button" class="btn btn-block btn-edit">Edit</button>
+                        <button type="button" class="btn btn-block btn-delete">Delete</button></td>`)
 
-            const editButton = document.createElement("button");
-            editButton.type = "button";
-            editButton.classList.add("btn", "btn-primary", "btn-xs", "dt-edit");
-            editButton.style.backgroundImage = "url('/edit.png')";
-            editButton.style.backgroundSize = "contain";
-            editButton.style.backgroundRepeat = "no-repeat";
-            editButton.style.backgroundPosition = "center";
+            tbody.appendChild(tbodyTr);
 
-            const editIcon = document.createElement("span");
-            editIcon.classList.add("glyphicon", "glyphicon-pencil");
-            editIcon.setAttribute("aria-hidden", "true");
+            const editButton = tbodyTr.querySelector(".btn-edit");
+            const deleteButton = tbodyTr.querySelector(".btn-delete");
 
-            editButton.appendChild(editIcon);
-
-            const deleteButton = document.createElement("button");
-            deleteButton.type = "button";
-            deleteButton.classList.add("btn", "btn-primary", "btn-xs", "dt-delete");
-            deleteButton.style.backgroundImage = "url('/delete.png')";
-            deleteButton.style.backgroundSize = "contain";
-            deleteButton.style.backgroundRepeat = "no-repeat";
-            deleteButton.style.backgroundPosition = "center";
-
-            const deleteIcon = document.createElement("span");
-            deleteIcon.classList.add("glyphicon", "glyphicon-pencil");
-            deleteIcon.setAttribute("aria-hidden", "true");
-
-            deleteButton.appendChild(deleteIcon);
-
-            buttonDiv.appendChild(editButton);
-            buttonDiv.appendChild(deleteButton);
-
-            li.appendChild(buttonDiv);
-
-            ul.appendChild(li);
-
-            editButton.addEventListener('click', () => {
+            editButton.addEventListener("click", () => {
                 modifyTestCase(testCase);
-            });
-            deleteButton.addEventListener('click', () => {
+            })
+            deleteButton.addEventListener("click", () => {
                 testCaseId = testCase["id"];
                 deleteTestCase();
-            });
-        });
+            })
 
-        const testCaseContainer = document.getElementById('test-case-container');
-        testCaseContainer.insertAdjacentHTML("beforeend",
-            ' <input id="add-button" type="submit" onclick="addTestCase()" value=" + Add">');
-        testCaseContainer.appendChild(ul);
+
+
+            // const li = document.createElement("li");
+            // li.classList.add("test-case-table-row");
+            // li.insertAdjacentHTML("beforeend", `<div class="col col-1" data-label="ID">${testCase["id"]}</div>`);
+            // li.insertAdjacentHTML("beforeend", `<div class="col col-2" data-label="Test Item">${testCase["testItem"]}</div>`);
+            // li.insertAdjacentHTML("beforeend", `<div class="col col-3" data-label="Method">${testCase["method"]}</div>`);
+            // li.insertAdjacentHTML("beforeend", `<div class="col col-4" data-label="URL">${testCase["apiurl"]}</div>`);
+            // li.insertAdjacentHTML("beforeend",
+            //     `<div class="col col-5" data-label="Details"><a href="/api/1.0/autoTest/monitor?testCaseId=${testCase["id"]}">View Monitor ⮕</a></div>`);
+            //
+            // const buttonDiv = document.createElement("div");
+            // buttonDiv.classList.add("col", "col-6", "buttonDiv");
+            //
+            // const editButton = document.createElement("button");
+            // editButton.type = "button";
+            // editButton.classList.add("btn", "btn-primary", "btn-xs", "dt-edit");
+            // editButton.style.backgroundImage = "url('/edit.png')";
+            // editButton.style.backgroundSize = "contain";
+            // editButton.style.backgroundRepeat = "no-repeat";
+            // editButton.style.backgroundPosition = "center";
+            //
+            // const editIcon = document.createElement("span");
+            // editIcon.classList.add("glyphicon", "glyphicon-pencil");
+            // editIcon.setAttribute("aria-hidden", "true");
+            //
+            // editButton.appendChild(editIcon);
+            //
+            // const deleteButton = document.createElement("button");
+            // deleteButton.type = "button";
+            // deleteButton.classList.add("btn", "btn-primary", "btn-xs", "dt-delete");
+            // deleteButton.style.backgroundImage = "url('/delete.png')";
+            // deleteButton.style.backgroundSize = "contain";
+            // deleteButton.style.backgroundRepeat = "no-repeat";
+            // deleteButton.style.backgroundPosition = "center";
+            //
+            // const deleteIcon = document.createElement("span");
+            // deleteIcon.classList.add("glyphicon", "glyphicon-pencil");
+            // deleteIcon.setAttribute("aria-hidden", "true");
+            //
+            // deleteButton.appendChild(deleteIcon);
+            //
+            // buttonDiv.appendChild(editButton);
+            // buttonDiv.appendChild(deleteButton);
+            //
+            // li.appendChild(buttonDiv);
+            //
+            // ul.appendChild(li);
+            //
+            // editButton.addEventListener('click', () => {
+            //     modifyTestCase(testCase);
+            // });
+            // deleteButton.addEventListener('click', () => {
+            //     testCaseId = testCase["id"];
+            //     deleteTestCase();
+            // });
+        });
+        table.appendChild(thead);
+        table.appendChild(tbody);
+        const container = document.getElementById('test-case-container');
+        container.insertAdjacentHTML("beforeend",
+        '<button type="button" class="btn btn-block btn-add" onclick="addTestCase()">+ Add</button>');
+        container.appendChild(table);
 
     })
     .catch(error => {
@@ -93,6 +136,22 @@ fetch('/api/1.0/testCase/get?userId=1')
     });
 
 function addTestCase() {
+
+    // Reset query params
+    const queryParams = document.getElementById("queryParams");
+    queryParams.innerHTML = '';
+    queryParams.insertAdjacentHTML("beforeend", '<label for="queryParams">Query Params</label><br>');
+    queryParams.insertAdjacentHTML("beforeend", '<input id="paramsKey" type="text" class="dynamic-input paramsKey" name="paramsKey" placeholder="Key" oninput="addQueryParamsInput(event)">');
+    queryParams.insertAdjacentHTML("beforeend"," ");
+    queryParams.insertAdjacentHTML("beforeend", '<input id="paramsValue" type="text" class="dynamic-input paramsValue" name="paramsValue" placeholder="Value" oninput="addQueryParamsInput(event)">');
+
+    // Reset headers
+    const headers = document.getElementById("headers");
+    headers.innerHTML = '';
+    headers.insertAdjacentHTML("beforeend", '<label for="headers">Headers</label><br>');
+    headers.insertAdjacentHTML("beforeend", '<input id="headersKey" type="text" class="headers-input" name="headersKey" placeholder="Key" oninput="addHeadersInput(event)">');
+    headers.insertAdjacentHTML("beforeend"," ");
+    headers.insertAdjacentHTML("beforeend", '<input id="headersValue" type="text" class="headers-input" name="headersValue" placeholder="Value" oninput="addHeadersInput(event)">');
 
     const recipientEmail = document.getElementById("recipientEmail");
     recipientEmail.innerHTML = '';
@@ -128,6 +187,16 @@ function addTestCase() {
         event.preventDefault();
         dom.style.display = "none";
         overlay.style.display = "none";
+    })
+
+    const body = document.getElementById("body");
+    body.addEventListener("input", () => {
+        body.value = JSON.stringify(JSON.parse(body.value), null, 4);
+    })
+
+    const expectedResponseBody = document.getElementById("expectedResponseBody");
+    expectedResponseBody.addEventListener("input", () => {
+        expectedResponseBody.value = JSON.stringify(JSON.parse(body.value), null, 4);
     })
 
     const cancelButton = document.getElementById("cancel-button");
@@ -466,6 +535,7 @@ function addQueryParamsInput(event) {
                 && paramsValueInput.nextElementSibling.value.trim() === "")) {
             paramsValueInput.parentNode.appendChild(br);
             paramsValueInput.parentNode.appendChild(newKeyInput);
+            paramsValueInput.parentNode.appendChild(document.createTextNode(" "));
             paramsValueInput.parentNode.appendChild(newValueInput);
         }
 
@@ -504,6 +574,7 @@ function addHeadersInput(event) {
         if (!inputHeaders.nextElementSibling || inputHeaders.nextElementSibling && inputHeaders.nextElementSibling.value.trim() === "") {
             inputHeaders.parentNode.appendChild(br);
             inputHeaders.parentNode.appendChild(newHeadersKeyInput);
+            inputHeaders.parentNode.appendChild(document.createTextNode(" "));
             inputHeaders.parentNode.appendChild(newHeadersValueInput);
         }
 
@@ -551,4 +622,85 @@ notificationSelect.addEventListener("change", function() {
         emailButton.style.display = "none";
     }
     emailInput.required = notificationSelect.value === "Yes";
+});
+
+function updateParamsFromUrl() {
+    let url = document.getElementById("url");
+    let allParamsKeysInput = document.querySelectorAll(".paramsKey");
+    let allParamsValueInput = document.querySelectorAll(".paramsValue");
+
+    let urlParams = url.value.split("?")[1] || "";
+    let paramsArray = urlParams.split("&");
+
+    paramsArray.forEach((param, index) => {
+        let keyValue = param.split("=");
+        let key = keyValue[0];
+        let value = keyValue[1] || '';
+
+        if (index >= allParamsKeysInput.length) {
+            addQueryParamsInput();
+            allParamsKeysInput = document.querySelectorAll(".paramsKey");
+            allParamsValueInput = document.querySelectorAll(".paramsValue");
+        }
+
+        allParamsKeysInput[index].value = key;
+
+        if (paramsArray.length < allParamsKeysInput.length) {
+            allParamsKeysInput[index+1].value = '';
+            allParamsValueInput[index+1].value = '';
+        }
+
+        if (!param.includes("=")) {
+            allParamsValueInput[index].value = '';
+        } else {
+            allParamsValueInput[index].value = value;
+        }
+    });
+
+    if (paramsArray.length >= allParamsKeysInput.length) {
+        addQueryParamsInput();
+        allParamsKeysInput = document.querySelectorAll(".paramsKey");
+        allParamsValueInput = document.querySelectorAll(".paramsValue");
+    }
+    let equalsArray = urlParams.split("=");
+    if (equalsArray.length - 1 > paramsArray.length) {
+        updateUrlFromParams();
+    }
+}
+
+function updateUrlFromParams() {
+    let url = document.getElementById("url");
+    let allParamsKeysInput = document.querySelectorAll(".paramsKey");
+    let allParamsValueInput = document.querySelectorAll(".paramsValue");
+
+    let queryString = "";
+    let count = 0;
+    for (let i = 0; i < allParamsKeysInput.length; i++) {
+        let paramsKeysInputValue = allParamsKeysInput[i].value;
+        let paramsValueInputValue = allParamsValueInput[i].value;
+        if (paramsKeysInputValue) {
+            queryString += paramsKeysInputValue;
+            if (paramsValueInputValue) {
+                queryString += "=" + paramsValueInputValue;
+            }
+            queryString += "&";
+        } else {
+            if (paramsValueInputValue) {
+                queryString += "=" + paramsValueInputValue;
+            }
+        }
+        count += 1;
+    }
+    if (queryString.charAt(queryString.length - 1) === "&") {
+        queryString = queryString.slice(0, -1);
+    }
+    url.value = url.value.split("?")[0] + (queryString ? "?" + queryString : "");
+}
+
+document.getElementById("url").addEventListener("input", function(event) {
+    updateParamsFromUrl();
+});
+
+document.getElementById("queryParams").addEventListener("input", function(event) {
+    updateUrlFromParams();
 });

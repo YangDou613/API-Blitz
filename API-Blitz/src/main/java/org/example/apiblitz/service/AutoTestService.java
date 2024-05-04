@@ -112,18 +112,34 @@ public class AutoTestService {
 
 		// Get expected response body
 		String expectedResponseBodyString = autoTestRepository.getExpectedResponseBody(testCaseId);
-		Map<String, Object> expectedResponseBody = objectMapper.readValue(expectedResponseBodyString, new TypeReference<>() {});
 
-		if (expectedResponseBody.size() != responseBody.size()) return "failed";
+		Map<String, Object> expectedResponseBody;
+
+		if (expectedResponseBodyString != null) {
+			expectedResponseBody = objectMapper.readValue(expectedResponseBodyString, new TypeReference<>() {});
+			if (expectedResponseBody.size() != responseBody.size()) return "failed";
+			Set<String> keys = expectedResponseBody.keySet();
+
+			for (String key : keys) {
+				if (!expectedResponseBody.get(key).equals(responseBody.get(key))) {
+					return "failed";
+				}
+			}
+
+		} else {
+			if (responseBody != null) return "failed";
+		}
+
+//		if (expectedResponseBody.size() != responseBody.size()) return "failed";
 
 		// Get key list
-		Set<String> keys = expectedResponseBody.keySet();
-
-		for (String key : keys) {
-			if (!expectedResponseBody.get(key).equals(responseBody.get(key))) {
-				return "failed";
-			}
-		}
+//		Set<String> keys = expectedResponseBody.keySet();
+//
+//		for (String key : keys) {
+//			if (!expectedResponseBody.get(key).equals(responseBody.get(key))) {
+//				return "failed";
+//			}
+//		}
 
 		return "pass";
 	}

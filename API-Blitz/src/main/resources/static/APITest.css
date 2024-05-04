@@ -202,6 +202,9 @@ pre {
 #response-container {
     flex: 1;
     grid-column: 2;
+    font-family: "Baloo Chettan 2";
+    font-size: 18px;
+    color: #4C4C4C;
     height: calc(100% - 100px);
     position: relative;
 }
@@ -252,12 +255,6 @@ h3 {
     font-family: "Baloo Chettan 2";
     font-size: 25pt;
     font-weight: bold;
-    color: #4C4C4C;
-}
-
-#response-container {
-    font-family: "Baloo Chettan 2";
-    font-size: 18px;
     color: #4C4C4C;
 }
 

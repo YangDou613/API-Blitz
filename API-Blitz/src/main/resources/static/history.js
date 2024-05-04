@@ -45,12 +45,11 @@ fetch('/APITest/history?userId=1')
 
             tbody.appendChild(tbodyTr);
 
-            selectedAPI = api;
-
             const testButton = tbodyTr.querySelector(".btn-test");
             const addButton = tbodyTr.querySelector(".btn-add");
 
             testButton.addEventListener("click", () => {
+                selectedAPI = api;
                 const queryString = `?selectedAPI=${encodeURIComponent(JSON.stringify(selectedAPI))}`;
                 window.location.href = "/APITest.html" + queryString;
             })
