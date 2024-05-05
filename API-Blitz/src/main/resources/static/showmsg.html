@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+      <meta charset="UTF-8"/>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+      <title>API Blitz</title>
+    </head>
+
+    <body>
+
+        <div id="root"></div>
+
+        <div id="messageArea"></div>
+
+        <script src="https://cdn.jsdelivr.net/npm/sockjs-client/dist/sockjs.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js"></script>
+
+        <script>
+
+            const socket = new SockJS('/ws');
+            const stompClient = Stomp.over(socket);
+
+            stompClient.connect({}, function(frame) {
+                console.log('Connected: ' + frame);
+                stompClient.subscribe('/topic/public', function(message) {
+                  // const msg = JSON.parse(message.body);
+                  // console.log(message.body);
+                });
+            });
+
+        </script>
+
+    </body>
+
+</html>
