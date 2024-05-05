@@ -6,10 +6,12 @@ import org.example.apiblitz.service.ResetTestCaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.sql.SQLException;
 
 @SpringBootApplication
+@EnableScheduling
 @Slf4j
 public class ApiBlitzApplication {
 
