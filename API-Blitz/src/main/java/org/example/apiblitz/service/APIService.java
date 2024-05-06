@@ -4,11 +4,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.example.apiblitz.model.APIData;
 import org.example.apiblitz.model.Request;
+import org.example.apiblitz.model.UserResponse;
 import org.example.apiblitz.repository.APIRepository;
 import org.example.apiblitz.repository.CollectionsRepository;
+import org.example.apiblitz.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -37,7 +40,13 @@ public class APIService {
 	@Autowired
 	CollectionsRepository collectionsRepository;
 
-	public ResponseEntity<?> APITest(APIData apiData) {
+	@Autowired
+	private JwtUtil jwtUtil;
+
+	public ResponseEntity<?> APITest(String accessToken, APIData apiData) {
+
+		Claims claims = jwtUtil.parseToken(accessToken);
+		Integer userId = claims.get("userId", Integer.class);
 
 		// Package API data into http request
 		Request request = httpRequest(apiData);
@@ -48,7 +57,7 @@ public class APIService {
 		}
 
 		// Store API data into APIHistory table
-		apiRepository.insertToAPIHistory(apiData.getUrl(), request);
+		apiRepository.insertToAPIHistory(userId, apiData.getUrl(), request);
 
 		// Send Request
 		ResponseEntity<?> result = sendRequest(request);
@@ -292,7 +301,15 @@ public class APIService {
 		return requestHeaders;
 	}
 
-	public List<Request> getAllHistory(Integer userId) {
+	public List<Request> getAllHistory(String accessToken) {
+
+		Claims claims = jwtUtil.parseToken(accessToken);
+		Integer userId = claims.get("userId", Integer.class);
+
 		return apiRepository.getAllHistoryList(userId);
 	}
+
+//	public List<Request> getAllHistory(Integer userId) {
+//		return apiRepository.getAllHistoryList(userId);
+//	}
 }

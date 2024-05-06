@@ -2,14 +2,13 @@ package org.example.apiblitz.controller;
 
 import org.example.apiblitz.model.CollectionTestResult;
 import org.example.apiblitz.model.TestResult;
+import org.example.apiblitz.model.UserResponse;
 import org.example.apiblitz.service.AutoTestService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -29,8 +28,21 @@ public class AutoTestController {
 	}
 
 	@GetMapping("/monitor/testCase")
-	public ResponseEntity<?> getTestCaseId(@RequestParam Integer userId) {
-		List<Integer> testCaseIdList = autoTestService.getAllTestCaseId(userId);
+//	public ResponseEntity<?> getTestCaseId(@RequestParam Integer userId) {
+	public ResponseEntity<?> getTestCaseId(
+			@RequestHeader("Authorization") String authorization) {
+
+		UserResponse userResponse = new UserResponse();
+
+		if (authorization == null || !authorization.startsWith("Bearer ")) {
+			userResponse.setError("Invalid or missing Bearer token");
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(userResponse);
+		}
+
+		String accessToken = extractAccessToken(authorization);
+
+//		List<Integer> testCaseIdList = autoTestService.getAllTestCaseId(userId);
+		List<Integer> testCaseIdList = autoTestService.getAllTestCaseId(accessToken);
 		if (testCaseIdList != null) {
 			return ResponseEntity.ok(testCaseIdList);
 		} else {
@@ -78,6 +90,15 @@ public class AutoTestController {
 			return ResponseEntity.ok(testResultList);
 		} else {
 			return ResponseEntity.badRequest().body("There is currently no test results.");
+		}
+	}
+
+	private String extractAccessToken(String authorization) {
+		String[] parts = authorization.split(" ");
+		if (parts.length == 2 && parts[0].equalsIgnoreCase("Bearer")) {
+			return parts[1];
+		} else {
+			return null;
 		}
 	}
 }

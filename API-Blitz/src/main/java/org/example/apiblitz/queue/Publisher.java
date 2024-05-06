@@ -1,4 +1,4 @@
-package org.example.apiblitz.sqs;
+package org.example.apiblitz.queue;
 
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.model.GetQueueUrlResult;

@@ -2,10 +2,12 @@ package org.example.apiblitz.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.example.apiblitz.model.*;
 import org.example.apiblitz.model.Collections;
 import org.example.apiblitz.repository.CollectionsRepository;
+import org.example.apiblitz.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -32,10 +34,17 @@ public class CollectionsService {
 	@Autowired
 	CollectionsRepository collectionsRepository;
 
+	@Autowired
+	private JwtUtil jwtUtil;
+
 	private static final long INITIAL_DELAY_MS = 60000;
 	private static final double BACKOFF_MULTIPLIER = 2.0;
 
-	public List<Map<String, Object>> get(Integer userId) {
+//	public List<Map<String, Object>> get(Integer userId) {
+	public List<Map<String, Object>> get(String accessToken) {
+
+		Claims claims = jwtUtil.parseToken(accessToken);
+		Integer userId = claims.get("userId", Integer.class);
 
 		try {
 			return collectionsRepository.getCollectionsList(userId);
@@ -45,7 +54,11 @@ public class CollectionsService {
 		}
 	}
 
-	public void create(Integer userId, Collections collection) {
+//	public void create(Integer userId, Collections collection) {
+	public void create(String accessToken, Collections collection) {
+
+		Claims claims = jwtUtil.parseToken(accessToken);
+		Integer userId = claims.get("userId", Integer.class);
 
 		try {
 			collectionsRepository.insertToCollectionsTable(userId, collection);
@@ -99,7 +112,11 @@ public class CollectionsService {
 		}
 	}
 
-	public void delete(Integer userId, String collectionName, Integer requestId) {
+//	public void delete(Integer userId, String collectionName, Integer requestId) {
+	public void delete(String accessToken, String collectionName, Integer requestId) {
+
+		Claims claims = jwtUtil.parseToken(accessToken);
+		Integer userId = claims.get("userId", Integer.class);
 
 		try {
 			collectionsRepository.deleteCollection(userId, collectionName, requestId);
@@ -132,6 +149,9 @@ public class CollectionsService {
 
 				if (request.getBody() != null) {
 					request.setRequestBody(objectMapper.readValue(request.getBody(), Object.class));
+//					request.setRequestBody(request.getBody());
+				} else {
+					request.setRequestBody(null);
 				}
 
 				// Header
@@ -300,7 +320,12 @@ public class CollectionsService {
 		APIData apiData = new APIData();
 
 		apiData.setMethod(collection.getMethod());
-		apiData.setUrl(collection.getUrl());
+		if (collection.getApiurl() != null) {
+			apiData.setUrl(collection.getApiurl());
+		} else {
+			apiData.setUrl(collection.getUrl());
+		}
+//		apiData.setUrl(collection.getApiurl());
 		apiData.setParamsKey(collection.getParamsKey());
 		apiData.setParamsValue(collection.getParamsValue());
 		if (collection.getAuthorizationKey() == null) {

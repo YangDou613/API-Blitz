@@ -30,15 +30,28 @@ public class APIController {
 	}
 
 	@PostMapping("/APITest.html")
-	public ResponseEntity<?> getResponse(@Valid @ModelAttribute APIData apiData, BindingResult bindingResult)
+	public ResponseEntity<?> getResponse(
+			@RequestHeader("Authorization") String authorization,
+			@Valid @ModelAttribute APIData apiData,
+			BindingResult bindingResult)
 			throws BindException {
+
+		UserResponse userResponse = new UserResponse();
+
+		if (authorization == null || !authorization.startsWith("Bearer ")) {
+			userResponse.setError("Invalid or missing Bearer token");
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(userResponse);
+		}
+
+		String accessToken = extractAccessToken(authorization);
 
 		if (bindingResult.hasErrors()) {
 			throw new BindException(bindingResult);
 		}
 
 		try {
-			return apiService.APITest(apiData);
+//			return apiService.APITest(apiData);
+			return apiService.APITest(accessToken, apiData);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error");
@@ -51,12 +64,43 @@ public class APIController {
 	}
 
 	@GetMapping("/APITest/history")
-	public ResponseEntity<?> getHistory(@RequestParam Integer userId) {
-		List<Request> historyList = apiService.getAllHistory(userId);
+	public ResponseEntity<?> getHistory(
+			@RequestHeader("Authorization") String authorization) {
+
+		UserResponse userResponse = new UserResponse();
+
+		if (authorization == null || !authorization.startsWith("Bearer ")) {
+			userResponse.setError("Invalid or missing Bearer token");
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(userResponse);
+		}
+
+		String accessToken = extractAccessToken(authorization);
+
+//		List<Request> historyList = apiService.getAllHistory(userId);
+		List<Request> historyList = apiService.getAllHistory(accessToken);
 		if (historyList != null) {
 			return ResponseEntity.ok(historyList);
 		} else {
 			return ResponseEntity.badRequest().body("There is currently no API history.");
+		}
+	}
+
+//	@GetMapping("/APITest/history")
+//	public ResponseEntity<?> getHistory(@RequestParam Integer userId) {
+//		List<Request> historyList = apiService.getAllHistory(userId);
+//		if (historyList != null) {
+//			return ResponseEntity.ok(historyList);
+//		} else {
+//			return ResponseEntity.badRequest().body("There is currently no API history.");
+//		}
+//	}
+
+	private String extractAccessToken(String authorization) {
+		String[] parts = authorization.split(" ");
+		if (parts.length == 2 && parts[0].equalsIgnoreCase("Bearer")) {
+			return parts[1];
+		} else {
+			return null;
 		}
 	}
 }

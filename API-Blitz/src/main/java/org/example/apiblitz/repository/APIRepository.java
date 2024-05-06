@@ -22,7 +22,7 @@ public class APIRepository {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
-	public Integer insertToAPIHistory(String APIUrl, Request request) {
+	public Integer insertToAPIHistory(Integer userId, String APIUrl, Request request) {
 
 		String insertToAPIHistorySql = "INSERT INTO APIHistory (userId, APIUrl, method, queryParams, headers, body) " +
 				"VALUES (?, ?, ?, ?, ?, ?)";
@@ -31,7 +31,7 @@ public class APIRepository {
 
 		jdbcTemplate.update(connection -> {
 			PreparedStatement ps = connection.prepareStatement(insertToAPIHistorySql, Statement.RETURN_GENERATED_KEYS);
-			ps.setInt(1, 1);
+			ps.setInt(1, userId);
 			ps.setString(2, APIUrl);
 			ps.setString(3, request.getMethod());
 			ps.setObject(4, request.getQueryParams());

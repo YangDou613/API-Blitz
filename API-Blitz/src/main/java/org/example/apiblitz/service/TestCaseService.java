@@ -3,9 +3,11 @@ package org.example.apiblitz.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.example.apiblitz.model.*;
 import org.example.apiblitz.repository.TestCaseRepository;
+import org.example.apiblitz.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +37,13 @@ public class TestCaseService {
 	@Autowired
 	AutoTestService autoTestService;
 
-	public Integer save(TestCase testCase) throws JsonProcessingException {
+	@Autowired
+	private JwtUtil jwtUtil;
+
+	public Integer save(String accessToken, TestCase testCase) throws JsonProcessingException {
+
+		Claims claims = jwtUtil.parseToken(accessToken);
+		Integer userId = claims.get("userId", Integer.class);
 
 		// Set testCase data in APIData
 		APIData apiData = setAPIData(testCase);
@@ -44,7 +52,7 @@ public class TestCaseService {
 		Request request = apiService.httpRequest(apiData);
 
 		// Store API data into APIHistory table and return testCaseId
-		return testCaseRepository.insertToTestCase(request, testCase);
+		return testCaseRepository.insertToTestCase(userId, request, testCase);
 	}
 
 	public void setTestSchedule(Integer testCaseId, TestCase testCase) {
@@ -137,7 +145,11 @@ public class TestCaseService {
 		executor.scheduleAtFixedRate(test, 0, intervalsTimeValue, timeUnit);
 	}
 
-	public List<NextSchedule> get(Integer userId) {
+//	public List<NextSchedule> get(Integer userId) {
+	public List<NextSchedule> get(String accessToken) {
+
+		Claims claims = jwtUtil.parseToken(accessToken);
+		Integer userId = claims.get("userId", Integer.class);
 
 		try {
 			return testCaseRepository.getTestCase(userId);
@@ -147,7 +159,10 @@ public class TestCaseService {
 		}
 	}
 
-	public void update(ResetTestCase resetTestCase) {
+	public void update(String accessToken, ResetTestCase resetTestCase) {
+
+		Claims claims = jwtUtil.parseToken(accessToken);
+		Integer userId = claims.get("userId", Integer.class);
 
 		try {
 			// Set testCase data in APIData
@@ -157,7 +172,7 @@ public class TestCaseService {
 			Request request = apiService.httpRequest(apiData);
 
 			// Update API data in APIHistory table
-			testCaseRepository.updateTestCase(request, resetTestCase);
+			testCaseRepository.updateTestCase(userId, request, resetTestCase);
 		} catch (SQLException | JsonProcessingException e) {
 			log.error(e.getMessage());
 		}

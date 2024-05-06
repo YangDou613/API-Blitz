@@ -154,11 +154,11 @@ public class CollectionsRepository {
 			ps.setLong(8, responseEntity.getHeaders().getContentLength());
 			try {
 				ps.setObject(9, objectMapper.writeValueAsString(responseEntity.getHeaders()));
+				ps.setObject(10, objectMapper.writeValueAsString(responseEntity.getBody()));
 			} catch (JsonProcessingException e) {
 				log.error(e.getMessage());
 				throw new RuntimeException(e);
 			}
-			ps.setObject(10, responseEntity.getBody());
 			ps.setString(11, result);
 			return ps;
 		}, keyHolder);

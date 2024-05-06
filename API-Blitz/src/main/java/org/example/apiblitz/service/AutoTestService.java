@@ -4,10 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import io.jsonwebtoken.Claims;
 import org.example.apiblitz.model.CollectionTestResult;
 import org.example.apiblitz.model.Request;
 import org.example.apiblitz.model.TestResult;
 import org.example.apiblitz.repository.AutoTestRepository;
+import org.example.apiblitz.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,9 @@ public class AutoTestService {
 
 	@Autowired
 	SendEmailService sendEmailService;
+
+	@Autowired
+	private JwtUtil jwtUtil;
 
 	private static final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -165,7 +170,12 @@ public class AutoTestService {
 //		return APIUrl;
 //	}
 
-	public List<Integer> getAllTestCaseId(Integer userId) {
+//	public List<Integer> getAllTestCaseId(Integer userId) {
+	public List<Integer> getAllTestCaseId(String accessToken) {
+
+		Claims claims = jwtUtil.parseToken(accessToken);
+		Integer userId = claims.get("userId", Integer.class);
+
 		return autoTestRepository.getAllTestCaseIdByUserId(userId);
 	}
 

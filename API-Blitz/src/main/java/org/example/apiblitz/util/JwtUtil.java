@@ -1,5 +1,6 @@
 package org.example.apiblitz.util;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -20,7 +21,7 @@ import java.util.Map;
 @Slf4j
 public class JwtUtil {
 
-	public static final long EXPIRE_TIME = 3600;
+	public static final long EXPIRE_TIME = 86400000;
 	private SecretKey secretKey;
 
 	@Value("${jwt.secret}")
@@ -34,7 +35,7 @@ public class JwtUtil {
 	public String userSignUpGenerateToken(UserSignUp user) {
 
 		long nowMills = System.currentTimeMillis();
-		Date expireDate = new Date(nowMills + EXPIRE_TIME * 1000);
+		Date expireDate = new Date(nowMills + EXPIRE_TIME * 30);
 
 		Map<String, Object> claims = userSignUpGetClaims(user);
 
@@ -51,7 +52,7 @@ public class JwtUtil {
 	public String userSignInGenerateToken(UserSignIn user) {
 
 		long nowMills = System.currentTimeMillis();
-		Date expireDate = new Date(nowMills + EXPIRE_TIME * 1000);
+		Date expireDate = new Date(nowMills + EXPIRE_TIME * 30);
 
 		Map<String, Object> claims = userSignInGetClaims(user);
 
@@ -68,6 +69,7 @@ public class JwtUtil {
 	public Map<String, Object> userSignUpGetClaims(UserSignUp user) {
 
 		Map<String, Object> claims = new HashMap<>();
+		claims.put("userId", user.getId());
 		claims.put("name", user.getName());
 		claims.put("email", user.getEmail());
 		return claims;
@@ -76,8 +78,18 @@ public class JwtUtil {
 	public Map<String, Object> userSignInGetClaims(UserSignIn user) {
 
 		Map<String, Object> claims = new HashMap<>();
+		claims.put("userId", user.getId());
 		claims.put("name", user.getName());
 		claims.put("email", user.getEmail());
 		return claims;
+	}
+
+	public Claims parseToken(String token) {
+		try {
+			return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+		} catch (Exception e) {
+			log.info(e.getMessage());
+			return null;
+		}
 	}
 }

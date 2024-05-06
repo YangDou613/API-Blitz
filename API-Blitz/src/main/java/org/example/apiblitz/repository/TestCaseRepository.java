@@ -30,7 +30,7 @@ public class TestCaseRepository {
 	@Autowired
 	ObjectMapper objectMapper;
 
-	public Integer insertToTestCase(Request request, TestCase testCase) throws JsonProcessingException {
+	public Integer insertToTestCase(Integer userId, Request request, TestCase testCase) throws JsonProcessingException {
 
 		Integer notification = testCase.getNotification().equals("Yes") ? 1 : 0;
 
@@ -52,7 +52,7 @@ public class TestCaseRepository {
 
 		jdbcTemplate.update(connection -> {
 			PreparedStatement ps = connection.prepareStatement(insertToTestCaseSql, Statement.RETURN_GENERATED_KEYS);
-			ps.setInt(1, 1);
+			ps.setInt(1, userId);
 			ps.setString(2, testCase.getUrl());
 			ps.setString(3, request.getMethod());
 			ps.setObject(4, request.getQueryParams());
@@ -77,10 +77,17 @@ public class TestCaseRepository {
 		return APIAutoId;
 	}
 
-	public void updateTestCase(Request request, ResetTestCase resetTestCase)
+	public void updateTestCase(Integer userId, Request request, ResetTestCase resetTestCase)
 			throws SQLException, JsonProcessingException {
 
 		Integer notification = resetTestCase.getNotification().equals("Yes") ? 1 : 0;
+
+		Object expectedResponseBody;
+		if (!resetTestCase.getExpectedResponseBody().isEmpty()) {
+			expectedResponseBody = resetTestCase.getExpectedResponseBody();
+		} else {
+			expectedResponseBody = null;
+		}
 
 		Object email = objectMapper.writeValueAsString(resetTestCase.getEmail());
 
@@ -89,14 +96,14 @@ public class TestCaseRepository {
 				"intervalsTimeValue = ?, notification = ?, recipientEmail = ?, resetStatus = ?, testItem = ? WHERE id = ?";
 
 		jdbcTemplate.update(updateTestCaseSql,
-				1,
+				userId,
 				resetTestCase.getUrl(),
 				request.getMethod(),
 				request.getQueryParams(),
 				request.getRequestHeaders(),
 				request.getRequestBody(),
 				resetTestCase.getStatusCode(),
-				resetTestCase.getExpectedResponseBody(),
+				expectedResponseBody,
 				resetTestCase.getIntervalsTimeUnit(),
 				resetTestCase.getIntervalsTimeValue(),
 				notification,
