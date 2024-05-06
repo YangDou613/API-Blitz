@@ -12,6 +12,11 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -50,11 +55,38 @@ public class APIController {
 		}
 
 		try {
-//			return apiService.APITest(apiData);
-			return apiService.APITest(accessToken, apiData);
+			LocalDateTime currentDateTime = LocalDateTime.now().withNano(0);
+			Timestamp timestamp = Timestamp.valueOf(currentDateTime);
+
+			apiService.APITest(accessToken, timestamp, apiData);
+			return ResponseEntity
+					.ok()
+					.body(currentDateTime);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error");
+		}
+	}
+
+	@GetMapping("/APITest/testResult")
+	public ResponseEntity<?> gettestResult(
+			@RequestHeader("Authorization") String authorization,
+			@RequestParam("testDateTime") String testDateTime) {
+
+		UserResponse userResponse = new UserResponse();
+
+		if (authorization == null || !authorization.startsWith("Bearer ")) {
+			userResponse.setError("Invalid or missing Bearer token");
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(userResponse);
+		}
+
+		String accessToken = extractAccessToken(authorization);
+
+		APITestResult apiTestResult = apiService.getApiTestResult(accessToken, testDateTime);
+		if (apiTestResult != null) {
+			return ResponseEntity.ok(apiTestResult);
+		} else {
+			return ResponseEntity.badRequest().body("There is currently no API test result.");
 		}
 	}
 
@@ -76,7 +108,6 @@ public class APIController {
 
 		String accessToken = extractAccessToken(authorization);
 
-//		List<Request> historyList = apiService.getAllHistory(userId);
 		List<Request> historyList = apiService.getAllHistory(accessToken);
 		if (historyList != null) {
 			return ResponseEntity.ok(historyList);

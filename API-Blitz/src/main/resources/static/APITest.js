@@ -1,6 +1,7 @@
 let response = null;
 let selectedAPI = null;
 let method = null;
+let testDateTime = null;
 
 const token = localStorage.getItem("access_token");
 
@@ -112,8 +113,10 @@ if (token === null) {
 
         xhr.onload = function () {
             document.getElementById('loading').style.display = 'none';
-            response = JSON.parse(xhr.responseText);
-            displayResponse();
+            if (xhr.status === 200) {
+                testDateTime = JSON.parse(xhr.responseText);
+                getResult();
+            }
         };
         xhr.setRequestHeader("Authorization", `Bearer ${token}`);
         xhr.send(formData);
@@ -138,6 +141,30 @@ if (token === null) {
         //     });
     });
 
+    function getResult() {
+
+        fetch('/APITest/testResult?testDateTime=' + testDateTime, {
+            method: 'GET',
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    console.log(response.status)
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                response = data;
+                displayResponse();
+            })
+            .catch(error => {
+                console.error('There was an error!', error);
+            });
+    }
+
     function clear() {
         let statusCode = document.getElementById('status-code');
         statusCode.innerHTML = '';
@@ -160,19 +187,21 @@ if (token === null) {
 
     function displayResponse() {
 
+        let responseHeaders = JSON.parse(response["responseHeaders"]);
+
         let statusCode = document.getElementById('status-code');
         statusCode.innerHTML = '';
-        let responseCodeHtml = `Status Code: ${response.statusCodeValue}`;
+        let responseCodeHtml = `Status Code: ${response["statusCode"]}`;
         statusCode.insertAdjacentHTML('beforeend', responseCodeHtml);
 
         let responseTime = document.getElementById('response-time');
         responseTime.innerHTML = '';
-        let responseTimeHtml = `Response Time: ${response.headers['Execution-Duration']} ms`;
+        let responseTimeHtml = `Response Time: ${responseHeaders['Execution-Duration']} ms`;
         responseTime.insertAdjacentHTML('beforeend', responseTimeHtml);
 
         let responseSize = document.getElementById('response-size');
         responseSize.innerHTML = '';
-        let responseSizeHtml = `Response Size: ${response.headers["Content-Length"]} B`;
+        let responseSizeHtml = `Response Size: ${responseHeaders["Content-Length"]} B`;
         responseSize.insertAdjacentHTML('beforeend', responseSizeHtml);
 
         let headerTab = document.getElementById("show-response-header");
@@ -185,50 +214,53 @@ if (token === null) {
 
         let contentType = getContentType();
 
-        if (response.body == null) {
+        if (response["responseBody"] == null) {
             responseBody.innerHTML = 'There is no response body.';
         } else if (contentType === "image") {
-            const imageURL = btoa(response.body);
+            const imageURL = btoa(response["responseBody"]);
             let img = document.createElement("img");
             img.src = `data:image/bmp;base64, ${imageURL}`;
             responseBody.insertAdjacentHTML("beforeend", "<br>");
             responseBody.appendChild(img);
         } else {
-            let responseBodyText = formatJSON(JSON.parse(response.body));
+            let responseBodyText = formatJSON(JSON.parse(response["responseBody"]));
             let responseBodyHtml = `<pre><code>${responseBodyText}</code></pre>`;
             responseBody.insertAdjacentHTML('beforeend', responseBodyHtml);
         }
     }
 
     function getContentType() {
-        let contentType = response.headers["Content-Type"];
+        let responseHeaders = JSON.parse(response["responseHeaders"]);
+        let contentType = responseHeaders["Content-Type"];
         return contentType[0].split("/")[0];
     }
 
     function displayHeaders() {
 
+        let responseHeaders = JSON.parse(response["responseHeaders"]);
+
         let statusCode = document.getElementById('status-code');
         statusCode.innerHTML = '';
-        let responseCodeHtml = `Status Code: ${response.statusCodeValue}`;
+        let responseCodeHtml = `Status Code: ${response["statusCode"]}`;
         statusCode.insertAdjacentHTML('beforeend', responseCodeHtml);
 
         let responseTime = document.getElementById('response-time');
         responseTime.innerHTML = '';
-        let responseTimeHtml = `Response Time: ${response.headers['Execution-Duration']} ms`;
+        let responseTimeHtml = `Response Time: ${responseHeaders['Execution-Duration']} ms`;
         responseTime.insertAdjacentHTML('beforeend', responseTimeHtml);
 
         let responseSize = document.getElementById('response-size');
         responseSize.innerHTML = '';
-        let responseSizeHtml = `Response Size: ${response.headers["Content-Length"]} B`;
+        let responseSizeHtml = `Response Size: ${responseHeaders["Content-Length"]} B`;
         responseSize.insertAdjacentHTML('beforeend', responseSizeHtml);
 
-        let responseHeaders = document.getElementById('response');
-        responseHeaders.innerHTML = '';
+        let responseHeader = document.getElementById('response');
+        responseHeader.innerHTML = '';
 
         const headersTable = document.createElement('table');
         headersTable.classList.add('headers-table');
 
-        const headersMap = objectToMap(response.headers);
+        const headersMap = objectToMap(responseHeaders);
 
         let keyHtml;
         let valueHtml;
@@ -248,7 +280,7 @@ if (token === null) {
             tr.insertAdjacentHTML('beforeend', valueHtml);
             headersTable.appendChild(tr);
         });
-        responseHeaders.appendChild(headersTable);
+        responseHeader.appendChild(headersTable);
     }
 
     document.addEventListener('DOMContentLoaded', function () {

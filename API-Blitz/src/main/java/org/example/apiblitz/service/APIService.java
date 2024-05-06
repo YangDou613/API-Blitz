@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.example.apiblitz.model.APIData;
+import org.example.apiblitz.model.APITestResult;
 import org.example.apiblitz.model.Request;
 import org.example.apiblitz.model.UserResponse;
 import org.example.apiblitz.repository.APIRepository;
@@ -20,7 +21,9 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
+import java.sql.Timestamp;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -43,7 +46,7 @@ public class APIService {
 	@Autowired
 	private JwtUtil jwtUtil;
 
-	public ResponseEntity<?> APITest(String accessToken, APIData apiData) {
+	public ResponseEntity<?> APITest(String accessToken, Timestamp timestamp, APIData apiData) throws JsonProcessingException {
 
 		Claims claims = jwtUtil.parseToken(accessToken);
 		Integer userId = claims.get("userId", Integer.class);
@@ -56,11 +59,14 @@ public class APIService {
 					.body("Failed to parse JSON data. Please check the JSON format and try again.");
 		}
 
-		// Store API data into APIHistory table
-		apiRepository.insertToAPIHistory(userId, apiData.getUrl(), request);
-
 		// Send Request
 		ResponseEntity<?> result = sendRequest(request);
+		Object responseHeaders = objectMapper.writeValueAsString(result.getHeaders());
+		Object responseBody = result.getBody();
+		Integer statusCode = result.getStatusCode().value();
+
+		// Store API data and response into APIHistory table
+		apiRepository.insertToAPIHistory(userId, apiData.getUrl(), request, timestamp, responseHeaders, responseBody, statusCode);
 
 		return setResponse(apiData, result);
 	}
@@ -307,6 +313,14 @@ public class APIService {
 		Integer userId = claims.get("userId", Integer.class);
 
 		return apiRepository.getAllHistoryList(userId);
+	}
+
+	public APITestResult getApiTestResult(String accessToken, String testDateTime) {
+
+		Claims claims = jwtUtil.parseToken(accessToken);
+		Integer userId = claims.get("userId", Integer.class);
+
+		return apiRepository.getApiTestResultByUserIdAndDateTime(userId, testDateTime);
 	}
 
 //	public List<Request> getAllHistory(Integer userId) {

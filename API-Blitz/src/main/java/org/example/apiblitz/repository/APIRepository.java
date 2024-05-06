@@ -1,6 +1,7 @@
 package org.example.apiblitz.repository;
 
 import lombok.extern.slf4j.Slf4j;
+import org.example.apiblitz.model.APITestResult;
 import org.example.apiblitz.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -12,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -22,10 +25,17 @@ public class APIRepository {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
-	public Integer insertToAPIHistory(Integer userId, String APIUrl, Request request) {
+	public Integer insertToAPIHistory(
+			Integer userId,
+			String APIUrl,
+			Request request,
+			Timestamp timestamp,
+			Object responseHeaders,
+			Object responseBody,
+			Integer statusCode) {
 
-		String insertToAPIHistorySql = "INSERT INTO APIHistory (userId, APIUrl, method, queryParams, headers, body) " +
-				"VALUES (?, ?, ?, ?, ?, ?)";
+		String insertToAPIHistorySql = "INSERT INTO APIHistory (userId, APIUrl, method, queryParams, headers, body, " +
+				"testDateTime, responseHeaders, responseBody, statusCode) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -37,6 +47,10 @@ public class APIRepository {
 			ps.setObject(4, request.getQueryParams());
 			ps.setObject(5, request.getRequestHeaders());
 			ps.setObject(6, request.getRequestBody());
+			ps.setTimestamp(7, timestamp);
+			ps.setObject(8, responseHeaders);
+			ps.setObject(9, responseBody);
+			ps.setInt(10, statusCode);
 			return ps;
 		}, keyHolder);
 
@@ -51,5 +65,10 @@ public class APIRepository {
 	public List<Request> getAllHistoryList(Integer userId) {
 		String getHistoryListSql = "SELECT * FROM APIHistory WHERE userId = ? ORDER BY id DESC LIMIT 20";
 		return jdbcTemplate.query(getHistoryListSql, new BeanPropertyRowMapper<>(Request.class), userId);
+	}
+
+	public APITestResult getApiTestResultByUserIdAndDateTime(Integer userId, String testDateTime) {
+		String getApiTestResultSql = "SELECT * FROM APIHistory WHERE userId = ? AND testDateTime = ?";
+		return jdbcTemplate.queryForObject(getApiTestResultSql, new BeanPropertyRowMapper<>(APITestResult.class), userId, testDateTime);
 	}
 }
