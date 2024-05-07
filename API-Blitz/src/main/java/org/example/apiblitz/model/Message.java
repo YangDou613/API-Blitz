@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 @Builder
@@ -12,7 +13,10 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Message {
-	private String id;
-	private String content;
+	private Integer userId;
+	private String category;
+	private Integer id;
+	private Timestamp testDateTime;
+	private Object content;
 	private Date createdAt;
 }

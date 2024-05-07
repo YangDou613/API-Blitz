@@ -11,6 +11,7 @@ import org.example.apiblitz.model.TestResult;
 import org.example.apiblitz.repository.AutoTestRepository;
 import org.example.apiblitz.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +39,7 @@ public class AutoTestService {
 
 	private static final ObjectMapper objectMapper = new ObjectMapper();
 
+//	@Profile("Consumer")
 	public void autoTest(Integer testCaseId) throws IOException, UnirestException {
 
 		// Test Date
@@ -68,18 +70,33 @@ public class AutoTestService {
 		Object responseHeaders = objectMapper.writeValueAsString(response.getHeaders());
 
 		// Response body
+
+		String result = null;
+
 		Object responseBody;
 		if (!request.getMethod().equals("HEAD")) {
-			responseBody = response.getBody();
+
+			if (response.getBody() != null) {
+				if (!isValidJson(response.getBody().toString())) {
+
+					responseBody = objectMapper.writeValueAsString(response.getBody());
+					result = getCompareResultForText(testCaseId, statusCode, responseBody);
+
+				} else {
+					responseBody = response.getBody();
+
+					// Convert data type to compare
+					Map<String, Object> responseBodyMap = objectMapper.readValue(responseBody.toString(), new TypeReference<>() {});
+
+					// Compare response
+					result = getCompareResultForJson(testCaseId, statusCode, responseBodyMap);
+				}
+			} else {
+				responseBody = null;
+			}
 		} else {
 			responseBody = null;
 		}
-
-		// Convert data type to compare
-		Map<String, Object> responseBodyMap = objectMapper.readValue(responseBody.toString(), new TypeReference<>() {});
-
-		// Compare response
-		String result = getCompareResult(testCaseId, statusCode, responseBodyMap);
 
 		if (result.equals("failed")) {
 
@@ -106,7 +123,29 @@ public class AutoTestService {
 				result);
 	}
 
-	public String getCompareResult(Integer testCaseId,
+	public String getCompareResultForText(Integer testCaseId,
+	                                      Integer statusCode,
+	                                      Object responseBody) {
+
+		// Get expected status code
+		Integer expectedStatusCode = autoTestRepository.getExpectedStatusCode(testCaseId);
+
+		if (!statusCode.equals(expectedStatusCode)) return "failed";
+
+		// Get expected response body
+		String expectedResponseBodyString = autoTestRepository.getExpectedResponseBody(testCaseId);
+
+		if (expectedResponseBodyString != null) {
+			if (!responseBody.equals(expectedResponseBodyString)) return "failed";
+		} else {
+			if (responseBody != null) return "failed";
+		}
+
+		return "pass";
+	}
+
+//	@Profile("Consumer")
+	public String getCompareResultForJson(Integer testCaseId,
 	                               Integer statusCode,
 	                               Map<String, Object> responseBody) throws IOException {
 
@@ -193,5 +232,15 @@ public class AutoTestService {
 
 	public List<List<TestResult>> collectionAllTestResult(Integer collectionId) {
 		return autoTestRepository.getAllTestResultByCollectionId(collectionId);
+	}
+
+	private boolean isValidJson(String responseBody) {
+		try {
+			ObjectMapper objectMapper = new ObjectMapper();
+			objectMapper.readTree(responseBody);
+			return true;
+		} catch (JsonProcessingException e) {
+			return false;
+		}
 	}
 }

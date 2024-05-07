@@ -1,22 +1,30 @@
 package org.example.apiblitz.messageBroker;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.example.apiblitz.controller.MessageController;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
+@Getter
+@Slf4j
 public class Receiver {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(Receiver.class);
+	private String receivedMessage;
 
-	private AtomicInteger counter = new AtomicInteger();
+	@Autowired
+	MessageController messageController;
 
-	public void receiveMessage(String message) {
-		LOGGER.info("Received <" + message + ">");
-		counter.incrementAndGet();
+	public void receiveMessage(String message) throws JsonProcessingException {
+
+		this.receivedMessage = message;
+		log.info("Received <" + message + ">");
+		messageController.sendMessage(message);
+
 	}
 
-	public int getCount() {
-		return counter.get();
-	}
+	//	public void receiveMessage(String message) {
+//		LOGGER.info("Received <" + message + ">");
+//		counter.incrementAndGet();
+//	}
 }

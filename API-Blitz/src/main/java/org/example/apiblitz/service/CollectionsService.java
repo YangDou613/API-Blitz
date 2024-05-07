@@ -6,9 +6,11 @@ import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.example.apiblitz.model.*;
 import org.example.apiblitz.model.Collections;
+import org.example.apiblitz.queue.Publisher;
 import org.example.apiblitz.repository.CollectionsRepository;
 import org.example.apiblitz.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.concurrent.*;
@@ -37,10 +40,13 @@ public class CollectionsService {
 	@Autowired
 	private JwtUtil jwtUtil;
 
+	@Autowired
+	Publisher publisher;
+
 	private static final long INITIAL_DELAY_MS = 60000;
 	private static final double BACKOFF_MULTIPLIER = 2.0;
 
-//	public List<Map<String, Object>> get(Integer userId) {
+//	@Profile("Producer")
 	public List<Map<String, Object>> get(String accessToken) {
 
 		Claims claims = jwtUtil.parseToken(accessToken);
@@ -54,7 +60,7 @@ public class CollectionsService {
 		}
 	}
 
-//	public void create(Integer userId, Collections collection) {
+//	@Profile("Consumer")
 	public void create(String accessToken, Collections collection) {
 
 		Claims claims = jwtUtil.parseToken(accessToken);
@@ -67,6 +73,7 @@ public class CollectionsService {
 		}
 	}
 
+//	@Profile("Consumer")
 	public void update(Integer collectionId, Collections collection) {
 
 		if (collection.getApiurl() != null) {
@@ -83,6 +90,7 @@ public class CollectionsService {
 		}
 	}
 
+//	@Profile("Consumer")
 	public void add(Integer collectionId, Collections collection) {
 
 //		Request request = new Request();
@@ -112,7 +120,7 @@ public class CollectionsService {
 		}
 	}
 
-//	public void delete(Integer userId, String collectionName, Integer requestId) {
+//	@Profile("Consumer")
 	public void delete(String accessToken, String collectionName, Integer requestId) {
 
 		Claims claims = jwtUtil.parseToken(accessToken);
@@ -125,20 +133,25 @@ public class CollectionsService {
 		}
 	}
 
-	public Map<String, Object> sendRequestAtSameTime(Integer collectionId, List<Request> requests) {
+//	@Profile("Consumer")
+	public void sendRequestAtSameTime(Integer collectionId, Timestamp testDateTime, List<Request> requests) {
 
-		Map<String, Object> collectionTestTime = new HashMap<>();
+//		Map<String, Object> collectionTestTime = new HashMap<>();
 
 		ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
 		List<Callable<Map.Entry<Integer, ResponseEntity<?>>>> callables = new ArrayList<>();
 
-		// Test Date
-		LocalDate testDate = LocalDate.now();
-		collectionTestTime.put("testDate", testDate);
+		LocalDateTime parsedDateTime = testDateTime.toLocalDateTime();
+		LocalDate testDate = parsedDateTime.toLocalDate();
+		LocalTime testTime = parsedDateTime.toLocalTime();
 
-		// Test time
-		LocalTime testTime = LocalTime.now();
-		collectionTestTime.put("testTime", testTime);
+//		// Test Date
+//		LocalDate testDate = LocalDate.now();
+//		collectionTestTime.put("testDate", testDate);
+//
+//		// Test time
+//		LocalTime testTime = LocalTime.now();
+//		collectionTestTime.put("testTime", testTime);
 
 		try {
 			for (Request request : requests) {
@@ -178,8 +191,20 @@ public class CollectionsService {
 				Map.Entry<Integer, ResponseEntity<?>> entry = future.get();
 				Integer collectionDetailsId = entry.getKey();
 				ResponseEntity<?> responseEntity = entry.getValue();
+
+				Object responseHeaders = objectMapper.writeValueAsString(responseEntity.getHeaders());
+
+				Object responseBody;
+
+				if (isValidJson(objectMapper.writeValueAsString(responseEntity.getBody()))) {
+					responseBody = objectMapper.writeValueAsString(responseEntity.getBody());
+				} else {
+					responseBody = responseEntity.getBody();
+				}
+
 				Integer collectionTestResultId = collectionsRepository.insertToCollectionTestResult(
-						collectionId, collectionDetailsId, testDate, testTime, responseEntity);
+						collectionId, collectionDetailsId, testDate, testTime, responseHeaders, responseBody, responseEntity);
+
 				if (!responseEntity.getStatusCode().is2xxSuccessful()) {
 					CompletableFuture.runAsync(() -> {
 						retest(collectionDetailsId, collectionTestResultId);
@@ -187,10 +212,9 @@ public class CollectionsService {
 				}
 				responseList.add(responseEntity);
 			}
-			return collectionTestTime;
+//			return collectionTestTime;
 		} catch (JsonProcessingException | InterruptedException | ExecutionException e) {
 			log.error(e.getMessage());
-			return null;
 		} finally {
 			cachedThreadPool.shutdown();
 		}
@@ -260,6 +284,7 @@ public class CollectionsService {
 //		}
 //	}
 
+//	@Profile("Consumer")
 	public void retest(Integer collectionDetailsId, Integer collectionTestResultId) {
 
 		long delay = INITIAL_DELAY_MS;
@@ -305,6 +330,7 @@ public class CollectionsService {
 		}
 	}
 
+//	@Profile("Producer")
 	public List<Request> getAPIList(Integer collectionId) {
 
 		try {
@@ -315,6 +341,7 @@ public class CollectionsService {
 		}
 	}
 
+//	@Profile("Consumer")
 	public APIData setAPIData(Collections collection) {
 
 		APIData apiData = new APIData();
@@ -342,5 +369,15 @@ public class CollectionsService {
 			apiData.setBody(collection.getBody());
 		}
 		return apiData;
+	}
+
+	private boolean isValidJson(String responseBody) {
+		try {
+			ObjectMapper objectMapper = new ObjectMapper();
+			objectMapper.readTree(responseBody);
+			return true;
+		} catch (JsonProcessingException e) {
+			return false;
+		}
 	}
 }

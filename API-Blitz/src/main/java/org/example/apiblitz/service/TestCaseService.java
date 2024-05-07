@@ -2,19 +2,20 @@ package org.example.apiblitz.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mashape.unirest.http.exceptions.UnirestException;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.example.apiblitz.model.*;
+import org.example.apiblitz.queue.Publisher;
 import org.example.apiblitz.repository.TestCaseRepository;
 import org.example.apiblitz.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -40,10 +41,11 @@ public class TestCaseService {
 	@Autowired
 	private JwtUtil jwtUtil;
 
-	public Integer save(String accessToken, TestCase testCase) throws JsonProcessingException {
+	@Autowired
+	Publisher publisher;
 
-		Claims claims = jwtUtil.parseToken(accessToken);
-		Integer userId = claims.get("userId", Integer.class);
+//	@Profile("Producer")
+	public Integer save(Integer userId, TestCase testCase) throws JsonProcessingException {
 
 		// Set testCase data in APIData
 		APIData apiData = setAPIData(testCase);
@@ -51,11 +53,24 @@ public class TestCaseService {
 		// Package API data into http request
 		Request request = apiService.httpRequest(apiData);
 
+		Object expectedResponseBody;
+
+		if (!testCase.getExpectedResponseBody().isEmpty()) {
+			if (!isValidJson(testCase.getExpectedResponseBody())) {
+				expectedResponseBody = objectMapper.writeValueAsString(testCase.getExpectedResponseBody());
+			} else {
+				expectedResponseBody = testCase.getExpectedResponseBody();
+			}
+		} else {
+			expectedResponseBody = null;
+		}
+
 		// Store API data into APIHistory table and return testCaseId
-		return testCaseRepository.insertToTestCase(userId, request, testCase);
+		return testCaseRepository.insertToTestCase(userId, request, testCase, expectedResponseBody);
 	}
 
-	public void setTestSchedule(Integer testCaseId, TestCase testCase) {
+//	@Profile("Producer")
+	public void setTestSchedule(Integer userId, Integer testCaseId, TestCase testCase) {
 
 		LocalDate testDate = LocalDate.now(); // Test Date
 		LocalTime testTime = LocalTime.now(); // Test time
@@ -73,19 +88,44 @@ public class TestCaseService {
 		Runnable test = () -> {
 			try {
 				Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+
 				// Confirm the reset status
 				Integer resetStatus = testCaseRepository.getResetStatusByTestCaseId(testCaseId);
+
 				if (resetStatus == 0) {
-					autoTestService.autoTest(testCaseId);
-					log.info(timestamp + " : testCaseId <" + testCaseId + "> Finish testing!");
+
+					// User ID
+//					String accessToken = extractAccessToken(authorization);
+//					Claims claims = jwtUtil.parseToken(accessToken);
+//					Integer userId = claims.get("userId", Integer.class);
+
+					// Category
+					String category = "TestCase";
+
+//					// Type
+//					String type = "create";
+
+					// ID
+					Integer id = testCaseId;
+
+					// Test dateTime
+					LocalDateTime currentDateTime = LocalDateTime.now().withNano(0);
+					Timestamp testDateTime = Timestamp.valueOf(currentDateTime);
+
+					// Content
+					Object content = testCase;
+					publisher.publishMessage(userId, category, id, testDateTime, content);
+
+//					autoTestService.autoTest(testCaseId);
+					log.info(timestamp + " : testCaseId <" + testCaseId + "> Set Schedule Successfully!");
 				} else {
 					executor.shutdown();
-					log.info(timestamp + " : testCaseId <" + testCaseId + "> Shutdown!");
+					log.info(timestamp + " : testCaseId <" + testCaseId + "> Schedule Shutdown!");
 					if (resetStatus == 1) {
 						executor.shutdown();
-						setTestSchedule(testCaseId, testCase);
+						setTestSchedule(userId, testCaseId, testCase);
 						testCaseRepository.updateResetStatusByTestCaseId(testCaseId);
-						log.info(timestamp + " : testCaseId <" + testCaseId + "> Reset Successfully!");
+						log.info(timestamp + " : testCaseId <" + testCaseId + "> Reset Schedule Successfully!");
 					}
 				}
 
@@ -115,8 +155,6 @@ public class TestCaseService {
 
 				testCaseRepository.updateNextTestTime(testCaseId, nextTestDate, nextTestTime);
 
-			} catch (IOException | UnirestException e) {
-				throw new RuntimeException(e);
 			} catch (SQLException e) {
 				log.error(e.getMessage());
 			}
@@ -145,7 +183,7 @@ public class TestCaseService {
 		executor.scheduleAtFixedRate(test, 0, intervalsTimeValue, timeUnit);
 	}
 
-//	public List<NextSchedule> get(Integer userId) {
+//	@Profile("Producer")
 	public List<NextSchedule> get(String accessToken) {
 
 		Claims claims = jwtUtil.parseToken(accessToken);
@@ -159,6 +197,7 @@ public class TestCaseService {
 		}
 	}
 
+	//	@Profile("Consumer")
 	public void update(String accessToken, ResetTestCase resetTestCase) {
 
 		Claims claims = jwtUtil.parseToken(accessToken);
@@ -178,6 +217,7 @@ public class TestCaseService {
 		}
 	}
 
+//	@Profile("Consumer")
 	public void delete(Integer testCaseId) {
 
 		// Delete API data in APIHistory table
@@ -188,6 +228,7 @@ public class TestCaseService {
 		}
 	}
 
+//	@Profile("Producer")
 	public APIData setAPIData(TestCase testCase) {
 
 		APIData apiData = new APIData();
@@ -205,6 +246,7 @@ public class TestCaseService {
 		return apiData;
 	}
 
+//	@Profile("Producer")
 	public APIData resetAPIData(ResetTestCase resetTestCase) {
 
 		APIData apiData = new APIData();
@@ -220,5 +262,15 @@ public class TestCaseService {
 		apiData.setBody(resetTestCase.getBody());
 
 		return apiData;
+	}
+
+	private boolean isValidJson(String responseBody) {
+		try {
+			ObjectMapper objectMapper = new ObjectMapper();
+			objectMapper.readTree(responseBody);
+			return true;
+		} catch (JsonProcessingException e) {
+			return false;
+		}
 	}
 }

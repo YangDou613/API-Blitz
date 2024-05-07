@@ -173,7 +173,7 @@ form label{
 
 #container {
     display: flex;
-    flex: 1;
+    flex-direction: column;
     justify-content: center;
     margin: 100px auto 100px 180px;
     width: calc(100% - 180px);

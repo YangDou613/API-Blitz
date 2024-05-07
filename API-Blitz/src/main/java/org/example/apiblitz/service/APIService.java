@@ -6,14 +6,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
-import org.example.apiblitz.model.APIData;
-import org.example.apiblitz.model.APITestResult;
-import org.example.apiblitz.model.Request;
-import org.example.apiblitz.model.UserResponse;
+import org.example.apiblitz.model.*;
 import org.example.apiblitz.repository.APIRepository;
 import org.example.apiblitz.repository.CollectionsRepository;
 import org.example.apiblitz.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -23,9 +21,7 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import java.sql.Timestamp;
 
-import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -46,50 +42,90 @@ public class APIService {
 	@Autowired
 	private JwtUtil jwtUtil;
 
-	public ResponseEntity<?> APITest(String accessToken, Timestamp timestamp, APIData apiData) throws JsonProcessingException {
+//	@Profile("Consumer")
+	public void APITest(Integer userId,
+	                    Timestamp testDateTime,
+	                    APIData apiData) throws JsonProcessingException, InterruptedException {
 
-		Claims claims = jwtUtil.parseToken(accessToken);
-		Integer userId = claims.get("userId", Integer.class);
+		ResponseEntity<?> result;
 
 		// Package API data into http request
 		Request request = httpRequest(apiData);
+
 		if (request == null) {
-			return ResponseEntity
+			result = ResponseEntity
 					.status(HttpStatus.BAD_REQUEST)
 					.body("Failed to parse JSON data. Please check the JSON format and try again.");
+		} else {
+			// Send Request
+			result = sendRequest(request);
 		}
 
-		// Send Request
-		ResponseEntity<?> result = sendRequest(request);
 		Object responseHeaders = objectMapper.writeValueAsString(result.getHeaders());
-		Object responseBody = result.getBody();
+
+		String contentType = result.getHeaders().get("Content-type").get(0);
+
+		Object responseBody;
+
+		if (contentType.equals("image/jpeg")) {
+			responseBody = objectMapper.writeValueAsString(result.getBody());
+		} else {
+			responseBody = result.getBody();
+		}
+
 		Integer statusCode = result.getStatusCode().value();
 
 		// Store API data and response into APIHistory table
-		apiRepository.insertToAPIHistory(userId, apiData.getUrl(), request, timestamp, responseHeaders, responseBody, statusCode);
+		apiRepository.insertToAPIHistory(userId, apiData.getUrl(), request, testDateTime, responseHeaders, responseBody, statusCode);
 
-		return setResponse(apiData, result);
+//		return setResponse(userId, apiData, testDateTime, result);
 	}
 
-	public ResponseEntity<?> setResponse(APIData apiData, ResponseEntity<?> result) {
+	// Consumer
+//	public ResponseEntity<?> setResponse(Integer userId, APIData apiData, ResponseEntity<?> result) throws InterruptedException {
+//	@Profile("Consumer")
+//	public Message setResponse(Integer userId,
+//	                        APIData apiData,
+//	                        Timestamp testDateTime,
+//	                        ResponseEntity<?> result) throws InterruptedException {
+//
+//		// Get status code
+//		HttpStatusCode statusCode = result.getStatusCode();
+//
+//		// To Producer
+//		Message message = new Message();
+//
+//		if (apiData.getMethod().equals("HEAD")) {
+//			HttpHeaders headers = result.getHeaders();
+//			String headersString = headers.entrySet().stream()
+//					.map(entry -> entry.getKey() + ": " + entry.getValue())
+//					.collect(Collectors.joining("\n"));
+//
+//			message.setUserId(userId);
+//			message.setCategory("APITest");
+//			message.setTestDateTime(testDateTime);
+//			message.setContent(ResponseEntity.status(statusCode).body(headersString));
+//			message.setCreatedAt(new Date());
+//
+////			return ResponseEntity
+////					.status(statusCode)
+////					.body(headersString);
+//		} else {
+//			message.setUserId(userId);
+//			message.setCategory("APITest");
+//			message.setTestDateTime(testDateTime);
+//			message.setContent(ResponseEntity.status(statusCode).body(result));
+//			message.setCreatedAt(new Date());
+//		}
+//
+//		return message;
+//
+////		return ResponseEntity
+////				.status(statusCode)
+////				.body(result);
+//	}
 
-		// Get status code
-		HttpStatusCode statusCode = result.getStatusCode();
-
-		if (apiData.getMethod().equals("HEAD")) {
-			HttpHeaders headers = result.getHeaders();
-			String headersString = headers.entrySet().stream()
-					.map(entry -> entry.getKey() + ": " + entry.getValue())
-					.collect(Collectors.joining("\n"));
-			return ResponseEntity
-					.status(statusCode)
-					.body(headersString);
-		}
-		return ResponseEntity
-				.status(statusCode)
-				.body(result);
-	}
-
+	@Profile("Consumer")
 	public Request httpRequest(APIData apiData) {
 
 		Request request = new Request();
@@ -139,6 +175,7 @@ public class APIService {
 		}
 	}
 
+//	@Profile("Consumer")
 	public ResponseEntity<?> sendRequest(Request request) {
 
 		// Test time
@@ -245,6 +282,7 @@ public class APIService {
 //		return APIUrl;
 //	}
 
+//	@Profile("Consumer")
 	public String getQueryParams(ArrayList<Object> paramsKey, ArrayList<Object> paramsValue)
 			throws JsonProcessingException {
 
@@ -257,6 +295,7 @@ public class APIService {
 		return objectMapper.writeValueAsString(queryParams);
 	}
 
+//	@Profile("Consumer")
 	public HttpHeaders setHeaders(APIData apiData) {
 
 		// Header
@@ -277,12 +316,14 @@ public class APIService {
 		return headers;
 	}
 
+//	@Profile("Consumer")
 	public HttpEntity<?> getHttpEntity(Request request) {
 
 		MultiValueMap<String, String> requestHeaders = convertJsonToMultiValueMap((String) request.getRequestHeaders());
 		return new HttpEntity<>(request.getRequestBody(), requestHeaders);
 	}
 
+//	@Profile("Consumer")
 	public MultiValueMap<String, String> convertJsonToMultiValueMap(String headers) {
 
 		MultiValueMap<String, String> requestHeaders = new LinkedMultiValueMap<>();
@@ -307,14 +348,7 @@ public class APIService {
 		return requestHeaders;
 	}
 
-	public List<Request> getAllHistory(String accessToken) {
-
-		Claims claims = jwtUtil.parseToken(accessToken);
-		Integer userId = claims.get("userId", Integer.class);
-
-		return apiRepository.getAllHistoryList(userId);
-	}
-
+//	@Profile("Producer")
 	public APITestResult getApiTestResult(String accessToken, String testDateTime) {
 
 		Claims claims = jwtUtil.parseToken(accessToken);
@@ -323,7 +357,12 @@ public class APIService {
 		return apiRepository.getApiTestResultByUserIdAndDateTime(userId, testDateTime);
 	}
 
-//	public List<Request> getAllHistory(Integer userId) {
-//		return apiRepository.getAllHistoryList(userId);
-//	}
+//	@Profile("Producer")
+	public List<Request> getAllHistory(String accessToken) {
+
+		Claims claims = jwtUtil.parseToken(accessToken);
+		Integer userId = claims.get("userId", Integer.class);
+
+		return apiRepository.getAllHistoryList(userId);
+	}
 }

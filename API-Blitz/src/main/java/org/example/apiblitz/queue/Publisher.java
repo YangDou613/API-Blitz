@@ -6,10 +6,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.example.apiblitz.model.Message;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
+@Profile("Producer")
 @Service
 @Slf4j
 public class Publisher {
@@ -18,6 +21,7 @@ public class Publisher {
 	private String queueName;
 
 	private final AmazonSQS amazonSQSClient;
+
 	private final ObjectMapper objectMapper;
 
 	public Publisher(AmazonSQS amazonSQSClient, ObjectMapper objectMapper) {
@@ -25,17 +29,33 @@ public class Publisher {
 		this.objectMapper = objectMapper;
 	}
 
-	public void publishMessage(String requestEntity) {
+//	@Bean
+//	public Publisher publisher() {
+//		return new Publisher(amazonSQSClient, objectMapper);
+//	}
+
+	public void publishMessage(
+			Integer userId,
+			String category,
+			Integer id,
+			Timestamp testDateTime,
+			Object content
+			) {
 		try {
 			GetQueueUrlResult queueUrl = amazonSQSClient.getQueueUrl(queueName);
+
 			var message = Message.builder()
-//					.id(id)
-//					.content("message")
-					.content(requestEntity)
+					.userId(userId)
+					.category(category)
+					.id(id)
+					.testDateTime(testDateTime)
+					.content(content)
 					.createdAt(new Date()).build();
-			var result = amazonSQSClient.sendMessage(queueUrl.getQueueUrl(), objectMapper.writeValueAsString(message));
+
+			amazonSQSClient.sendMessage(queueUrl.getQueueUrl(), objectMapper.writeValueAsString(message));
+
 		} catch (Exception e) {
-			log.error("Queue Exception Message: {}", e.getMessage());
+			log.error("Queue Exception Message: { " + e.getMessage() + "}");
 		}
 	}
 }

@@ -245,6 +245,9 @@ if (token === null) {
             const formData = new FormData(this);
             fetch('/api/1.0/collections/update?collectionId=' + selectedCollection, {
                 method: 'POST',
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                },
                 body: formData
             })
                 .then(response => {

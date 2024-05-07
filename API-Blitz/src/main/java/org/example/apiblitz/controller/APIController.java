@@ -1,11 +1,16 @@
 package org.example.apiblitz.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Claims;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.example.apiblitz.model.*;
+import org.example.apiblitz.queue.Publisher;
 import org.example.apiblitz.service.APIService;
 import org.example.apiblitz.service.AutoTestService;
+import org.example.apiblitz.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindException;
@@ -13,12 +18,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
+//@Profile("Producer")
 @Controller
 @Slf4j
 public class APIController {
@@ -28,6 +31,15 @@ public class APIController {
 
 	@Autowired
 	AutoTestService autoTestService;
+
+	@Autowired
+	private JwtUtil jwtUtil;
+
+	@Autowired
+	ObjectMapper objectMapper;
+
+	@Autowired
+	Publisher publisher;
 
 	@GetMapping ("/APITest.html")
 	public String APITestPage() {
@@ -48,17 +60,33 @@ public class APIController {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(userResponse);
 		}
 
-		String accessToken = extractAccessToken(authorization);
-
 		if (bindingResult.hasErrors()) {
 			throw new BindException(bindingResult);
 		}
 
 		try {
-			LocalDateTime currentDateTime = LocalDateTime.now().withNano(0);
-			Timestamp timestamp = Timestamp.valueOf(currentDateTime);
+			// User ID
+			String accessToken = extractAccessToken(authorization);
+			Claims claims = jwtUtil.parseToken(accessToken);
+			Integer userId = claims.get("userId", Integer.class);
 
-			apiService.APITest(accessToken, timestamp, apiData);
+			// Category
+			String category = "APITest";
+
+			// ID
+			Integer id = null;
+
+			// Test dateTime
+			LocalDateTime currentDateTime = LocalDateTime.now().withNano(0);
+			Timestamp testDateTime = Timestamp.valueOf(currentDateTime);
+
+			// Content
+			Object content = apiData;
+
+			publisher.publishMessage(userId, category, id, testDateTime, content);
+
+//			apiService.APITest(accessToken, timestamp, apiData);
+
 			return ResponseEntity
 					.ok()
 					.body(currentDateTime);
@@ -69,7 +97,7 @@ public class APIController {
 	}
 
 	@GetMapping("/APITest/testResult")
-	public ResponseEntity<?> gettestResult(
+	public ResponseEntity<?> getTestResult(
 			@RequestHeader("Authorization") String authorization,
 			@RequestParam("testDateTime") String testDateTime) {
 
@@ -115,16 +143,6 @@ public class APIController {
 			return ResponseEntity.badRequest().body("There is currently no API history.");
 		}
 	}
-
-//	@GetMapping("/APITest/history")
-//	public ResponseEntity<?> getHistory(@RequestParam Integer userId) {
-//		List<Request> historyList = apiService.getAllHistory(userId);
-//		if (historyList != null) {
-//			return ResponseEntity.ok(historyList);
-//		} else {
-//			return ResponseEntity.badRequest().body("There is currently no API history.");
-//		}
-//	}
 
 	private String extractAccessToken(String authorization) {
 		String[] parts = authorization.split(" ");

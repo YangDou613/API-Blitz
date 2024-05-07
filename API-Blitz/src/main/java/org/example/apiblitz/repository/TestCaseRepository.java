@@ -30,16 +30,9 @@ public class TestCaseRepository {
 	@Autowired
 	ObjectMapper objectMapper;
 
-	public Integer insertToTestCase(Integer userId, Request request, TestCase testCase) throws JsonProcessingException {
+	public Integer insertToTestCase(Integer userId, Request request, TestCase testCase, Object expectedResponseBody) throws JsonProcessingException {
 
 		Integer notification = testCase.getNotification().equals("Yes") ? 1 : 0;
-
-		Object expectedResponseBody;
-		if (!testCase.getExpectedResponseBody().isEmpty()) {
-			expectedResponseBody = testCase.getExpectedResponseBody();
-		} else {
-			expectedResponseBody = null;
-		}
 
 		Object email = objectMapper.writeValueAsString(testCase.getEmail());
 

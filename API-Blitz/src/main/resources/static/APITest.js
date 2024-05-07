@@ -112,10 +112,33 @@ if (token === null) {
         xhr.open('POST', '/APITest.html');
 
         xhr.onload = function () {
-            document.getElementById('loading').style.display = 'none';
+
             if (xhr.status === 200) {
+
                 testDateTime = JSON.parse(xhr.responseText);
-                getResult();
+
+                const socket = new SockJS('http://52.195.230.90/ws');
+                const stompClient = Stomp.over(socket);
+
+                stompClient.connect({}, function(frame) {
+
+                // const socket = new SockJS('http://localhost:8080/ws');
+                // const stompClient = Stomp.over(socket);
+                //
+                // stompClient.connect({}, function(frame) {
+                //     console.log('Connected: ' + frame);
+                    stompClient.subscribe('/topic/APITest', function(message) {
+                        // const contentType = message.headers['content-type'];
+                        // if (contentType === 'application/json') {
+                        //     const msg = JSON.parse(message.body);
+                        //     console.log(msg.from, msg.text);
+                        // } else {
+                        //     const msg = message.body;
+                        //     console.log(msg);
+                        // }
+                        getResult();
+                    });
+                });
             }
         };
         xhr.setRequestHeader("Authorization", `Bearer ${token}`);
@@ -158,6 +181,7 @@ if (token === null) {
             })
             .then(data => {
                 response = data;
+                document.getElementById('loading').style.display = 'none';
                 displayResponse();
             })
             .catch(error => {
@@ -217,7 +241,8 @@ if (token === null) {
         if (response["responseBody"] == null) {
             responseBody.innerHTML = 'There is no response body.';
         } else if (contentType === "image") {
-            const imageURL = btoa(response["responseBody"]);
+            let responseBodyText = JSON.parse(response["responseBody"]);
+            const imageURL = btoa(responseBodyText);
             let img = document.createElement("img");
             img.src = `data:image/bmp;base64, ${imageURL}`;
             responseBody.insertAdjacentHTML("beforeend", "<br>");

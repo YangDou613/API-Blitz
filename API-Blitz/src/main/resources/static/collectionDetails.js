@@ -227,6 +227,9 @@ if (token === null) {
             const formData = new FormData(this);
             fetch('/api/1.0/collections/create/addAPI?collectionId=' + collectionId, {
                 method: 'POST',
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                },
                 body: formData
             })
                 .then(response => {
@@ -353,34 +356,45 @@ if (token === null) {
     function testAllAPI() {
 
         const requestHeader = {
+            "Authorization": `Bearer ${token}`,
             'Content-Type': 'application/json'
         };
 
-        fetch('/api/1.0/collections/testAll?collectionId=' + collectionId, {
-            method: 'POST',
-            headers: requestHeader,
-            body: JSON.stringify(apiList)
-        })
-            .then(response => {
-                if (!response.ok) {
-                    alert("Test failed!");
-                } else {
-                    return response.json();
-                }
-            })
-            .then(data => {
+        const socket = new SockJS('http://52.195.230.90/ws');
+        const stompClient = Stomp.over(socket);
 
-                const testDate = data.testDate;
-                const testTime = (data.testTime).split(".")[0];
-                window.location.href =
-                    "/api/1.0/autoTest/monitor?collectionId=" + collectionId + "&testDate=" + testDate + "&testTime=" + testTime;
-                // window.location.href =
-                //     "/api/1.0/autoTest/monitor/testResult?collectionId=" + collectionId + "&testDate=" + testDate + "&testTime=" + testTime;
-                alert("Successfully set up test all!");
+        stompClient.connect({}, function(frame) {
+
+            fetch('/api/1.0/collections/testAll?collectionId=' + collectionId, {
+                method: 'POST',
+                headers: requestHeader,
+                body: JSON.stringify(apiList)
             })
-            .catch(error => {
-                console.error('Error submitting form:', error);
-            });
+                .then(response => {
+                    if (!response.ok) {
+                        alert("Test failed!");
+                    } else {
+                        return response.json();
+                    }
+                })
+                .then(data => {
+
+                    const testDate = data.testDate;
+                    const testTime = (data.testTime).split(".")[0];
+
+                    stompClient.subscribe('/topic/Collections', function(message) {
+                        window.location.href =
+                            "/api/1.0/autoTest/monitor?collectionId=" + collectionId + "&testDate=" + testDate + "&testTime=" + testTime;
+                        // window.location.href =
+                        //     "/api/1.0/autoTest/monitor/testResult?collectionId=" + collectionId + "&testDate=" + testDate + "&testTime=" + testTime;
+                        alert("Successfully set up test all!");
+                    });
+
+                })
+                .catch(error => {
+                    console.error('Error submitting form:', error);
+                });
+        });
     }
 
     function addQueryParamsInput(event) {

@@ -161,6 +161,7 @@ if (token === null) {
             selectedAPI.requestName = requestName.value;
 
             const requestHeader = {
+                "Authorization": `Bearer ${token}`,
                 'Content-Type': 'application/json'
             };
 

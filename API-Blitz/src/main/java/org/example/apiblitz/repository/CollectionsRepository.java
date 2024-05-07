@@ -130,6 +130,8 @@ public class CollectionsRepository {
 	                                         Integer collectionDetailsId,
 	                                         LocalDate testDate,
 	                                         LocalTime testTime,
+											 Object responseHeaders,
+											 Object responseBody,
 	                                         ResponseEntity<?> responseEntity) {
 
 		String result = responseEntity.getStatusCode().is2xxSuccessful() ? "pass" : "failed";
@@ -152,13 +154,8 @@ public class CollectionsRepository {
 			ps.setInt(6, responseEntity.getStatusCode().value());
 			ps.setString(7, responseEntity.getHeaders().getFirst("Execution-Duration"));
 			ps.setLong(8, responseEntity.getHeaders().getContentLength());
-			try {
-				ps.setObject(9, objectMapper.writeValueAsString(responseEntity.getHeaders()));
-				ps.setObject(10, objectMapper.writeValueAsString(responseEntity.getBody()));
-			} catch (JsonProcessingException e) {
-				log.error(e.getMessage());
-				throw new RuntimeException(e);
-			}
+			ps.setObject(9, responseHeaders);
+			ps.setObject(10, responseBody);
 			ps.setString(11, result);
 			return ps;
 		}, keyHolder);

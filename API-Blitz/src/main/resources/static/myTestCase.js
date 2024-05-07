@@ -214,12 +214,24 @@ if (token === null) {
 
         const body = document.getElementById("body");
         body.addEventListener("input", () => {
-            body.value = JSON.stringify(JSON.parse(body.value), null, 4);
+
+            try {
+                JSON.parse(body.value);
+                body.value = JSON.stringify(JSON.parse(body.value), null, 4);
+            } catch (error) {
+
+            }
         })
 
         const expectedResponseBody = document.getElementById("expectedResponseBody");
         expectedResponseBody.addEventListener("input", () => {
-            expectedResponseBody.value = JSON.stringify(JSON.parse(body.value), null, 4);
+
+            try {
+                const parsedBody = JSON.parse(expectedResponseBody.value);
+                expectedResponseBody.value = JSON.stringify(JSON.parse(expectedResponseBody.value), null, 4);
+            } catch (error) {
+
+            }
         })
 
         const cancelButton = document.getElementById("cancel-button");
@@ -313,6 +325,9 @@ if (token === null) {
 
         fetch('/api/1.0/testCase/delete?testCaseId=' + testCaseId, {
             method: 'DELETE',
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
         })
             .then(response => {
                 if (!response.ok) {
@@ -646,11 +661,7 @@ if (token === null) {
 
     intervalsTimeUnitSelect.addEventListener("change", function () {
 
-        console.log("hiiiiiii")
-
         let selectedUnit = intervalsTimeUnitSelect.value;
-
-        console.log(selectedUnit)
 
         switch (selectedUnit) {
             case "Hour":
