@@ -1,14 +1,16 @@
 package org.example.apiblitz.service;
 
-import com.mashape.unirest.http.exceptions.UnirestException;
+import com.amazonaws.services.sqs.AmazonSQS;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.example.apiblitz.model.NextSchedule;
+import org.example.apiblitz.queue.Publisher;
 import org.example.apiblitz.repository.ResetTestCaseRepository;
 import org.example.apiblitz.repository.TestCaseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -20,18 +22,34 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+@Profile("Producer")
 @Service
 @Slf4j
 public class ResetTestCaseService {
 
-	@Autowired
+	final
 	ResetTestCaseRepository resetTestCaseRepository;
 
-	@Autowired
+	final
 	TestCaseRepository testCaseRepository;
 
-	@Autowired
+	final
 	AutoTestService autoTestService;
+
+	final
+	Publisher publisher;
+
+	public ResetTestCaseService(ResetTestCaseRepository resetTestCaseRepository, TestCaseRepository testCaseRepository, AutoTestService autoTestService, Publisher publisher) {
+		this.resetTestCaseRepository = resetTestCaseRepository;
+		this.testCaseRepository = testCaseRepository;
+		this.autoTestService = autoTestService;
+		this.publisher = publisher;
+		try {
+			this.resetTestCase();
+		} catch (SQLException e) {
+			log.error(e.getMessage());
+		}
+	}
 
 	public void resetTestCase() throws SQLException {
 
@@ -60,8 +78,27 @@ public class ResetTestCaseService {
 			Runnable test = () -> {
 				try {
 					Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-					autoTestService.autoTest(nextSchedule.getTestCaseId());
-					log.info(timestamp + " : testCaseId <" + nextSchedule.getTestCaseId() + "> Finish testing!");
+
+					// User ID
+					Integer userId = null;
+
+					// Category
+					String category = "TestCase";
+
+					// ID
+					Integer id = nextSchedule.getTestCaseId();
+
+					// Test dateTime
+					LocalDateTime currentDateTimeForTest = LocalDateTime.now().withNano(0);
+					Timestamp testDateTime = Timestamp.valueOf(currentDateTimeForTest);
+
+					// Content
+					Object content = null;
+
+					publisher.publishMessage(userId, category, id, testDateTime, content);
+
+//					autoTestService.autoTest(nextSchedule.getTestCaseId());
+					log.info(timestamp + " : testCaseId <" + nextSchedule.getTestCaseId() + "> Set Schedule Successfully!");
 
 					// Calculate next test date and time
 					LocalDateTime updateNextTestDateTime = calculateNextTestTime(nextSchedule, timestamp);
@@ -71,10 +108,6 @@ public class ResetTestCaseService {
 							updateNextTestDateTime.toLocalDate(),
 							updateNextTestDateTime.toLocalTime());
 
-				} catch (IOException e) {
-					throw new RuntimeException(e);
-				} catch (UnirestException e) {
-					throw new RuntimeException(e);
 				} catch (SQLException e) {
 					log.error(e.getMessage());
 				}

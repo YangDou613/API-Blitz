@@ -3,6 +3,7 @@ package org.example.apiblitz.messageBroker;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.listener.PatternTopic;
@@ -10,6 +11,7 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.stereotype.Component;
 
+@Profile("Consumer")
 @Component
 @Slf4j
 public class Sender {
@@ -21,26 +23,26 @@ public class Sender {
 		this.stringRedisTemplate = stringRedisTemplate;
 	}
 
-	@Bean
-	RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory connectionFactory,
-	                                        MessageListenerAdapter listenerAdapter) {
+//	@Bean
+//	RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory connectionFactory,
+//	                                        MessageListenerAdapter listenerAdapter) {
+//
+//		RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+//		container.setConnectionFactory(connectionFactory);
+//		container.addMessageListener(listenerAdapter, new PatternTopic("chat"));
+//
+//		return container;
+//	}
 
-		RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-		container.setConnectionFactory(connectionFactory);
-		container.addMessageListener(listenerAdapter, new PatternTopic("chat"));
+//	@Bean
+//	MessageListenerAdapter messageListenerAdapter(Receiver receiver) {
+//		return new MessageListenerAdapter(receiver, "receiveMessage");
+//	}
 
-		return container;
-	}
-
-	@Bean
-	MessageListenerAdapter messageListenerAdapter(Receiver receiver) {
-		return new MessageListenerAdapter(receiver, "receiveMessage");
-	}
-
-	@Bean
-	Receiver messageBrokerReceiver() {
-		return new Receiver();
-	}
+//	@Bean
+//	Receiver messageBrokerReceiver() {
+//		return new Receiver();
+//	}
 
 //	@Bean
 //	StringRedisTemplate messageBrokerTemplate(RedisConnectionFactory connectionFactory) {
@@ -54,7 +56,8 @@ public class Sender {
 //		StringRedisTemplate template = ctx.getBean(StringRedisTemplate.class);
 //		Receiver receiver = ctx.getBean(Receiver.class);
 
-		log.info("Sending message...");
+//		log.info("Sending message...");
+		log.info("Finish task, and sending message to producer...");
 		stringRedisTemplate.convertAndSend("chat", message);
 //		Thread.sleep(500L);
 

@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-//@Profile("Producer")
+@Profile("Producer")
 @Controller
 @Slf4j
 @RequestMapping("/api/1.0/collections")

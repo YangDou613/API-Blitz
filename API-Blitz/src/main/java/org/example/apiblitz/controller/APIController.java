@@ -21,7 +21,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
-//@Profile("Producer")
+@Profile("Producer")
 @Controller
 @Slf4j
 public class APIController {
@@ -79,6 +79,8 @@ public class APIController {
 			// Test dateTime
 			LocalDateTime currentDateTime = LocalDateTime.now().withNano(0);
 			Timestamp testDateTime = Timestamp.valueOf(currentDateTime);
+
+			System.out.println("TestDateTime from APIController: " + testDateTime);
 
 			// Content
 			Object content = apiData;

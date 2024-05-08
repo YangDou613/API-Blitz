@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.util.Date;
 
-@Profile("Producer")
 @Service
 @Slf4j
 public class Publisher {
@@ -24,9 +23,9 @@ public class Publisher {
 
 	private final ObjectMapper objectMapper;
 
-	public Publisher(AmazonSQS amazonSQSClient, ObjectMapper objectMapper) {
+	public Publisher(AmazonSQS amazonSQSClient) {
 		this.amazonSQSClient = amazonSQSClient;
-		this.objectMapper = objectMapper;
+		this.objectMapper = new ObjectMapper();
 	}
 
 //	@Bean
@@ -53,6 +52,7 @@ public class Publisher {
 					.createdAt(new Date()).build();
 
 			amazonSQSClient.sendMessage(queueUrl.getQueueUrl(), objectMapper.writeValueAsString(message));
+			log.info("Sending message to queue: { " + message + "}");
 
 		} catch (Exception e) {
 			log.error("Queue Exception Message: { " + e.getMessage() + "}");

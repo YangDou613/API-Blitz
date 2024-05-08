@@ -360,7 +360,7 @@ if (token === null) {
             'Content-Type': 'application/json'
         };
 
-        const socket = new SockJS('http://52.195.230.90/ws');
+        const socket = new SockJS('https://apiblitz.site/ws');
         const stompClient = Stomp.over(socket);
 
         stompClient.connect({}, function(frame) {

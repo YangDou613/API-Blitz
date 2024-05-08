@@ -5,6 +5,7 @@ import org.example.apiblitz.model.TestResult;
 import org.example.apiblitz.model.UserResponse;
 import org.example.apiblitz.service.AutoTestService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -15,6 +16,7 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 
+@Profile("Producer")
 @Controller
 @RequestMapping("/api/1.0/autoTest")
 public class AutoTestController {

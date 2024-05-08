@@ -39,7 +39,6 @@ public class AutoTestService {
 
 	private static final ObjectMapper objectMapper = new ObjectMapper();
 
-//	@Profile("Consumer")
 	public void autoTest(Integer testCaseId) throws IOException, UnirestException {
 
 		// Test Date
@@ -73,11 +72,13 @@ public class AutoTestService {
 
 		String result = null;
 
+		String contentType = response.getHeaders().get("Content-type").get(0);
+
 		Object responseBody;
 		if (!request.getMethod().equals("HEAD")) {
 
 			if (response.getBody() != null) {
-				if (!isValidJson(response.getBody().toString())) {
+				if (!isValidJson(response.getBody().toString()) || contentType.equals("image/jpeg")) {
 
 					responseBody = objectMapper.writeValueAsString(response.getBody());
 					result = getCompareResultForText(testCaseId, statusCode, responseBody);
@@ -144,7 +145,6 @@ public class AutoTestService {
 		return "pass";
 	}
 
-//	@Profile("Consumer")
 	public String getCompareResultForJson(Integer testCaseId,
 	                               Integer statusCode,
 	                               Map<String, Object> responseBody) throws IOException {
@@ -209,7 +209,7 @@ public class AutoTestService {
 //		return APIUrl;
 //	}
 
-//	public List<Integer> getAllTestCaseId(Integer userId) {
+	@Profile("Producer")
 	public List<Integer> getAllTestCaseId(String accessToken) {
 
 		Claims claims = jwtUtil.parseToken(accessToken);
@@ -218,18 +218,22 @@ public class AutoTestService {
 		return autoTestRepository.getAllTestCaseIdByUserId(userId);
 	}
 
+	@Profile("Producer")
 	public List<TestResult> getAllTestResult(Integer testCaseId) {
 		return autoTestRepository.getAllTestResultByTestCaseId(testCaseId);
 	}
 
+	@Profile("Producer")
 	public List<Map<String, Object>> getTestTime(Integer collectionId) {
 		return autoTestRepository.getAllTestTime(collectionId);
 	}
 
+	@Profile("Producer")
 	public List<CollectionTestResult> collectionOnceTestResult(Integer collectionId, LocalDate testDate, LocalTime testTime) {
 		return autoTestRepository.getOnceTestResultByCollectionId(collectionId, testDate, testTime);
 	}
 
+	@Profile("Producer")
 	public List<List<TestResult>> collectionAllTestResult(Integer collectionId) {
 		return autoTestRepository.getAllTestResultByCollectionId(collectionId);
 	}

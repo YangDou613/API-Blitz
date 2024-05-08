@@ -23,7 +23,7 @@ public class SqsConfig {
 		BasicAWSCredentials awsCredentials = new BasicAWSCredentials(accessKey, secretKey);
 		return AmazonSQSClientBuilder.standard()
 				.withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
-				.withRegion(Regions.EU_CENTRAL_1)
+				.withRegion(Regions.AP_NORTHEAST_1)
 				.build();
 	}
 }

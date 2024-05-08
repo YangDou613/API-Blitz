@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
-//@Profile("Consumer")
+@Profile("Consumer")
 @Service
 @Slf4j
 public class Consumer {
@@ -77,6 +77,8 @@ public class Consumer {
 				messageToReceiver.setTestDateTime(messageBody.getTestDateTime());
 				messageToReceiver.setCreatedAt(new Date());
 
+				System.out.println("Consumer get testDateTime: " + messageBody.getTestDateTime());
+
 				switch (category) {
 					case "APITest":
 						apiService.APITest(
@@ -97,6 +99,8 @@ public class Consumer {
 						sender.sendMessage(objectMapper.writeValueAsString(messageToReceiver));
 						break;
 				}
+
+//				log.info("Finish task, and sending message to producer...");
 
 				amazonSQSClient.deleteMessage(queueUrl, message.getReceiptHandle());
 			}

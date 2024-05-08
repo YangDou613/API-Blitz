@@ -195,7 +195,6 @@ if (token === null) {
             event.preventDefault();
 
             const formData = new FormData(this);
-            // fetch('/api/1.0/collections/create?userId=1', {
             fetch('/api/1.0/collections/create', {
                 method: 'POST',
                 headers: {

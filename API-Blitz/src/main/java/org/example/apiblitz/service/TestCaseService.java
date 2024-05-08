@@ -44,7 +44,7 @@ public class TestCaseService {
 	@Autowired
 	Publisher publisher;
 
-//	@Profile("Producer")
+	@Profile("Producer")
 	public Integer save(Integer userId, TestCase testCase) throws JsonProcessingException {
 
 		// Set testCase data in APIData
@@ -69,7 +69,7 @@ public class TestCaseService {
 		return testCaseRepository.insertToTestCase(userId, request, testCase, expectedResponseBody);
 	}
 
-//	@Profile("Producer")
+	@Profile("Producer")
 	public void setTestSchedule(Integer userId, Integer testCaseId, TestCase testCase) {
 
 		LocalDate testDate = LocalDate.now(); // Test Date
@@ -102,9 +102,6 @@ public class TestCaseService {
 					// Category
 					String category = "TestCase";
 
-//					// Type
-//					String type = "create";
-
 					// ID
 					Integer id = testCaseId;
 
@@ -114,6 +111,7 @@ public class TestCaseService {
 
 					// Content
 					Object content = testCase;
+
 					publisher.publishMessage(userId, category, id, testDateTime, content);
 
 //					autoTestService.autoTest(testCaseId);
@@ -183,7 +181,7 @@ public class TestCaseService {
 		executor.scheduleAtFixedRate(test, 0, intervalsTimeValue, timeUnit);
 	}
 
-//	@Profile("Producer")
+	@Profile("Producer")
 	public List<NextSchedule> get(String accessToken) {
 
 		Claims claims = jwtUtil.parseToken(accessToken);
@@ -197,7 +195,7 @@ public class TestCaseService {
 		}
 	}
 
-	//	@Profile("Consumer")
+	@Profile("Producer")
 	public void update(String accessToken, ResetTestCase resetTestCase) {
 
 		Claims claims = jwtUtil.parseToken(accessToken);
@@ -217,7 +215,7 @@ public class TestCaseService {
 		}
 	}
 
-//	@Profile("Consumer")
+	@Profile("Producer")
 	public void delete(Integer testCaseId) {
 
 		// Delete API data in APIHistory table
@@ -228,7 +226,7 @@ public class TestCaseService {
 		}
 	}
 
-//	@Profile("Producer")
+	@Profile("Consumer")
 	public APIData setAPIData(TestCase testCase) {
 
 		APIData apiData = new APIData();
@@ -246,7 +244,7 @@ public class TestCaseService {
 		return apiData;
 	}
 
-//	@Profile("Producer")
+	@Profile("Consumer")
 	public APIData resetAPIData(ResetTestCase resetTestCase) {
 
 		APIData apiData = new APIData();
@@ -264,6 +262,7 @@ public class TestCaseService {
 		return apiData;
 	}
 
+	@Profile("Consumer")
 	private boolean isValidJson(String responseBody) {
 		try {
 			ObjectMapper objectMapper = new ObjectMapper();

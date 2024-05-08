@@ -46,7 +46,7 @@ public class CollectionsService {
 	private static final long INITIAL_DELAY_MS = 60000;
 	private static final double BACKOFF_MULTIPLIER = 2.0;
 
-//	@Profile("Producer")
+	@Profile("Producer")
 	public List<Map<String, Object>> get(String accessToken) {
 
 		Claims claims = jwtUtil.parseToken(accessToken);
@@ -60,7 +60,7 @@ public class CollectionsService {
 		}
 	}
 
-//	@Profile("Consumer")
+	@Profile("Producer")
 	public void create(String accessToken, Collections collection) {
 
 		Claims claims = jwtUtil.parseToken(accessToken);
@@ -73,7 +73,7 @@ public class CollectionsService {
 		}
 	}
 
-//	@Profile("Consumer")
+	@Profile("Producer")
 	public void update(Integer collectionId, Collections collection) {
 
 		if (collection.getApiurl() != null) {
@@ -90,7 +90,7 @@ public class CollectionsService {
 		}
 	}
 
-//	@Profile("Consumer")
+	@Profile("Producer")
 	public void add(Integer collectionId, Collections collection) {
 
 //		Request request = new Request();
@@ -120,7 +120,7 @@ public class CollectionsService {
 		}
 	}
 
-//	@Profile("Consumer")
+	@Profile("Producer")
 	public void delete(String accessToken, String collectionName, Integer requestId) {
 
 		Claims claims = jwtUtil.parseToken(accessToken);
@@ -133,7 +133,7 @@ public class CollectionsService {
 		}
 	}
 
-//	@Profile("Consumer")
+	@Profile("Consumer")
 	public void sendRequestAtSameTime(Integer collectionId, Timestamp testDateTime, List<Request> requests) {
 
 //		Map<String, Object> collectionTestTime = new HashMap<>();
@@ -284,7 +284,7 @@ public class CollectionsService {
 //		}
 //	}
 
-//	@Profile("Consumer")
+	@Profile("Consumer")
 	public void retest(Integer collectionDetailsId, Integer collectionTestResultId) {
 
 		long delay = INITIAL_DELAY_MS;
@@ -330,7 +330,7 @@ public class CollectionsService {
 		}
 	}
 
-//	@Profile("Producer")
+	@Profile("Producer")
 	public List<Request> getAPIList(Integer collectionId) {
 
 		try {
@@ -341,7 +341,7 @@ public class CollectionsService {
 		}
 	}
 
-//	@Profile("Consumer")
+	@Profile("Consumer")
 	public APIData setAPIData(Collections collection) {
 
 		APIData apiData = new APIData();
@@ -371,6 +371,7 @@ public class CollectionsService {
 		return apiData;
 	}
 
+	@Profile("Consumer")
 	private boolean isValidJson(String responseBody) {
 		try {
 			ObjectMapper objectMapper = new ObjectMapper();

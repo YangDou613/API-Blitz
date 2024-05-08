@@ -42,7 +42,7 @@ public class APIService {
 	@Autowired
 	private JwtUtil jwtUtil;
 
-//	@Profile("Consumer")
+	@Profile("Consumer")
 	public void APITest(Integer userId,
 	                    Timestamp testDateTime,
 	                    APIData apiData) throws JsonProcessingException, InterruptedException {
@@ -67,11 +67,22 @@ public class APIService {
 
 		Object responseBody;
 
-		if (contentType.equals("image/jpeg")) {
-			responseBody = objectMapper.writeValueAsString(result.getBody());
+		if (result.getBody() != null) {
+
+			if (!isValidJson(result.getBody().toString()) || contentType.equals("image/jpeg")) {
+				responseBody = objectMapper.writeValueAsString(result.getBody());
+			} else {
+				responseBody = result.getBody();
+			}
 		} else {
-			responseBody = result.getBody();
+			responseBody = null;
 		}
+
+//		if (contentType.equals("image/jpeg")) {
+//			responseBody = objectMapper.writeValueAsString(result.getBody());
+//		} else {
+//			responseBody = result.getBody();
+//		}
 
 		Integer statusCode = result.getStatusCode().value();
 
@@ -125,7 +136,6 @@ public class APIService {
 ////				.body(result);
 //	}
 
-	@Profile("Consumer")
 	public Request httpRequest(APIData apiData) {
 
 		Request request = new Request();
@@ -175,7 +185,7 @@ public class APIService {
 		}
 	}
 
-//	@Profile("Consumer")
+	@Profile("Consumer")
 	public ResponseEntity<?> sendRequest(Request request) {
 
 		// Test time
@@ -282,7 +292,7 @@ public class APIService {
 //		return APIUrl;
 //	}
 
-//	@Profile("Consumer")
+	@Profile("Consumer")
 	public String getQueryParams(ArrayList<Object> paramsKey, ArrayList<Object> paramsValue)
 			throws JsonProcessingException {
 
@@ -295,7 +305,7 @@ public class APIService {
 		return objectMapper.writeValueAsString(queryParams);
 	}
 
-//	@Profile("Consumer")
+	@Profile("Consumer")
 	public HttpHeaders setHeaders(APIData apiData) {
 
 		// Header
@@ -316,14 +326,14 @@ public class APIService {
 		return headers;
 	}
 
-//	@Profile("Consumer")
+	@Profile("Consumer")
 	public HttpEntity<?> getHttpEntity(Request request) {
 
 		MultiValueMap<String, String> requestHeaders = convertJsonToMultiValueMap((String) request.getRequestHeaders());
 		return new HttpEntity<>(request.getRequestBody(), requestHeaders);
 	}
 
-//	@Profile("Consumer")
+	@Profile("Consumer")
 	public MultiValueMap<String, String> convertJsonToMultiValueMap(String headers) {
 
 		MultiValueMap<String, String> requestHeaders = new LinkedMultiValueMap<>();
@@ -348,7 +358,6 @@ public class APIService {
 		return requestHeaders;
 	}
 
-//	@Profile("Producer")
 	public APITestResult getApiTestResult(String accessToken, String testDateTime) {
 
 		Claims claims = jwtUtil.parseToken(accessToken);
@@ -357,12 +366,21 @@ public class APIService {
 		return apiRepository.getApiTestResultByUserIdAndDateTime(userId, testDateTime);
 	}
 
-//	@Profile("Producer")
 	public List<Request> getAllHistory(String accessToken) {
 
 		Claims claims = jwtUtil.parseToken(accessToken);
 		Integer userId = claims.get("userId", Integer.class);
 
 		return apiRepository.getAllHistoryList(userId);
+	}
+
+	private boolean isValidJson(String responseBody) {
+		try {
+			ObjectMapper objectMapper = new ObjectMapper();
+			objectMapper.readTree(responseBody);
+			return true;
+		} catch (JsonProcessingException e) {
+			return false;
+		}
 	}
 }

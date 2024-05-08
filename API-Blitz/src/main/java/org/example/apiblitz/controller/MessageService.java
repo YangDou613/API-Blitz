@@ -2,23 +2,23 @@ package org.example.apiblitz.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.example.apiblitz.model.*;
-import org.example.apiblitz.service.CollectionsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Service;
 
-@RestController
-public class MessageController {
+@Profile("Producer")
+@Service
+@Slf4j
+public class MessageService {
 
 	private final SimpMessagingTemplate messagingTemplate;
 
-	public MessageController(SimpMessagingTemplate messagingTemplate) {
+	public MessageService(SimpMessagingTemplate messagingTemplate) {
 		this.messagingTemplate = messagingTemplate;
 	}
-
-	@Autowired
-	CollectionsService collectionsService;
 
 	@Autowired
 	ObjectMapper objectMapper;
@@ -40,6 +40,7 @@ public class MessageController {
 				messagingTemplate.convertAndSend("/topic/Collections", "Collection Test All Successfully!");
 				break;
 		}
+		log.info("Sending message to browser through websocket!");
 	}
 
 //	@GetMapping("/send-message")

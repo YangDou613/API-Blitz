@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-//@Profile("Producer")
+@Profile("Producer")
 @Controller
 @Slf4j
 @RequestMapping("/api/1.0/testCase")

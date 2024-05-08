@@ -117,7 +117,7 @@ if (token === null) {
 
                 testDateTime = JSON.parse(xhr.responseText);
 
-                const socket = new SockJS('http://52.195.230.90/ws');
+                const socket = new SockJS('https://apiblitz.site/ws');
                 const stompClient = Stomp.over(socket);
 
                 stompClient.connect({}, function(frame) {
@@ -416,7 +416,7 @@ if (token === null) {
                     queryParams.insertAdjacentHTML("beforeend", paramValueHtml)
                 }
             });
-            document.getElementById("queryParamsButton").style.display = "block";
+            // document.getElementById("queryParamsButton").style.display = "block";
         }
 
         document.getElementById('authorizationKey').value = '';
