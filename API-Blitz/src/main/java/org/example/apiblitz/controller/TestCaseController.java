@@ -54,7 +54,6 @@ public class TestCaseController {
 
 		String accessToken = extractAccessToken(authorization);
 
-//		List<NextSchedule> testCaseList = testCaseService.get(userId);
 		List<NextSchedule> testCaseList = testCaseService.get(accessToken);
 
 		if (testCaseList != null) {
@@ -67,7 +66,7 @@ public class TestCaseController {
 	}
 
 	@PostMapping(path = "/create")
-	public String createTestCase(
+	public ResponseEntity<?> createTestCase(
 			@RequestHeader("Authorization") String authorization,
 			@Valid @ModelAttribute TestCase testCase,
 			BindingResult bindingResult) throws BindException {
@@ -76,7 +75,7 @@ public class TestCaseController {
 
 		if (authorization == null || !authorization.startsWith("Bearer ")) {
 			userResponse.setError("Invalid or missing Bearer token");
-			return "redirect:/api/1.0/testCase";
+			return ResponseEntity.badRequest().body(userResponse);
 		}
 
 		if (bindingResult.hasErrors()) {
@@ -88,34 +87,17 @@ public class TestCaseController {
 			String accessToken = extractAccessToken(authorization);
 			Claims claims = jwtUtil.parseToken(accessToken);
 			Integer userId = claims.get("userId", Integer.class);
-//
-//			// Category
-//			String category = "TestCase";
-//
-//			// Type
-//			String type = "create/save";
-//
-//			// ID
-//			Integer id = null;
-//
-//			// Test dateTime
-//			LocalDateTime currentDateTime = LocalDateTime.now().withNano(0);
-//			Timestamp testDateTime = Timestamp.valueOf(currentDateTime);
-//
-//			// Content
-//			Object content = testCase;
-
-//			publisher.publishMessage(userId, category, type, id, testDateTime, content);
 
 			Integer testCaseId = testCaseService.save(userId, testCase);
 
-//			testCaseService.setTestSchedule(userId, Integer.parseInt(message), testCase);
 			testCaseService.setTestSchedule(userId, testCaseId, testCase);
 
 		} catch (Exception e) {
 			log.error(e.getMessage());
 		}
-		return "redirect:/api/1.0/testCase";
+		return ResponseEntity
+				.ok()
+				.build();
 	}
 
 	@GetMapping("/myTestCase")
@@ -142,29 +124,9 @@ public class TestCaseController {
 
 		try {
 			String accessToken = extractAccessToken(authorization);
-//			Claims claims = jwtUtil.parseToken(accessToken);
-//			Integer userId = claims.get("userId", Integer.class);
-//
-//			// Category
-//			String category = "TestCase";
-//
-//			// Type
-//			String type = "update";
-//
-//			// ID
-//			Integer id = null;
-//
-//			// Test dateTime
-//			LocalDateTime currentDateTime = LocalDateTime.now().withNano(0);
-//			Timestamp testDateTime = Timestamp.valueOf(currentDateTime);
-//
-//			// Content
-//			Object content = resetTestCase;
-//
-//			publisher.publishMessage(userId, category, type, id, testDateTime, content);
 
-//			testCaseService.update(resetTestCase);
 			testCaseService.update(accessToken, resetTestCase);
+
 			return ResponseEntity
 					.ok()
 					.build();
@@ -187,30 +149,8 @@ public class TestCaseController {
 		}
 
 		try {
-			// User ID
-//			String accessToken = extractAccessToken(authorization);
-//			Claims claims = jwtUtil.parseToken(accessToken);
-//			Integer userId = claims.get("userId", Integer.class);
-//
-//			// Category
-//			String category = "TestCase";
-//
-//			// Type
-//			String type = "delete";
-//
-//			// ID
-//			Integer id = testCaseId;
-//
-//			// Test dateTime
-//			LocalDateTime currentDateTime = LocalDateTime.now().withNano(0);
-//			Timestamp testDateTime = Timestamp.valueOf(currentDateTime);
-//
-//			// Content
-//			Object content = null;
-//
-//			publisher.publishMessage(userId, category, type, id, testDateTime, content);
-
 			testCaseService.delete(testCaseId);
+
 			return ResponseEntity
 					.ok()
 					.build();

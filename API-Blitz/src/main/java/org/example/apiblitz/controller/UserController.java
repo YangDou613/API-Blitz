@@ -7,6 +7,7 @@ import org.example.apiblitz.model.UserSignIn;
 import org.example.apiblitz.model.UserSignUp;
 import org.example.apiblitz.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+@Profile("Producer")
 @Controller
 @Slf4j
 @RequestMapping("/api/1.0/user")
@@ -49,6 +51,7 @@ public class UserController {
 
 		try {
 			userResponse = userService.signUp(user);
+
 			if (userResponse.getError() == null) {
 				return ResponseEntity.ok(userResponse);
 			} else {
@@ -76,6 +79,7 @@ public class UserController {
 
 		try {
 			userResponse = userService.signIn(user);
+
 			if (userResponse.getError() == null) {
 				return ResponseEntity.ok(userResponse);
 			} else {

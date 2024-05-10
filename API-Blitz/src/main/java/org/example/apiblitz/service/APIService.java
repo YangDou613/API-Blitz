@@ -78,18 +78,10 @@ public class APIService {
 			responseBody = null;
 		}
 
-//		if (contentType.equals("image/jpeg")) {
-//			responseBody = objectMapper.writeValueAsString(result.getBody());
-//		} else {
-//			responseBody = result.getBody();
-//		}
-
 		Integer statusCode = result.getStatusCode().value();
 
 		// Store API data and response into APIHistory table
 		apiRepository.insertToAPIHistory(userId, apiData.getUrl(), request, testDateTime, responseHeaders, responseBody, statusCode);
-
-//		return setResponse(userId, apiData, testDateTime, result);
 	}
 
 	// Consumer

@@ -109,7 +109,14 @@ if (token === null) {
                 "<div style='font-size: 30px; font-weight: bold; font-family: \"Baloo Chettan 2\";'>Collection List</div>");
             const select = document.createElement('select');
 
+            let theFirstOption = true;
+
             data.forEach(collection => {
+
+                if (theFirstOption) {
+                    selectedCollectionId = collection["id"];
+                    theFirstOption = false;
+                }
 
                 const option = document.createElement('option');
                 option.setAttribute("value", collection["id"]);

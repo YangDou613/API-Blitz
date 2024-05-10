@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.example.apiblitz.model.Message;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -27,11 +26,6 @@ public class Publisher {
 		this.amazonSQSClient = amazonSQSClient;
 		this.objectMapper = new ObjectMapper();
 	}
-
-//	@Bean
-//	public Publisher publisher() {
-//		return new Publisher(amazonSQSClient, objectMapper);
-//	}
 
 	public void publishMessage(
 			Integer userId,

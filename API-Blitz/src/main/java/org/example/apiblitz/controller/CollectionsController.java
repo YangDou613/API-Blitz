@@ -81,7 +81,7 @@ public class CollectionsController {
 	}
 
 	@PostMapping(path = "/create")
-	public String createCollection(
+	public ResponseEntity<?> createCollection(
 			@RequestHeader("Authorization") String authorization,
 			@ModelAttribute Collections collection,
 			BindingResult bindingResult) throws BindException {
@@ -90,7 +90,7 @@ public class CollectionsController {
 
 		if (authorization == null || !authorization.startsWith("Bearer ")) {
 			userResponse.setError("Invalid or missing Bearer token");
-			return "redirect:/api/1.0/collections";
+			return ResponseEntity.badRequest().body(userResponse);
 		}
 
 		if (bindingResult.hasErrors()) {
@@ -99,33 +99,15 @@ public class CollectionsController {
 
 		try {
 			String accessToken = extractAccessToken(authorization);
-//			Claims claims = jwtUtil.parseToken(accessToken);
-//			Integer userId = claims.get("userId", Integer.class);
-//
-//			// Category
-//			String category = "Collections";
-//
-//			// Type
-//			String type = "create";
-//
-//			// ID
-//			Integer id = null;
-//
-//			// Test dateTime
-//			LocalDateTime currentDateTime = LocalDateTime.now().withNano(0);
-//			Timestamp testDateTime = Timestamp.valueOf(currentDateTime);
-//
-//			// Content
-//			Object content = collection;
-//
-//			publisher.publishMessage(userId, category, type, id, testDateTime, content);
 
-//			collectionService.create(userId, collection);
 			collectionService.create(accessToken, collection);
+
 		} catch (Exception e) {
 			log.error(e.getMessage());
 		}
-		return "redirect:/api/1.0/collections";
+		return ResponseEntity
+				.ok()
+				.build();
 	}
 
 	@PostMapping(path = "/create/addAPI")
@@ -147,30 +129,9 @@ public class CollectionsController {
 		}
 
 		try {
-			// User ID
-//			String accessToken = extractAccessToken(authorization);
-//			Claims claims = jwtUtil.parseToken(accessToken);
-//			Integer userId = claims.get("userId", Integer.class);
-//
-//			// Category
-//			String category = "Collections";
-//
-//			// Type
-//			String type = "create/addAPI";
-//
-//			// ID
-//			Integer id = collectionId;
-//
-//			// Test dateTime
-//			LocalDateTime currentDateTime = LocalDateTime.now().withNano(0);
-//			Timestamp testDateTime = Timestamp.valueOf(currentDateTime);
-//
-//			// Content
-//			Object content = collection;
-//
-//			publisher.publishMessage(userId, category, type, id, testDateTime, content);
 
 			collectionService.add(collectionId, collection);
+
 			return ResponseEntity
 					.ok()
 					.build();
@@ -199,30 +160,9 @@ public class CollectionsController {
 		}
 
 		try {
-			// User ID
-//			String accessToken = extractAccessToken(authorization);
-//			Claims claims = jwtUtil.parseToken(accessToken);
-//			Integer userId = claims.get("userId", Integer.class);
-//
-//			// Category
-//			String category = "Collections";
-//
-//			// Type
-//			String type = "create/addHistoryAPI";
-//
-//			// ID
-//			Integer id = collectionId;
-//
-//			// Test dateTime
-//			LocalDateTime currentDateTime = LocalDateTime.now().withNano(0);
-//			Timestamp testDateTime = Timestamp.valueOf(currentDateTime);
-//
-//			// Content
-//			Object content = collection;
-//
-//			publisher.publishMessage(userId, category, type, id, testDateTime, content);
 
 			collectionService.add(collectionId, collection);
+
 			return ResponseEntity
 					.ok()
 					.build();
@@ -251,30 +191,9 @@ public class CollectionsController {
 		}
 
 		try {
-			// User ID
-//			String accessToken = extractAccessToken(authorization);
-//			Claims claims = jwtUtil.parseToken(accessToken);
-//			Integer userId = claims.get("userId", Integer.class);
-//
-//			// Category
-//			String category = "Collections";
-//
-//			// Type
-//			String type = "update";
-//
-//			// ID
-//			Integer id = collectionId;
-//
-//			// Test dateTime
-//			LocalDateTime currentDateTime = LocalDateTime.now().withNano(0);
-//			Timestamp testDateTime = Timestamp.valueOf(currentDateTime);
-//
-//			// Content
-//			Object content = collection;
-//
-//			publisher.publishMessage(userId, category, type, id, testDateTime, content);
 
 			collectionService.update(collectionId, collection);
+
 			return ResponseEntity
 					.ok()
 					.build();
@@ -286,7 +205,6 @@ public class CollectionsController {
 
 	@DeleteMapping(path = "/delete")
 	public ResponseEntity<?> deleteCollection(
-//			Integer userId,
 			@RequestHeader("Authorization") String authorization,
 			String collectionName,
 			@RequestParam(required = false) Integer requestId) {
@@ -300,29 +218,9 @@ public class CollectionsController {
 
 		try {
 			String accessToken = extractAccessToken(authorization);
-//			Claims claims = jwtUtil.parseToken(accessToken);
-//			Integer userId = claims.get("userId", Integer.class);
-//
-//			// Category
-//			String category = "Collections";
-//
-//			// Type
-//			String type = "delete";
-//
-//			// ID
-//			Integer id = requestId;
-//
-//			// Test dateTime
-//			LocalDateTime currentDateTime = LocalDateTime.now().withNano(0);
-//			Timestamp testDateTime = Timestamp.valueOf(currentDateTime);
-//
-//			// Content
-//			Object content = collectionName;
-//
-//			publisher.publishMessage(userId, category, type, id, testDateTime, content);
 
-//			collectionService.delete(userId, collectionName, requestId);
 			collectionService.delete(accessToken, collectionName, requestId);
+
 			return ResponseEntity
 					.ok()
 					.build();
@@ -370,7 +268,6 @@ public class CollectionsController {
 			Integer id = collectionId;
 
 			// Test dateTime
-
 			Map<String, Object> collectionTestTime = new HashMap<>();
 
 			// Test Date
@@ -389,38 +286,13 @@ public class CollectionsController {
 
 			publisher.publishMessage(userId, category, id, testDateTime, content);
 
-//			Map<String, Object> testTime = collectionService.sendRequestAtSameTime(collectionId, requests);
-//
-//			if (testTime == null) {
-//				return ResponseEntity.badRequest().build();
-//			}
-
-//			return ResponseEntity.status(200).body(testTime);
 			return ResponseEntity.ok().body(collectionTestTime);
+
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error");
 		}
 	}
-
-//	@PostMapping("/testAll")
-//	public ResponseEntity<?> getResponseAtSameTime(
-//			Integer collectionId,
-//			@RequestBody List<Request> requests) {
-//
-//		try {
-//			List<ResponseEntity<?>> responseList = collectionService.sendRequestAtSameTime(collectionId, requests);
-//
-//			if (responseList == null) {
-//				return ResponseEntity.badRequest().build();
-//			}
-//
-//			return ResponseEntity.ok(responseList);
-//		} catch (Exception e) {
-//			log.error(e.getMessage());
-//			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error");
-//		}
-//	}
 
 	private String extractAccessToken(String authorization) {
 		String[] parts = authorization.split(" ");

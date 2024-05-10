@@ -26,9 +26,4 @@ public class Receiver {
 		messageService.sendMessage(message);
 
 	}
-
-	//	public void receiveMessage(String message) {
-//		LOGGER.info("Received <" + message + ">");
-//		counter.incrementAndGet();
-//	}
 }

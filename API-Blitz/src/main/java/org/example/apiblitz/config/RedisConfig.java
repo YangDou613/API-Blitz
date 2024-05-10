@@ -43,22 +43,4 @@ public class RedisConfig {
 	MessageListenerAdapter messageListenerAdapter(Receiver receiver) {
 		return new MessageListenerAdapter(receiver, "receiveMessage");
 	}
-
-
-//	@Bean
-//	RedisMessageListenerContainer redisMessageListenerContainer(MessageListenerAdapter listenerAdapter) {
-//
-//		RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-//		container.addMessageListener(listenerAdapter, new PatternTopic("chat"));
-//
-//		return container;
-//	}
-
-//	@Bean
-//	MessageListenerAdapter messageListenerAdapter() {
-//		return new MessageListenerAdapter();
-//
-//	}
-
-
 }

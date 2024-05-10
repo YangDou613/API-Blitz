@@ -30,7 +30,6 @@ public class AutoTestController {
 	}
 
 	@GetMapping("/monitor/testCase")
-//	public ResponseEntity<?> getTestCaseId(@RequestParam Integer userId) {
 	public ResponseEntity<?> getTestCaseId(
 			@RequestHeader("Authorization") String authorization) {
 
@@ -43,8 +42,8 @@ public class AutoTestController {
 
 		String accessToken = extractAccessToken(authorization);
 
-//		List<Integer> testCaseIdList = autoTestService.getAllTestCaseId(userId);
 		List<Integer> testCaseIdList = autoTestService.getAllTestCaseId(accessToken);
+
 		if (testCaseIdList != null) {
 			return ResponseEntity.ok(testCaseIdList);
 		} else {
@@ -54,7 +53,9 @@ public class AutoTestController {
 
 	@GetMapping("/monitor/testResult/{testCaseId}")
 	public ResponseEntity<?> getTestResult(@PathVariable Integer testCaseId) {
+
 		List<TestResult> testResultList = autoTestService.getAllTestResult(testCaseId);
+
 		if (testResultList != null) {
 			return ResponseEntity.ok(testResultList);
 		} else {
@@ -64,7 +65,9 @@ public class AutoTestController {
 
 	@GetMapping("/monitor/testResult/testTime/{collectionId}")
 	public ResponseEntity<?> getCollectionTestTime(@PathVariable Integer collectionId) {
+
 		List<Map<String, Object>> testResultList = autoTestService.getTestTime(collectionId);
+
 		if (testResultList != null) {
 			return ResponseEntity.ok(testResultList);
 		} else {
@@ -77,7 +80,9 @@ public class AutoTestController {
 			@RequestParam Integer collectionId,
 			@RequestParam LocalDate testDate,
 			@RequestParam LocalTime testTime) {
+
 		List<CollectionTestResult> testResultList = autoTestService.collectionOnceTestResult(collectionId, testDate, testTime);
+
 		if (testResultList != null) {
 			return ResponseEntity.ok(testResultList);
 		} else {
@@ -87,7 +92,9 @@ public class AutoTestController {
 
 	@GetMapping("/monitor/testResult/all")
 	public ResponseEntity<?> getCollectionAllTestResult(@RequestParam Integer collectionId) {
+
 		List<List<TestResult>> testResultList = autoTestService.collectionAllTestResult(collectionId);
+
 		if (testResultList != null) {
 			return ResponseEntity.ok(testResultList);
 		} else {

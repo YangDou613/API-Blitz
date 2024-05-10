@@ -76,7 +76,6 @@ public class UserService {
 		} else {
 			userResponse.setError("No such user here");
 		}
-
 		return userResponse;
 	}
 }

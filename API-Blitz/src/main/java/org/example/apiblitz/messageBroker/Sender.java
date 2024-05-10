@@ -23,44 +23,8 @@ public class Sender {
 		this.stringRedisTemplate = stringRedisTemplate;
 	}
 
-//	@Bean
-//	RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory connectionFactory,
-//	                                        MessageListenerAdapter listenerAdapter) {
-//
-//		RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-//		container.setConnectionFactory(connectionFactory);
-//		container.addMessageListener(listenerAdapter, new PatternTopic("chat"));
-//
-//		return container;
-//	}
-
-//	@Bean
-//	MessageListenerAdapter messageListenerAdapter(Receiver receiver) {
-//		return new MessageListenerAdapter(receiver, "receiveMessage");
-//	}
-
-//	@Bean
-//	Receiver messageBrokerReceiver() {
-//		return new Receiver();
-//	}
-
-//	@Bean
-//	StringRedisTemplate messageBrokerTemplate(RedisConnectionFactory connectionFactory) {
-//		return new StringRedisTemplate(connectionFactory);
-//	}
-
 	public void sendMessage(String message) {
-
-//		ApplicationContext ctx = SpringApplication.run(MessagingRedisApplication.class);
-
-//		StringRedisTemplate template = ctx.getBean(StringRedisTemplate.class);
-//		Receiver receiver = ctx.getBean(Receiver.class);
-
-//		log.info("Sending message...");
 		log.info("Finish task, and sending message to producer...");
 		stringRedisTemplate.convertAndSend("chat", message);
-//		Thread.sleep(500L);
-
-//		System.exit(0);
 	}
 }

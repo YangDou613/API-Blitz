@@ -1,13 +1,10 @@
 package org.example.apiblitz.service;
 
-import com.amazonaws.services.sqs.AmazonSQS;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.example.apiblitz.model.NextSchedule;
 import org.example.apiblitz.queue.Publisher;
 import org.example.apiblitz.repository.ResetTestCaseRepository;
 import org.example.apiblitz.repository.TestCaseRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
@@ -97,7 +94,6 @@ public class ResetTestCaseService {
 
 					publisher.publishMessage(userId, category, id, testDateTime, content);
 
-//					autoTestService.autoTest(nextSchedule.getTestCaseId());
 					log.info(timestamp + " : testCaseId <" + nextSchedule.getTestCaseId() + "> Set Schedule Successfully!");
 
 					// Calculate next test date and time
@@ -206,7 +202,6 @@ public class ResetTestCaseService {
 				}
 				break;
 		}
-
 		return LocalDateTime.of(nextTestDate, nextTestTime);
 	}
 }

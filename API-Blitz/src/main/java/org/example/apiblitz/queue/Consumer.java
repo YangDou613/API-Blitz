@@ -51,7 +51,7 @@ public class Consumer {
 		this.amazonSQSClient = amazonSQSClient;
 	}
 
-	@Scheduled(fixedDelay = 2000)
+	@Scheduled(fixedDelay = 500)
 	public void consumeMessages() {
 
 		String queueUrl = amazonSQSClient.getQueueUrl(queueName).getQueueUrl();
@@ -77,8 +77,6 @@ public class Consumer {
 				messageToReceiver.setTestDateTime(messageBody.getTestDateTime());
 				messageToReceiver.setCreatedAt(new Date());
 
-				System.out.println("Consumer get testDateTime: " + messageBody.getTestDateTime());
-
 				switch (category) {
 					case "APITest":
 						apiService.APITest(
@@ -99,9 +97,6 @@ public class Consumer {
 						sender.sendMessage(objectMapper.writeValueAsString(messageToReceiver));
 						break;
 				}
-
-//				log.info("Finish task, and sending message to producer...");
-
 				amazonSQSClient.deleteMessage(queueUrl, message.getReceiptHandle());
 			}
 		} catch(Exception e){

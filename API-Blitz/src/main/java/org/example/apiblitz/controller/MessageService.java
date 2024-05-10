@@ -40,11 +40,6 @@ public class MessageService {
 				messagingTemplate.convertAndSend("/topic/Collections", "Collection Test All Successfully!");
 				break;
 		}
-		log.info("Sending message to browser through websocket!");
+		log.info("Sending message to browser through websocket...");
 	}
-
-//	@GetMapping("/send-message")
-//	public void sendMessage() {
-//		messagingTemplate.convertAndSend("/topic/public", "Hello from the server!");
-//	}
 }

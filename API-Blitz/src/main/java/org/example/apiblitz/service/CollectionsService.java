@@ -93,20 +93,6 @@ public class CollectionsService {
 	@Profile("Producer")
 	public void add(Integer collectionId, Collections collection) {
 
-//		Request request = new Request();
-
-		// Package API data into http request
-//		if (collection.getParamsKey() != null) {
-//			APIData apiData = setAPIData(collection);
-//			request = apiService.httpRequest(apiData);
-//		} else {
-//			request.setAPIUrl(collection.getApiurl());
-//			request.setMethod(collection.getMethod());
-//			request.setQueryParams(collection.getQueryParams());
-//			request.setHeaders(collection.getHeaders());
-//			request.setBody(collection.getBody());
-//		}
-
 		// Package API data into http request
 		APIData apiData = setAPIData(collection);
 		Request request = apiService.httpRequest(apiData);
@@ -135,8 +121,6 @@ public class CollectionsService {
 
 	@Profile("Consumer")
 	public void sendRequestAtSameTime(Integer collectionId, Timestamp testDateTime, List<Request> requests) {
-
-//		Map<String, Object> collectionTestTime = new HashMap<>();
 
 		ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
 		List<Callable<Map.Entry<Integer, ResponseEntity<?>>>> callables = new ArrayList<>();

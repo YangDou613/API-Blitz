@@ -80,14 +80,10 @@ public class APIController {
 			LocalDateTime currentDateTime = LocalDateTime.now().withNano(0);
 			Timestamp testDateTime = Timestamp.valueOf(currentDateTime);
 
-			System.out.println("TestDateTime from APIController: " + testDateTime);
-
 			// Content
 			Object content = apiData;
 
 			publisher.publishMessage(userId, category, id, testDateTime, content);
-
-//			apiService.APITest(accessToken, timestamp, apiData);
 
 			return ResponseEntity
 					.ok()
@@ -113,6 +109,7 @@ public class APIController {
 		String accessToken = extractAccessToken(authorization);
 
 		APITestResult apiTestResult = apiService.getApiTestResult(accessToken, testDateTime);
+
 		if (apiTestResult != null) {
 			return ResponseEntity.ok(apiTestResult);
 		} else {
@@ -139,6 +136,7 @@ public class APIController {
 		String accessToken = extractAccessToken(authorization);
 
 		List<Request> historyList = apiService.getAllHistory(accessToken);
+
 		if (historyList != null) {
 			return ResponseEntity.ok(historyList);
 		} else {

@@ -105,7 +105,6 @@ public class AutoTestRepository {
 					collectionId);
 			testResultList.add(testResult);
 		}
-
 		return testResultList;
 	}
 }
