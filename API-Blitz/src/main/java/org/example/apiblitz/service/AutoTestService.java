@@ -219,8 +219,18 @@ public class AutoTestService {
 	}
 
 	@Profile("Producer")
+	public Map<String, Object> getTestStartTime(Integer testCaseId) {
+		return autoTestRepository.getTestStartTime(testCaseId);
+	}
+
+	@Profile("Producer")
 	public List<TestResult> getAllTestResult(Integer testCaseId) {
 		return autoTestRepository.getAllTestResultByTestCaseId(testCaseId);
+	}
+
+	@Profile("Producer")
+	public List<TestResult> getTenTestResult(Integer testCaseId) {
+		return autoTestRepository.getTenTestResultByTestCaseId(testCaseId);
 	}
 
 	@Profile("Producer")

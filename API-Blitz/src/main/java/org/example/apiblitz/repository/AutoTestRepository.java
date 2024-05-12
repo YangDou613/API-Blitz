@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -69,7 +70,21 @@ public class AutoTestRepository {
 		return jdbcTemplate.queryForList(getTestCaseIdListSql, Integer.class, userId);
 	}
 
+	public Map<String, Object> getTestStartTime(Integer testCaseId) {
+
+		String getMinTestDateSql = "SELECT MIN(testDate) FROM testResult WHERE testCaseId = ?";
+		Date startTestDate = jdbcTemplate.queryForObject(getMinTestDateSql, Date.class, testCaseId);
+
+		String getMinTestTimeSql = "SELECT testDate, MIN(testTime) FROM testResult WHERE testCaseId = ? AND testDate = ?";
+		return jdbcTemplate.queryForMap(getMinTestTimeSql, testCaseId, startTestDate);
+	}
+
 	public List<TestResult> getAllTestResultByTestCaseId(Integer testCaseId) {
+		String getTestResultListSql = "SELECT * FROM testResult WHERE testCaseId = ?";
+		return jdbcTemplate.query(getTestResultListSql, new Object[]{testCaseId}, new BeanPropertyRowMapper<>(TestResult.class));
+	}
+
+	public List<TestResult> getTenTestResultByTestCaseId(Integer testCaseId) {
 		String getTestResultListSql = "SELECT * FROM ( SELECT * FROM testResult WHERE testCaseId = ? " +
 				"ORDER BY testDate DESC, testTime DESC LIMIT 10 ) AS subquery ORDER BY testTime ASC";
 		return jdbcTemplate.query(getTestResultListSql, new Object[]{testCaseId}, new BeanPropertyRowMapper<>(TestResult.class));

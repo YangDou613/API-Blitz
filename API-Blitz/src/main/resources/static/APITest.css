@@ -258,6 +258,7 @@ input[type="text"]::placeholder {
 
 input[type="submit"]:hover {
     background-color: #ddd;
+    cursor: pointer;
 }
 
 input[type="submit"] {

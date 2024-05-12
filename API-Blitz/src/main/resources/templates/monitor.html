@@ -7,6 +7,7 @@
         <link rel="stylesheet" href="/monitor.css">
         <link rel="favicon" href="/favicon.ico">
         <script src='https://cdn.plot.ly/plotly-2.31.1.min.js'></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     </head>
 
     <body>
@@ -56,7 +57,8 @@
                 </a>
 
                 <br>
-                <a href="/api/1.0/autoTest/monitor" class="sidebar-link">
+<!--                <a href="/api/1.0/autoTest/monitor" class="sidebar-link">-->
+                <a href="#" class="sidebar-link" onclick="openSidebar()">
                     <img id="monitor" src="/monitor.png" alt="test">
                     <p>Monitor</p>
                 </a>
@@ -71,9 +73,74 @@
 
             <div id="container">
 
-                <div id="test-case-table"></div>
-                <div id='test-result-dashboard'></div>
-                <div id="test-result"></div>
+                <div id="smallSidebar" class="sidenav">
+
+                    <a href="#" class="closeBtn" onclick="closeSidebar()">&times;</a>
+
+                    <a href="#" id="monitor-myTestCase" class="myTestCase-container" onclick="toggleTriangle(this)">
+                        <span class="triangle"></span>
+                        <p>My Test Case</p>
+                    </a>
+                    <div id="test-case-list" style="display: none"></div>
+
+                    <a href="#" id="monitor-collections" class="collections-container" onclick="toggleTriangle(this)">
+                        <span class="triangle"></span>
+                        <p>Collections</p>
+                    </a>
+                    <div id="collections-list" style="display: none"></div>
+
+                </div>
+
+                <div id="result-container">
+
+                    <div class="tab-container">
+                        <button id="show-testCase-details" class="tablinks" onclick="displayDetails()" style="font-size: 16pt; font-weight: bold; font-family: 'Baloo Chettan 2'; display: none">Test case details</button>
+                        <button id="show-testCase-result" class="tablinks" onclick="displayResult()" style="font-size: 16pt; font-weight: bold; font-family: 'Baloo Chettan 2'; display: none">Test result</button>
+                    </div>
+
+                    <div id="charts-data-container">
+
+                        <div id="charts-container">
+                            <canvas id="doughnut"></canvas>
+                        </div>
+
+                        <div id="testCaseData"></div>
+
+                        <div id="test-result-container">
+
+                            <div id='test-result-dashboard' style="display: none"></div>
+
+                            <div id="test-result" style="display: none"></div>
+
+                        </div>
+
+                    </div>
+
+                    <div id="collections-container">
+
+                        <div id="select"></div>
+                        <div id="outline"></div>
+
+                        <div id="api-testResult-container">
+
+                            <div id="api-testResult" style="display: none"></div>
+
+                            <div id="response-container" style="display: none">
+
+                                <div class="tab-container">
+                                    <button id="show-response-body" class="tablinks" onclick="displayResponse()" style="font-size: 16pt; font-weight: bold; font-family: 'Baloo Chettan 2'; display: none">Body</button>
+                                    <button id="show-response-header" class="tablinks" onclick="displayHeaders()" style="font-size: 16pt; font-weight: bold; font-family: 'Baloo Chettan 2'; display: none">Headers</button>
+                                </div>
+
+                                <div id="api-testResultDetails"></div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
 
             </div>
 

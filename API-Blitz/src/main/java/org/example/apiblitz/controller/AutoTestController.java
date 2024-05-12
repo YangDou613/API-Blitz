@@ -51,10 +51,34 @@ public class AutoTestController {
 		}
 	}
 
+	@GetMapping("/monitor/testResult/testStartTime/{testCaseId}")
+	public ResponseEntity<?> getTestStartTime(@PathVariable Integer testCaseId) {
+
+		Map<String, Object> testResultList = autoTestService.getTestStartTime(testCaseId);
+
+		if (testResultList != null) {
+			return ResponseEntity.ok(testResultList);
+		} else {
+			return ResponseEntity.badRequest().body("There is currently no test results.");
+		}
+	}
+
 	@GetMapping("/monitor/testResult/{testCaseId}")
-	public ResponseEntity<?> getTestResult(@PathVariable Integer testCaseId) {
+	public ResponseEntity<?> getAllTestResult(@PathVariable Integer testCaseId) {
 
 		List<TestResult> testResultList = autoTestService.getAllTestResult(testCaseId);
+
+		if (testResultList != null) {
+			return ResponseEntity.ok(testResultList);
+		} else {
+			return ResponseEntity.badRequest().body("There is currently no test results.");
+		}
+	}
+
+	@GetMapping("/monitor/testResult/dashboard/{testCaseId}")
+	public ResponseEntity<?> getTenTestResult(@PathVariable Integer testCaseId) {
+
+		List<TestResult> testResultList = autoTestService.getTenTestResult(testCaseId);
 
 		if (testResultList != null) {
 			return ResponseEntity.ok(testResultList);
