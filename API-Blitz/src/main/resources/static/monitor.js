@@ -1,6 +1,7 @@
 let selectedTestCaseId;
 let selectedCollectionId;
 let collectionDetailsList;
+let collectionTestResultId;
 let testResult;
 let testDate;
 let testTime;
@@ -16,28 +17,46 @@ if (token === null) {
 
 } else {
 
-    // if (window.location.search !== "") {
-    //     let urlParams = new URLSearchParams(window.location.search);
-    //     if (urlParams.has("testCaseId")) {
-    //         selectedTestCaseId = urlParams.get("testCaseId");
-    //         getTestCaseResult();
-    //     }
-    //     if (urlParams.has("collectionId") &&
-    //         urlParams.has("testDate") &&
-    //         urlParams.has("testTime")) {
-    //
-    //         selectedCollectionId = urlParams.get("collectionId");
-    //         testDate = urlParams.get("testDate");
-    //         testTime = urlParams.get("testTime");
-    //         getCollectionResult();
-    //     }
-    // }
+    document.addEventListener("DOMContentLoaded", function() {
+
+        const currentPagePath = window.location.pathname;
+
+        const sidebarLinks = document.querySelectorAll('.sidebar-link');
+
+        sidebarLinks.forEach(link => {
+
+            const linkPath = link.getAttribute('href');
+
+            if (linkPath === currentPagePath) {
+                link.classList.add('active');
+            }
+        });
+    });
+
+    if (window.location.search !== "") {
+        let urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has("testCaseId")) {
+            selectedTestCaseId = urlParams.get("testCaseId");
+        }
+        if (urlParams.has("collectionId") &&
+            urlParams.has("testDate") &&
+            urlParams.has("testTime")) {
+
+            selectedCollectionId = urlParams.get("collectionId");
+            testDate = urlParams.get("testDate");
+            testTime = urlParams.get("testTime");
+        }
+    }
+
+    document.getElementById("smallSidebar").style.width = "350px";
+    document.getElementById("smallSidebar").style.borderLeft = "2px solid #EEEEEE";
 
     let detailsTab = document.getElementById("show-testCase-details");
     let resultTab = document.getElementById("show-testCase-result");
 
     let bodyTab = document.getElementById("show-response-body");
     let headerTab = document.getElementById("show-response-header");
+    let retestResultTab = document.getElementById("show-retest-result");
 
     let previousClickedElement = null;
 
@@ -65,13 +84,29 @@ if (token === null) {
 
                 testCaseList.appendChild(a);
 
+                if (selectedTestCaseId) {
+                    if (testCase["id"].toString() === selectedTestCaseId) {
+
+                        testCaseList.style.display = "block";
+
+                        if (previousClickedElement) {
+                            previousClickedElement.style.color = "#818181";
+                        }
+
+                        a.style.color = "#2C3E50";
+                        previousClickedElement = a;
+
+                        testData = testCase;
+                    }
+                }
+
                 a.addEventListener("click", () => {
 
                     if (previousClickedElement) {
                         previousClickedElement.style.color = "#818181";
                     }
 
-                    a.style.color = "#AACB73";
+                    a.style.color = "#2C3E50";
                     previousClickedElement = a;
 
                     selectedTestCaseId = testCase["id"];
@@ -83,6 +118,14 @@ if (token === null) {
                     displayDetails();
                 })
             });
+
+            if (selectedTestCaseId) {
+                detailsTab.style.display = "block";
+                resultTab.style.display = "block";
+
+                displayDetails();
+            }
+
         })
         .catch(error => {
             console.error('There was an error!', error);
@@ -116,13 +159,25 @@ if (token === null) {
 
             data.forEach(collection => {
 
-                console.log(collection)
-
                 let a = document.createElement("a");
                 a.href = "#";
                 a.insertAdjacentHTML("beforeend", `<p id="collection">${collection["collectionName"]}</p>`)
 
                 collectionsList.appendChild(a);
+
+                if (selectedCollectionId) {
+                    if (collection["id"].toString() === selectedCollectionId) {
+
+                        collectionsList.style.display = "block";
+
+                        if (previousClickedElement) {
+                            previousClickedElement.style.color = "#818181";
+                        }
+
+                        a.style.color = "#2C3E50";
+                        previousClickedElement = a;
+                    }
+                }
 
                 a.addEventListener("click", () => {
 
@@ -130,7 +185,7 @@ if (token === null) {
                         previousClickedElement.style.color = "#818181";
                     }
 
-                    a.style.color = "#AACB73";
+                    a.style.color = "#2C3E50";
                     previousClickedElement = a;
 
                     selectedCollectionId = collection["id"];
@@ -138,6 +193,9 @@ if (token === null) {
                     getAllTestTime();
                 })
             });
+            if (selectedCollectionId) {
+                getAllTestTime();
+            }
         })
         .catch(error => {
             console.error('There was an error!', error);
@@ -170,7 +228,7 @@ if (token === null) {
         let triangle = element.querySelector('.triangle');
         triangle.classList.toggle('triangle-down');
         let testCaseList = document.getElementById("test-case-list");
-        testCaseList.classList.toggle("active");
+        // testCaseList.classList.toggle("active");
     }
 
     // function getTestCase() {
@@ -281,6 +339,7 @@ if (token === null) {
 
         bodyTab.style.display = "none";
         headerTab.style.display = "none";
+        retestResultTab.style.display = "none";
 
         // let testResultDashboard = document.getElementById("test-result-dashboard");
         // let testResult = document.getElementById("test-result");
@@ -347,7 +406,7 @@ if (token === null) {
             ],
             datasets: [{
                 label: 'Time(s) ',
-                data: [failedPercentage, passedPercentage],
+                data: [passedPercentage, failedPercentage],
                 backgroundColor: [
                     '#AACB73',
                     '#D8D9CF'
@@ -496,22 +555,43 @@ if (token === null) {
             x: x,
             y: y,
             marker: {
-                color: color
+                color: color,
+                size: 10
             },
             // type: 'bar'
-            type: 'scatter'
+            type: 'scatter',
+            line: {
+                color: '#4C4C4C'
+            }
         };
         let result = [trace]
 
         let layout = {
             title: 'Automated Testing Monitor Performance',
+            titlefont: {
+                size: 20
+            },
             xaxis: {
                 title: 'Test Time',
+                tickfont: {
+                    size: 16
+                },
+                titlefont: {
+                    size: 20
+                }
             },
             yaxis: {
                 title: 'Execution Duration (ms)',
+                tickfont: {
+                    size: 16
+                },
+                titlefont: {
+                    size: 20
+                }
+            },
+            font: {
+                size: 12
             }
-
         };
 
         Plotly.newPlot('test-result-dashboard', result, layout);
@@ -614,20 +694,23 @@ if (token === null) {
 
                 let select = document.createElement('select');
 
-                let theFirstOption = true;
+                // let theFirstOption = true;
 
-                console.log(data)
                 data.forEach(testDateTime => {
 
-                    if (theFirstOption) {
-                        testDate = testDateTime["testDate"];
-                        testTime = testDateTime["testTime"];
-                        theFirstOption = false;
-                    }
+                    testDate = testDateTime["testDate"];
+                    testTime = testDateTime["testTime"];
+
+                    // if (theFirstOption && !testDate && !testTime) {
+                    //
+                    //     testDate = testDateTime["testDate"];
+                    //     testTime = testDateTime["testTime"];
+                    //     theFirstOption = false;
+                    // }
 
                     let option = document.createElement('option');
                     option.insertAdjacentHTML("beforeend", testDateTime["testDate"] + " " + testDateTime["testTime"]);
-                    select.appendChild(option)
+                    select.insertBefore(option, select.firstChild);
 
                 });
                 selectContainer.appendChild(select);
@@ -640,7 +723,10 @@ if (token === null) {
                     getCollectionTestResult();
                 });
 
-                getCollectionTestResult();
+                if (testDate && testTime) {
+                    select.value = testDate + " " + testTime;
+                    getCollectionTestResult();
+                }
 
             })
             .catch(error => {
@@ -650,9 +736,9 @@ if (token === null) {
 
     function getCollectionTestResult() {
 
-        let responseBody = document.getElementById('api-testResultDetails');
-        responseBody.innerHTML = '';
-        responseBody.style.display = "none";
+        // let responseBody = document.getElementById('api-testResultDetails');
+        // responseBody.innerHTML = '';
+        // responseBody.style.display = "none";
 
         detailsTab.style.display = "none";
         resultTab.style.display = "none";
@@ -662,6 +748,12 @@ if (token === null) {
         let apiTestResultContainer = document.getElementById('api-testResult');
         apiTestResultContainer.innerHTML = '';
         apiTestResultContainer.style.display = "block";
+
+        let outline = document.getElementById("outline");
+        outline.innerHTML = '';
+        outline.style.display = "inline-flex";
+
+        let previousClickedApi = null;
 
         fetch("/api/1.0/autoTest/monitor/testResult?collectionId=" + selectedCollectionId + "&testDate=" + testDate + "&testTime=" + testTime)
             .then(response => {
@@ -673,20 +765,50 @@ if (token === null) {
             })
             .then(data => {
 
+                // let outline = document.getElementById("outline");
+
+                let apiNum = 0;
+                // let duration = 0;
+                let totalResponseTime = 0;
+                let passed = 0;
+                let failed = 0;
+
+                let firstApiTestResult = true;
+
                 data.forEach(apiTestResult => {
 
                     let div = document.createElement("div");
-                    div.id = "api";
+                    div.classList.add("api");
 
-                    if (apiTestResult["result"] === "pass") {
-                        div.insertAdjacentHTML("beforeend", `<div class="result passed">${apiTestResult["result"]}</div>`);
-                    } else if (apiTestResult["result"] === "failed") {
-                        div.insertAdjacentHTML("beforeend", `<div class="result failed">${apiTestResult["result"]}</div>`);
+                    if (firstApiTestResult) {
+
+                        if (previousClickedApi) {
+                            // previousClickedApi.classList.add("api");
+                            previousClickedApi.classList.remove("api-active");
+                            // previousClickedApi.style.backgroundColor = "#F9F9F9";
+                        }
+
+                        div.classList.add("api-active");
+                        // div.style.backgroundColor = "#ebebeb";
+                        previousClickedApi = div;
+
+                        testResult = apiTestResult;
+
+                        bodyTab.style.display = "block";
+                        headerTab.style.display = "block";
+
+                        if (apiTestResult["result"] === "failed") {
+                            retestResultTab.style.display = "block";
+                        }
+
+                        displayResponse();
+
+                        firstApiTestResult = false;
                     }
 
                     let methodNameDiv = document.createElement("div");
                     methodNameDiv.id = "methodName";
-                    methodNameDiv.insertAdjacentHTML("beforeend", `<div class="method">${apiTestResult["method"]}</div>`);
+                    methodNameDiv.insertAdjacentHTML("beforeend", `<div class="method" style="font-weight: bold">${apiTestResult["method"]}</div>`);
                     methodNameDiv.insertAdjacentHTML("beforeend", `<div class="requestName">${apiTestResult["requestName"]}</div>`);
                     div.appendChild(methodNameDiv);
 
@@ -696,17 +818,75 @@ if (token === null) {
                     // urlCodeDiv.insertAdjacentHTML("beforeend", `<div class="statusCode">${apiTestResult["statusCode"]}</div>`);
                     div.appendChild(urlCodeDiv);
 
+                    if (apiTestResult["result"] === "pass") {
+                        div.insertAdjacentHTML("beforeend", `<div class="result passed">${apiTestResult["result"]}</div>`);
+                        passed += 1;
+                    } else if (apiTestResult["result"] === "failed") {
+                        div.insertAdjacentHTML("beforeend", `<div class="result failed">${apiTestResult["result"]}</div>`);
+                        failed += 1;
+                    }
+
                     apiTestResultContainer.appendChild(div);
 
+                    apiNum += 1;
+                    totalResponseTime += apiTestResult["executionDuration"];
+
+                    // let previousClickedApi = null;
+
                     div.addEventListener("click", () => {
+
+                        if (previousClickedApi) {
+                            // previousClickedApi.classList.add("api");
+                            previousClickedApi.classList.remove("api-active");
+                            // previousClickedApi.style.backgroundColor = "#F9F9F9";
+                        }
+
+                        div.classList.add("api-active");
+                        // div.style.backgroundColor = "#ebebeb";
+                        previousClickedApi = div;
+
                         testResult = apiTestResult;
+                        collectionTestResultId = apiTestResult["id"];
 
                         bodyTab.style.display = "block";
                         headerTab.style.display = "block";
 
+                        if (apiTestResult["result"] === "failed") {
+                            retestResultTab.style.display = "block";
+                        } else {
+                            retestResultTab.style.display = "none";
+                        }
+
                         displayResponse();
                     })
                 });
+
+                let apiNumDiv = document.createElement("div");
+                apiNumDiv.id = "outline-item";
+                apiNumDiv.insertAdjacentHTML("beforeend", `<div id="outline-title">API Num.</div>`);
+                apiNumDiv.insertAdjacentHTML("beforeend", `<div style="font-weight: bold">${apiNum}</div>`);
+                outline.appendChild(apiNumDiv);
+
+                let passedDiv = document.createElement("div");
+                passedDiv.id = "outline-item";
+                passedDiv.insertAdjacentHTML("beforeend", `<div id="outline-title">Passed</div>`);
+                passedDiv.insertAdjacentHTML("beforeend", `<div style="font-weight: bold">${passed}</div>`);
+                outline.appendChild(passedDiv);
+
+                let failedDiv = document.createElement("div");
+                failedDiv.id = "outline-item";
+                failedDiv.insertAdjacentHTML("beforeend", `<div id="outline-title">Failed</div>`);
+                failedDiv.insertAdjacentHTML("beforeend", `<div style="font-weight: bold">${failed}</div>`);
+                outline.appendChild(failedDiv);
+
+                let avgResponseTime = totalResponseTime / apiNum;
+
+                let avgDurationTimeDiv = document.createElement("div");
+                avgDurationTimeDiv.id = "outline-item";
+                avgDurationTimeDiv.insertAdjacentHTML("beforeend", `<div id="outline-title">Avg. Resp. Time</div>`);
+                avgDurationTimeDiv.insertAdjacentHTML("beforeend", `<div style="font-weight: bold">${avgResponseTime} ms</div>`);
+                outline.appendChild(avgDurationTimeDiv);
+
             })
             .catch(error => {
                 console.error('There was an error!', error);
@@ -715,8 +895,8 @@ if (token === null) {
 
     function displayResponse() {
 
-        let responseContainer = document.getElementById("response-container");
-        responseContainer.style.display = "block";
+        // let responseContainer = document.getElementById("response-container");
+        // responseContainer.style.display = "block";
 
         let responseBody = document.getElementById('api-testResultDetails');
         responseBody.innerHTML = '';
@@ -776,6 +956,108 @@ if (token === null) {
         responseHeader.appendChild(headersTable);
     }
 
+    function displayRetestResult() {
+
+        fetch("/api/1.0/autoTest/monitor/retestResult?collectionTestResultId=" + collectionTestResultId)
+            .then(response => {
+                if (!response.ok) {
+                    console.log(response.status)
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+
+                let retestResultContainer = document.getElementById('retestResult');
+
+                retestResultContainer.innerHTML = '';
+
+                let testNum = 1;
+
+                data.forEach(retestResult => {
+
+                    let detailTable = document.createElement('table');
+                    detailTable.classList.add('detail-table');
+
+                    let testDateTr = document.createElement("tr");
+                    let testDateKeyHtml = `<td id="td-header">Test Date</td>`;
+                    let testDateValueHtml = `<td>${retestResult["testDate"]}</td>`;
+                    testDateTr.insertAdjacentHTML('beforeend', testDateKeyHtml);
+                    testDateTr.insertAdjacentHTML('beforeend', testDateValueHtml);
+                    detailTable.appendChild(testDateTr);
+
+                    let testTimeTr = document.createElement("tr");
+                    let testTimeKeyHtml = `<td id="td-header">Test Time</td>`;
+                    let testTimeValueHtml = `<td>${retestResult["testTime"]}</td>`;
+                    testTimeTr.insertAdjacentHTML('beforeend', testTimeKeyHtml);
+                    testTimeTr.insertAdjacentHTML('beforeend', testTimeValueHtml);
+                    detailTable.appendChild(testTimeTr);
+
+                    let resultTr = document.createElement("tr");
+                    let resultKeyHtml = `<td id="td-header">Result</td>`;
+                    let resultColor = "";
+                    switch (retestResult["result"]) {
+                        case "pass":
+                            resultColor = "green";
+                            break;
+                        case "failed":
+                            resultColor = "red";
+                            break;
+                        default:
+                            resultColor = "black";
+                    }
+                    let resultValueHtml = `<td style="color: ${resultColor}; font-weight: bold;">${retestResult["result"]}</td>`;
+                    resultTr.insertAdjacentHTML('beforeend', resultKeyHtml);
+                    resultTr.insertAdjacentHTML('beforeend', resultValueHtml);
+                    detailTable.appendChild(resultTr);
+
+                    let executionDurationTr = document.createElement("tr");
+                    let executionDurationKeyHtml = `<td id="td-header">Execution Duration</td>`;
+                    let executionDurationValueHtml = `<td>${retestResult["executionDuration"]} ms</td>`;
+                    executionDurationTr.insertAdjacentHTML('beforeend', executionDurationKeyHtml);
+                    executionDurationTr.insertAdjacentHTML('beforeend', executionDurationValueHtml);
+                    detailTable.appendChild(executionDurationTr);
+
+                    let contentLengthTr = document.createElement("tr");
+                    let contentLengthKeyHtml = `<td id="td-header">Content Length</td>`;
+                    let contentLengthValueHtml = `<td>${retestResult["contentLength"]} B</td>`;
+                    contentLengthTr.insertAdjacentHTML('beforeend', contentLengthKeyHtml);
+                    contentLengthTr.insertAdjacentHTML('beforeend', contentLengthValueHtml);
+                    detailTable.appendChild(contentLengthTr);
+
+                    let statusCodeTr = document.createElement("tr");
+                    let statusCodeKeyHtml = `<td id="td-header">Status Code</td>`;
+                    let statusCodeValueHtml = `<td>${retestResult["statusCode"]}</td>`;
+                    statusCodeTr.insertAdjacentHTML('beforeend', statusCodeKeyHtml);
+                    statusCodeTr.insertAdjacentHTML('beforeend', statusCodeValueHtml);
+                    detailTable.appendChild(statusCodeTr);
+
+                    let responseBodyTr = document.createElement("tr");
+                    let responseBodyKeyHtml = `<td id="td-header">Response Body</td>`;
+                    let responseBodyText = formatJSON(JSON.parse(retestResult["responseBody"]));
+                    let responseBodyValueHtml = `<td><pre><code>${responseBodyText}</code></pre></td>`;
+                    responseBodyTr.insertAdjacentHTML('beforeend', responseBodyKeyHtml);
+                    responseBodyTr.insertAdjacentHTML('beforeend', responseBodyValueHtml);
+                    detailTable.appendChild(responseBodyTr);
+
+                    retestResultContainer.insertAdjacentHTML("beforeend", `<p>Test ${testNum}</p>`);
+                    retestResultContainer.appendChild(detailTable);
+
+                    testNum += 1;
+                });
+                const dom = document.getElementById("retestResult")
+                dom.style.display = "block";
+                const overlay = document.getElementById('overlay');
+                overlay.style.display = 'block'
+            })
+            .catch(error => {
+                console.error('There was an error!', error);
+            })
+
+        // document.getElementById("overlay").style.display = "block";
+
+    }
+
     function getContentType() {
         let responseHeaders = JSON.parse(testResult["responseHeaders"]);
         let contentType = responseHeaders["Content-Type"];
@@ -793,13 +1075,7 @@ if (token === null) {
     }
 
     function formatJSON(json) {
-        return JSON.stringify(json, null, 2)
-            .replace(/^"|"$/g, '')
-            .replace(/\\/g, '')
-            .replace(/,/g, ',\n')
-            .replace(/(["{\[\]}])\n(?=.)/g, '$1\n')
-            .replace(/(".*?": )/g, '\n$1')
-            .replace(/\n/g, '\n    ');
+        return JSON.stringify(json, null, 4)
     }
 
     function clear() {
@@ -834,6 +1110,10 @@ if (token === null) {
             selectContainer.style.display = "none";
         // }
 
+        let outline = document.getElementById("outline");
+        outline.innerHTML = '';
+        outline.style.display = "none";
+
         let apiTestResultContainer = document.getElementById('api-testResult');
         apiTestResultContainer.innerHTML = '';
         // if (apiTestResultContainer.style.display === "block") {
@@ -846,4 +1126,10 @@ if (token === null) {
             responseBody.style.display = "none";
         // }
     }
+
+    const overlay = document.getElementById('overlay');
+    overlay.addEventListener("click", (event) => {
+        document.getElementById('retestResult').style.display = "none";
+        overlay.style.display = "none";
+    })
 }

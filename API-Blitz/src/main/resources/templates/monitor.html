@@ -58,7 +58,7 @@
 
                 <br>
 <!--                <a href="/api/1.0/autoTest/monitor" class="sidebar-link">-->
-                <a href="#" class="sidebar-link" onclick="openSidebar()">
+                <a href="/api/1.0/autoTest/monitor" class="sidebar-link" onclick="openSidebar()">
                     <img id="monitor" src="/monitor.png" alt="test">
                     <p>Monitor</p>
                 </a>
@@ -119,20 +119,25 @@
                     <div id="collections-container">
 
                         <div id="select"></div>
-                        <div id="outline"></div>
+                        <div id="outline" style="display: none"></div>
 
                         <div id="api-testResult-container">
 
                             <div id="api-testResult" style="display: none"></div>
 
-                            <div id="response-container" style="display: none">
+                            <div id="response-container">
 
                                 <div class="tab-container">
                                     <button id="show-response-body" class="tablinks" onclick="displayResponse()" style="font-size: 16pt; font-weight: bold; font-family: 'Baloo Chettan 2'; display: none">Body</button>
                                     <button id="show-response-header" class="tablinks" onclick="displayHeaders()" style="font-size: 16pt; font-weight: bold; font-family: 'Baloo Chettan 2'; display: none">Headers</button>
+                                    <button id="show-retest-result" class="tablinks" onclick="displayRetestResult()" style="font-size: 16pt; font-weight: bold; font-family: 'Baloo Chettan 2'; display: none">Retest Result</button>
                                 </div>
 
                                 <div id="api-testResultDetails"></div>
+
+                                <div id="overlay" class="overlay" style="display: none"></div>
+
+                                <div id="retestResult" class="popup" style="display: none"></div>
 
                             </div>
 

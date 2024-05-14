@@ -11,6 +11,22 @@ if (token === null) {
 
 } else {
 
+    document.addEventListener("DOMContentLoaded", function() {
+
+        const currentPagePath = window.location.pathname;
+
+        const sidebarLinks = document.querySelectorAll('.sidebar-link');
+
+        sidebarLinks.forEach(link => {
+
+            const linkPath = link.getAttribute('href');
+
+            if (linkPath === currentPagePath) {
+                link.classList.add('active');
+            }
+        });
+    });
+
     requestHeader = {
         "method": "GET",
         "headers": {
@@ -37,13 +53,15 @@ if (token === null) {
 
             const thead = document.createElement("thead");
             const theadTr = document.createElement("tr");
-            theadTr.insertAdjacentHTML("beforeend", "<th>ID</th>");
+            theadTr.insertAdjacentHTML("beforeend", "<th>#</th>");
             theadTr.insertAdjacentHTML("beforeend", "<th>Name</th>");
             theadTr.insertAdjacentHTML("beforeend", "<th>Description</th>");
             theadTr.insertAdjacentHTML("beforeend", "<th>Actions</th>");
             thead.appendChild(theadTr);
 
             const tbody = document.createElement("tbody");
+
+            let number = 1;
 
             // const ul = document.createElement("ul");
             // ul.classList.add("collection-table");
@@ -60,12 +78,14 @@ if (token === null) {
             data.forEach(collection => {
 
                 const tbodyTr = document.createElement("tr");
-                tbodyTr.insertAdjacentHTML("beforeend", `<td class="col col-1">${collection["id"]}</td>`);
+                tbodyTr.insertAdjacentHTML("beforeend", `<td class="col col-1">${number}.</td>`);
                 tbodyTr.insertAdjacentHTML("beforeend", `<td class="col col-2">${collection["collectionName"]}</td>`);
                 tbodyTr.insertAdjacentHTML("beforeend", `<td class="col col-3">${collection["description"]}</td>`);
                 tbodyTr.insertAdjacentHTML("beforeend",
                     `<td class="col col-4"><button type="button" class="btn btn-block btn-edit">Edit</button>
                         <button type="button" class="btn btn-block btn-delete">Delete</button></td>`)
+
+                number += 1;
 
                 tbody.appendChild(tbodyTr);
 

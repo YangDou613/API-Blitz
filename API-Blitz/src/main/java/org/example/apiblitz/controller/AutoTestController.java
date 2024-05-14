@@ -100,12 +100,12 @@ public class AutoTestController {
 	}
 
 	@GetMapping("/monitor/testResult")
-	public ResponseEntity<?> getCollectionOnceTestResult(
+	public ResponseEntity<?> getCollectionTestResult(
 			@RequestParam Integer collectionId,
 			@RequestParam LocalDate testDate,
 			@RequestParam LocalTime testTime) {
 
-		List<CollectionTestResult> testResultList = autoTestService.collectionOnceTestResult(collectionId, testDate, testTime);
+		List<CollectionTestResult> testResultList = autoTestService.collectionTestResult(collectionId, testDate, testTime);
 
 		if (testResultList != null) {
 			return ResponseEntity.ok(testResultList);
@@ -114,17 +114,29 @@ public class AutoTestController {
 		}
 	}
 
-	@GetMapping("/monitor/testResult/all")
-	public ResponseEntity<?> getCollectionAllTestResult(@RequestParam Integer collectionId) {
+	@GetMapping("/monitor/retestResult")
+	public ResponseEntity<?> getCollectionRetestResult(@RequestParam Integer collectionTestResultId) {
 
-		List<List<TestResult>> testResultList = autoTestService.collectionAllTestResult(collectionId);
+		List<CollectionTestResult> retestResultList = autoTestService.collectionRetestResult(collectionTestResultId);
 
-		if (testResultList != null) {
-			return ResponseEntity.ok(testResultList);
+		if (retestResultList != null) {
+			return ResponseEntity.ok(retestResultList);
 		} else {
 			return ResponseEntity.badRequest().body("There is currently no test results.");
 		}
 	}
+
+//	@GetMapping("/monitor/testResult/retestResult")
+//	public ResponseEntity<?> getCollectionAllTestResult(@RequestParam Integer collectionTestResultId) {
+//
+//		List<List<TestResult>> testResultList = autoTestService.collectionAllTestResult(collectionId);
+//
+//		if (testResultList != null) {
+//			return ResponseEntity.ok(testResultList);
+//		} else {
+//			return ResponseEntity.badRequest().body("There is currently no test results.");
+//		}
+//	}
 
 	private String extractAccessToken(String authorization) {
 		String[] parts = authorization.split(" ");

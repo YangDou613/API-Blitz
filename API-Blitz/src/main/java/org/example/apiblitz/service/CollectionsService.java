@@ -180,7 +180,7 @@ public class CollectionsService {
 
 				Object responseBody;
 
-				if (isValidJson(objectMapper.writeValueAsString(responseEntity.getBody()))) {
+				if (!isValidJson(objectMapper.writeValueAsString(responseEntity.getBody()))) {
 					responseBody = objectMapper.writeValueAsString(responseEntity.getBody());
 				} else {
 					responseBody = responseEntity.getBody();

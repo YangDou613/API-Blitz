@@ -13,6 +13,20 @@ if (token === null) {
 
 } else {
 
+    document.addEventListener("DOMContentLoaded", function() {
+
+        const sidebarLinks = document.querySelectorAll('.sidebar-link');
+
+        sidebarLinks.forEach(link => {
+
+            const linkPath = link.getAttribute('href');
+
+            if (linkPath === "/api/1.0/collections") {
+                link.classList.add('active');
+            }
+        });
+    });
+
     if (window.location.search !== "") {
         let urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has("collectionId")) {
@@ -355,6 +369,9 @@ if (token === null) {
 
     function testAllAPI() {
 
+        document.getElementById("overlay").style.display = 'block';
+        document.getElementById('loading').style.display = 'block';
+
         const requestHeader = {
             "Authorization": `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -383,6 +400,10 @@ if (token === null) {
                     const testTime = (data.testTime).split(".")[0];
 
                     stompClient.subscribe('/topic/Collections', function(message) {
+
+                        document.getElementById("overlay").style.display = 'none';
+                        document.getElementById('loading').style.display = 'none';
+
                         window.location.href =
                             "/api/1.0/autoTest/monitor?collectionId=" + collectionId + "&testDate=" + testDate + "&testTime=" + testTime;
                         // window.location.href =

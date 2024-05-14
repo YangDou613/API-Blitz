@@ -13,6 +13,22 @@ if (token === null) {
 
 } else {
 
+    document.addEventListener("DOMContentLoaded", function() {
+
+        const currentPagePath = window.location.pathname;
+
+        const sidebarLinks = document.querySelectorAll('.sidebar-link');
+
+        sidebarLinks.forEach(link => {
+
+            const linkPath = link.getAttribute('href');
+
+            if (linkPath === currentPagePath) {
+                link.classList.add('active');
+            }
+        });
+    });
+
     requestHeader = {
         "method": "GET",
         "headers": {

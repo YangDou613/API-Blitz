@@ -73,7 +73,9 @@ header {
 #user {
     width: 35px;
     height: 35px;
-    margin-left: 1380px;
+    position: fixed;
+    right: 40px;
+    top: 50px;
 }
 
 .sidebar {
@@ -84,8 +86,18 @@ header {
     align-items: center;
     height: 100%;
     background-color: #F9F9F9;
-    gap: 30px;
     padding: 15px;
+}
+
+.sidebar-select {
+    text-decoration: none;
+    color: black;
+    justify-content: center;
+    align-items: center;
+    background-color: #ebebeb;
+    width: 150px;
+    border-radius: 5px;
+    padding: 25px 0;
 }
 
 .sidebar-link a {
@@ -189,6 +201,13 @@ pre {
     color: black;
     justify-content: center;
     align-items: center;
+    padding: 25px 0;
+}
+
+.active {
+    background-color: #ebebeb;
+    width: 150px;
+    border-radius: 5px;
 }
 
 #container {
@@ -321,4 +340,10 @@ h3 {
 
 .headers-table tr:hover {
     background-color: #ddd;
+}
+
+.btn:hover {
+    opacity: 0.6;
+    cursor: pointer;
+    transform: scale(1.1);
 }

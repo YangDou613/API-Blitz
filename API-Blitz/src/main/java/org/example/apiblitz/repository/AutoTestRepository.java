@@ -95,11 +95,18 @@ public class AutoTestRepository {
 		return jdbcTemplate.queryForList(getTestTimeSql, testCaseId);
 	}
 
-	public List<CollectionTestResult> getOnceTestResultByCollectionId(Integer collectionId, LocalDate testDate, LocalTime testTime) {
+	public List<CollectionTestResult> getTestResultByCollectionId(Integer collectionId, LocalDate testDate, LocalTime testTime) {
 
 		String getTestTimeSql = "SELECT cd.*, ctr.* FROM collectionDetails cd JOIN collectionTestResult ctr " +
 				"ON cd.id = ctr.collectionDetailsId WHERE testDate = ? AND testTime = ? AND cd.collectionId = ?";
 		return jdbcTemplate.query(getTestTimeSql, new BeanPropertyRowMapper<>(CollectionTestResult.class), testDate, testTime, collectionId);
+	}
+
+	public List<CollectionTestResult> getRetestResultByCollectionTestResultId(Integer collectionTestResultId) {
+
+		String getRetestResultSql =
+				"SELECT * FROM collectionTestResultException WHERE collectionTestResultId = ?";
+		return jdbcTemplate.query(getRetestResultSql, new BeanPropertyRowMapper<>(CollectionTestResult.class), collectionTestResultId);
 	}
 
 	public List<List<TestResult>> getAllTestResultByCollectionId(Integer collectionId) {

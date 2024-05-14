@@ -239,14 +239,19 @@ public class AutoTestService {
 	}
 
 	@Profile("Producer")
-	public List<CollectionTestResult> collectionOnceTestResult(Integer collectionId, LocalDate testDate, LocalTime testTime) {
-		return autoTestRepository.getOnceTestResultByCollectionId(collectionId, testDate, testTime);
+	public List<CollectionTestResult> collectionTestResult(Integer collectionId, LocalDate testDate, LocalTime testTime) {
+		return autoTestRepository.getTestResultByCollectionId(collectionId, testDate, testTime);
 	}
 
 	@Profile("Producer")
-	public List<List<TestResult>> collectionAllTestResult(Integer collectionId) {
-		return autoTestRepository.getAllTestResultByCollectionId(collectionId);
+	public List<CollectionTestResult> collectionRetestResult(Integer collectionTestResultId) {
+		return autoTestRepository.getRetestResultByCollectionTestResultId(collectionTestResultId);
 	}
+
+//	@Profile("Producer")
+//	public List<List<TestResult>> collectionAllTestResult(Integer collectionId) {
+//		return autoTestRepository.getAllTestResultByCollectionId(collectionId);
+//	}
 
 	private boolean isValidJson(String responseBody) {
 		try {

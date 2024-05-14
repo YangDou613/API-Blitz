@@ -7,8 +7,10 @@ import java.time.LocalTime;
 
 @Data
 public class CollectionTestResult {
+	private Integer id;
 	private Integer collectionId;
 	private Integer collectionDetailsId;
+	private Integer collectionTestResultId;
 	private String requestName;
 	private String method;
 	private String apiurl;
