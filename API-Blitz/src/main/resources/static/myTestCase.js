@@ -55,7 +55,8 @@ if (token === null) {
 
             const thead = document.createElement("thead");
             const theadTr = document.createElement("tr");
-            theadTr.insertAdjacentHTML("beforeend", "<th>ID</th>");
+            // theadTr.insertAdjacentHTML("beforeend", "<th>ID</th>");
+            theadTr.insertAdjacentHTML("beforeend", "<th>#</th>");
             theadTr.insertAdjacentHTML("beforeend", "<th>Test Item</th>");
             theadTr.insertAdjacentHTML("beforeend", "<th>Method</th>");
             theadTr.insertAdjacentHTML("beforeend", "<th>URL</th>");
@@ -64,6 +65,8 @@ if (token === null) {
             thead.appendChild(theadTr);
 
             const tbody = document.createElement("tbody");
+
+            let number = 1;
 
             // const ul = document.createElement("ul");
             // ul.classList.add("test-case-table");
@@ -82,7 +85,8 @@ if (token === null) {
             data.forEach(testCase => {
 
                 const tbodyTr = document.createElement("tr");
-                tbodyTr.insertAdjacentHTML("beforeend", `<td class="col col-1">${testCase["id"]}</td>`);
+                // tbodyTr.insertAdjacentHTML("beforeend", `<td class="col col-1">${testCase["id"]}</td>`);
+                tbodyTr.insertAdjacentHTML("beforeend", `<td class="col col-1">${number}.</td>`);
                 tbodyTr.insertAdjacentHTML("beforeend", `<td class="col col-2">${testCase["testItem"]}</td>`);
                 tbodyTr.insertAdjacentHTML("beforeend", `<td class="col col-3">${testCase["method"]}</td>`);
 
@@ -90,7 +94,9 @@ if (token === null) {
                 tbodyTr.insertAdjacentHTML("beforeend", `<td class="col col-5"><a href="/api/1.0/autoTest/monitor?testCaseId=${testCase["id"]}">View Monitor ⮕</a></td>`);
                 tbodyTr.insertAdjacentHTML("beforeend",
                     `<td class="col col-6"><button type="button" class="btn btn-block btn-edit">Edit</button>
-                        <button type="button" class="btn btn-block btn-delete">Delete</button></td>`)
+                        <button type="button" class="btn btn-block btn-delete">Delete</button></td>`);
+
+                number += 1;
 
                 tbody.appendChild(tbodyTr);
 

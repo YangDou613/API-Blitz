@@ -83,7 +83,7 @@ if (token === null) {
                 tbodyTr.insertAdjacentHTML("beforeend", `<td class="col col-3">${collection["description"]}</td>`);
                 tbodyTr.insertAdjacentHTML("beforeend",
                     `<td class="col col-4"><button type="button" class="btn btn-block btn-edit">Edit</button>
-                        <button type="button" class="btn btn-block btn-delete">Delete</button></td>`)
+                        <button type="button" class="btn btn-block btn-delete">Delete</button></td>`);
 
                 number += 1;
 

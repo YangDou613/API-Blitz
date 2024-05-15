@@ -51,7 +51,7 @@ public class Consumer {
 		this.amazonSQSClient = amazonSQSClient;
 	}
 
-	@Scheduled(fixedDelay = 500)
+	@Scheduled(fixedRate = 200)
 	public void consumeMessages() {
 
 		String queueUrl = amazonSQSClient.getQueueUrl(queueName).getQueueUrl();

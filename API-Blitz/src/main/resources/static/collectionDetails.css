@@ -97,7 +97,8 @@ header {
     text-align: center;
     font-family: "Baloo Chettan 2";
     font-size: 18pt;
-    font-weight: bold;
+    /*font-weight: bold;*/
+    font-weight: 500;
     color: #4C4C4C;
     margin-top: 10px;
 }

@@ -879,7 +879,7 @@ if (token === null) {
                 failedDiv.insertAdjacentHTML("beforeend", `<div style="font-weight: bold">${failed}</div>`);
                 outline.appendChild(failedDiv);
 
-                let avgResponseTime = totalResponseTime / apiNum;
+                let avgResponseTime = (totalResponseTime / apiNum).toFixed(2);
 
                 let avgDurationTimeDiv = document.createElement("div");
                 avgDurationTimeDiv.id = "outline-item";

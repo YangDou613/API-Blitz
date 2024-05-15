@@ -26,159 +26,200 @@ if (token === null) {
                 link.classList.add('active');
             }
         });
+
+        const socket = new SockJS('https://apiblitz.site/ws');
+        const stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, function(frame) {
+
+            stompClient.subscribe('/topic/APITest', function(message) {
+                // const contentType = message.headers['content-type'];
+                // if (contentType === 'application/json') {
+                //     const msg = JSON.parse(message.body);
+                //     console.log(msg.from, msg.text);
+                // } else {
+                //     const msg = message.body;
+                //     console.log(msg);
+                // }
+                getResult();
+            });
+        });
     });
 
-    const body = document.getElementById("body");
-    body.addEventListener("input", () => {
-        body.value = JSON.stringify(JSON.parse(body.value), null, 4);
-    })
+    // const socket = new SockJS('https://apiblitz.site/ws');
+    // const stompClient = Stomp.over(socket);
+    //
+    // stompClient.connect({}, function(frame) {
 
-    function updateParamsFromUrl() {
-        let url = document.getElementById("url");
-        let allParamsKeysInput = document.querySelectorAll(".paramsKey");
-        let allParamsValueInput = document.querySelectorAll(".paramsValue");
+        // document.addEventListener("DOMContentLoaded", function() {
+        //
+        //     const currentPagePath = window.location.pathname;
+        //
+        //     const sidebarLinks = document.querySelectorAll('.sidebar-link');
+        //
+        //     sidebarLinks.forEach(link => {
+        //
+        //         const linkPath = link.getAttribute('href');
+        //
+        //         if (linkPath === currentPagePath) {
+        //             link.classList.add('active');
+        //         }
+        //     });
+        // });
 
-        let urlParams = url.value.split("?")[1] || "";
-        let paramsArray = urlParams.split("&");
+        const body = document.getElementById("body");
+        body.addEventListener("input", () => {
+            body.value = JSON.stringify(JSON.parse(body.value), null, 4);
+        })
 
-        paramsArray.forEach((param, index) => {
-            let keyValue = param.split("=");
-            let key = keyValue[0];
-            let value = keyValue[1] || '';
+        function updateParamsFromUrl() {
+            let url = document.getElementById("url");
+            let allParamsKeysInput = document.querySelectorAll(".paramsKey");
+            let allParamsValueInput = document.querySelectorAll(".paramsValue");
 
-            if (index >= allParamsKeysInput.length) {
+            let urlParams = url.value.split("?")[1] || "";
+            let paramsArray = urlParams.split("&");
+
+            paramsArray.forEach((param, index) => {
+                let keyValue = param.split("=");
+                let key = keyValue[0];
+                let value = keyValue[1] || '';
+
+                if (index >= allParamsKeysInput.length) {
+                    addQueryParamsInput();
+                    allParamsKeysInput = document.querySelectorAll(".paramsKey");
+                    allParamsValueInput = document.querySelectorAll(".paramsValue");
+                }
+
+                allParamsKeysInput[index].value = key;
+
+                if (paramsArray.length < allParamsKeysInput.length) {
+                    allParamsKeysInput[index + 1].value = '';
+                    allParamsValueInput[index + 1].value = '';
+                }
+
+                if (!param.includes("=")) {
+                    allParamsValueInput[index].value = '';
+                } else {
+                    allParamsValueInput[index].value = value;
+                }
+            });
+
+            if (paramsArray.length >= allParamsKeysInput.length) {
                 addQueryParamsInput();
                 allParamsKeysInput = document.querySelectorAll(".paramsKey");
                 allParamsValueInput = document.querySelectorAll(".paramsValue");
             }
-
-            allParamsKeysInput[index].value = key;
-
-            if (paramsArray.length < allParamsKeysInput.length) {
-                allParamsKeysInput[index + 1].value = '';
-                allParamsValueInput[index + 1].value = '';
+            let equalsArray = urlParams.split("=");
+            if (equalsArray.length - 1 > paramsArray.length) {
+                updateUrlFromParams();
             }
+        }
 
-            if (!param.includes("=")) {
-                allParamsValueInput[index].value = '';
-            } else {
-                allParamsValueInput[index].value = value;
+        function updateUrlFromParams() {
+            let url = document.getElementById("url");
+            let allParamsKeysInput = document.querySelectorAll(".paramsKey");
+            let allParamsValueInput = document.querySelectorAll(".paramsValue");
+
+            let queryString = "";
+            let count = 0;
+            for (let i = 0; i < allParamsKeysInput.length; i++) {
+                let paramsKeysInputValue = allParamsKeysInput[i].value;
+                let paramsValueInputValue = allParamsValueInput[i].value;
+                if (paramsKeysInputValue) {
+                    queryString += paramsKeysInputValue;
+                    if (paramsValueInputValue) {
+                        queryString += "=" + paramsValueInputValue;
+                    }
+                    queryString += "&";
+                } else {
+                    if (paramsValueInputValue) {
+                        queryString += "=" + paramsValueInputValue;
+                    }
+                }
+                count += 1;
             }
+            if (queryString.charAt(queryString.length - 1) === "&") {
+                queryString = queryString.slice(0, -1);
+            }
+            url.value = url.value.split("?")[0] + (queryString ? "?" + queryString : "");
+        }
+
+        document.getElementById("url").addEventListener("input", function (event) {
+            updateParamsFromUrl();
         });
 
-        if (paramsArray.length >= allParamsKeysInput.length) {
-            addQueryParamsInput();
-            allParamsKeysInput = document.querySelectorAll(".paramsKey");
-            allParamsValueInput = document.querySelectorAll(".paramsValue");
-        }
-        let equalsArray = urlParams.split("=");
-        if (equalsArray.length - 1 > paramsArray.length) {
+        document.getElementById("queryParams").addEventListener("input", function (event) {
             updateUrlFromParams();
-        }
-    }
+        });
 
-    function updateUrlFromParams() {
-        let url = document.getElementById("url");
-        let allParamsKeysInput = document.querySelectorAll(".paramsKey");
-        let allParamsValueInput = document.querySelectorAll(".paramsValue");
+        document.getElementById('api-form').addEventListener('submit', function (event) {
+            event.preventDefault();
 
-        let queryString = "";
-        let count = 0;
-        for (let i = 0; i < allParamsKeysInput.length; i++) {
-            let paramsKeysInputValue = allParamsKeysInput[i].value;
-            let paramsValueInputValue = allParamsValueInput[i].value;
-            if (paramsKeysInputValue) {
-                queryString += paramsKeysInputValue;
-                if (paramsValueInputValue) {
-                    queryString += "=" + paramsValueInputValue;
+            clear();
+
+            document.getElementById('loading').style.display = 'block';
+
+            let formData = new FormData(this);
+            method = formData.get("method");
+
+            let xhr = new XMLHttpRequest();
+            xhr.open('POST', '/APITest.html');
+
+            xhr.onload = function () {
+
+                if (xhr.status === 200) {
+
+                    testDateTime = JSON.parse(xhr.responseText);
+
+                    // const socket = new SockJS('https://apiblitz.site/ws');
+                    // const stompClient = Stomp.over(socket);
+                    //
+                    // stompClient.connect({}, function(frame) {
+
+                    // const socket = new SockJS('http://localhost:8080/ws');
+                    // const stompClient = Stomp.over(socket);
+                    //
+                    // stompClient.connect({}, function(frame) {
+                    //     console.log('Connected: ' + frame);
+                    //     stompClient.subscribe('/topic/APITest', function(message) {
+                            // const contentType = message.headers['content-type'];
+                            // if (contentType === 'application/json') {
+                            //     const msg = JSON.parse(message.body);
+                            //     console.log(msg.from, msg.text);
+                            // } else {
+                            //     const msg = message.body;
+                            //     console.log(msg);
+                            // }
+                        //     getResult();
+                        // });
+                    // });
                 }
-                queryString += "&";
-            } else {
-                if (paramsValueInputValue) {
-                    queryString += "=" + paramsValueInputValue;
-                }
-            }
-            count += 1;
-        }
-        if (queryString.charAt(queryString.length - 1) === "&") {
-            queryString = queryString.slice(0, -1);
-        }
-        url.value = url.value.split("?")[0] + (queryString ? "?" + queryString : "");
-    }
+            };
+            xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+            xhr.send(formData);
 
-    document.getElementById("url").addEventListener("input", function (event) {
-        updateParamsFromUrl();
-    });
+            // fetch('/APITest.html', {
+            //     method: 'POST',
+            //     headers: {
+            //         'Authorization': `Bearer ${token}`
+            //     },
+            //     body: formData
+            // })
+            //     .then(response => response.json())
+            //     .then(data => {
+            //         document.getElementById('loading').style.display = 'none';
+            //         response = data;
+            //         displayResponse();
+            //     })
+            //     .catch(error => {
+            //         console.error('Error:', error);
+            //         alert("Please sign in fist!")
+            //         // window.location.href = "/api/1.0/user/signUpIn";
+            //     });
+        // });
+        });
 
-    document.getElementById("queryParams").addEventListener("input", function (event) {
-        updateUrlFromParams();
-    });
-
-    document.getElementById('api-form').addEventListener('submit', function (event) {
-        event.preventDefault();
-
-        clear();
-
-        document.getElementById('loading').style.display = 'block';
-
-        let formData = new FormData(this);
-        method = formData.get("method");
-
-        let xhr = new XMLHttpRequest();
-        xhr.open('POST', '/APITest.html');
-
-        xhr.onload = function () {
-
-            if (xhr.status === 200) {
-
-                testDateTime = JSON.parse(xhr.responseText);
-
-                const socket = new SockJS('https://apiblitz.site/ws');
-                const stompClient = Stomp.over(socket);
-
-                stompClient.connect({}, function(frame) {
-
-                // const socket = new SockJS('http://localhost:8080/ws');
-                // const stompClient = Stomp.over(socket);
-                //
-                // stompClient.connect({}, function(frame) {
-                //     console.log('Connected: ' + frame);
-                    stompClient.subscribe('/topic/APITest', function(message) {
-                        // const contentType = message.headers['content-type'];
-                        // if (contentType === 'application/json') {
-                        //     const msg = JSON.parse(message.body);
-                        //     console.log(msg.from, msg.text);
-                        // } else {
-                        //     const msg = message.body;
-                        //     console.log(msg);
-                        // }
-                        getResult();
-                    });
-                });
-            }
-        };
-        xhr.setRequestHeader("Authorization", `Bearer ${token}`);
-        xhr.send(formData);
-
-        // fetch('/APITest.html', {
-        //     method: 'POST',
-        //     headers: {
-        //         'Authorization': `Bearer ${token}`
-        //     },
-        //     body: formData
-        // })
-        //     .then(response => response.json())
-        //     .then(data => {
-        //         document.getElementById('loading').style.display = 'none';
-        //         response = data;
-        //         displayResponse();
-        //     })
-        //     .catch(error => {
-        //         console.error('Error:', error);
-        //         alert("Please sign in fist!")
-        //         // window.location.href = "/api/1.0/user/signUpIn";
-        //     });
-    });
 
     function getResult() {
 
@@ -426,8 +467,10 @@ if (token === null) {
                     isFirstIteration = false;
                 } else {
                     document.getElementById("queryParamsButton").style.display = "none";
-                    let paramKeyHtml = `<input id="paramsKey" type="text" name="paramsKey" placeholder="Key" value=${key}>`;
-                    let paramValueHtml = `<input id="paramsValue" type="text" name="paramsValue" placeholder="Value" value=${value}><br>`;
+                    // let paramKeyHtml = `<input id="paramsKey" type="text" name="paramsKey" placeholder="Key" value=${key}>`;
+                    // let paramValueHtml = `<input id="paramsValue" type="text" name="paramsValue" placeholder="Value" value=${value}><br>`;
+                    let paramKeyHtml = `<input type="text" class="dynamic-input paramsKey" name="paramsKey" placeholder="Key" value=${key}>`;
+                    let paramValueHtml = `<input type="text" class="dynamic-input paramsValue" name="paramsValue" placeholder="Value" value=${value}><br>`;
                     queryParams.insertAdjacentHTML("beforeend", paramKeyHtml)
                     queryParams.insertAdjacentHTML("beforeend", paramValueHtml)
                 }
@@ -479,8 +522,10 @@ if (token === null) {
                         isFirstIteration = false;
                     } else {
                         document.getElementById("headersButton").style.display = "none";
-                        let headersKeyHtml = `<input id="headersKey" type="text" name="headersKey" placeholder="Key" value=${key}>`;
-                        let headersValueHtml = `<input id="headersValue" type="text" name="headersValue" placeholder="Value" value=${value}><br>`;
+                        // let headersKeyHtml = `<input id="headersKey" type="text" name="headersKey" placeholder="Key" value=${key}>`;
+                        // let headersValueHtml = `<input id="headersValue" type="text" name="headersValue" placeholder="Value" value=${value}><br>`;
+                        let headersKeyHtml = `<input type="text" class="headers-input headersKey" name="headersKey" placeholder="Key" value=${key}>`;
+                        let headersValueHtml = `<input type="text" class="headers-input headersValue" name="headersValue" placeholder="Value" value=${value}><br>`;
                         headers.insertAdjacentHTML("beforeend", headersKeyHtml)
                         headers.insertAdjacentHTML("beforeend", headersValueHtml)
                     }
@@ -544,6 +589,7 @@ if (token === null) {
             newKeyInput.classList.add("paramsKey");
             newKeyInput.setAttribute("name", "paramsKey");
             newKeyInput.setAttribute("placeholder", "Key");
+            // newKeyInput.setAttribute("style", "margin-top: 10px");
             newKeyInput.setAttribute("oninput", "addQueryParamsInput(event)");
 
             const newValueInput = document.createElement("input");
@@ -552,6 +598,7 @@ if (token === null) {
             newValueInput.classList.add("paramsValue");
             newValueInput.setAttribute("name", "paramsValue");
             newValueInput.setAttribute("placeholder", "Value");
+            // newValueInput.setAttribute("style", "margin-top: 10px");
             newValueInput.setAttribute("oninput", "addQueryParamsInput(event)");
 
             if (!paramsValueInput.nextElementSibling ||
@@ -581,19 +628,23 @@ if (token === null) {
             const br = document.createElement("br");
 
             const newHeadersKeyInput = document.createElement("input");
-            newHeadersKeyInput.id = "headersKey";
+            // newHeadersKeyInput.id = "headersKey";
             newHeadersKeyInput.setAttribute("type", "text");
             newHeadersKeyInput.classList.add("headers-input");
+            newHeadersKeyInput.classList.add("headersKey");
             newHeadersKeyInput.setAttribute("name", "headersKey");
             newHeadersKeyInput.setAttribute("placeholder", "Key");
+            // newHeadersKeyInput.setAttribute("style", "margin-top: 10px");
             newHeadersKeyInput.setAttribute("oninput", "addHeadersInput(event)");
 
             const newHeadersValueInput = document.createElement("input");
             newHeadersValueInput.setAttribute("type", "text");
-            newHeadersValueInput.id = "headersValue";
+            // newHeadersValueInput.id = "headersValue";
             newHeadersValueInput.classList.add("headers-input");
+            newHeadersValueInput.classList.add("headersValue");
             newHeadersValueInput.setAttribute("name", "headersValue");
             newHeadersValueInput.setAttribute("placeholder", "Value");
+            // newHeadersValueInput.setAttribute("style", "margin-top: 10px");
             newHeadersValueInput.setAttribute("oninput", "addHeadersInput(event)");
 
             if (!inputHeaders.nextElementSibling || inputHeaders.nextElementSibling && inputHeaders.nextElementSibling.value.trim() === "") {
