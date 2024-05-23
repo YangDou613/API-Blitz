@@ -1,7 +1,7 @@
 package org.example.apiblitz.config;
 
-import org.example.apiblitz.controller.MessageService;
 import org.example.apiblitz.messageBroker.Receiver;
+import org.example.apiblitz.service.MessageService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;

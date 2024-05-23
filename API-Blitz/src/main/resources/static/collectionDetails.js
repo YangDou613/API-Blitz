@@ -9,11 +9,11 @@ const token = localStorage.getItem("access_token");
 if (token === null) {
 
     alert("Please sign in fist!")
-    window.location.href = "/api/1.0/user/signUpIn";
+    window.location.href = "/signUpIn";
 
 } else {
 
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
 
         const sidebarLinks = document.querySelectorAll('.sidebar-link');
 
@@ -21,7 +21,7 @@ if (token === null) {
 
             const linkPath = link.getAttribute('href');
 
-            if (linkPath === "/api/1.0/collections") {
+            if (linkPath === "/collections") {
                 link.classList.add('active');
             }
         });
@@ -72,26 +72,6 @@ if (token === null) {
 
                     const tbody = document.createElement("tbody");
 
-                    // const button = document.createElement("div");
-                    // button.id = "button-div";
-                    // button.insertAdjacentHTML("beforeend",
-                    //     ' <input id="add-button" type="submit" onclick="addAPI()" value=" + Add">');
-                    // button.insertAdjacentHTML("beforeend",
-                    //     ' <input id="run-all-button" type="button" onclick="testAllAPI()" value="Test All">');
-                    // container.appendChild(button);
-                    //
-                    // const ul = document.createElement("ul");
-                    // ul.classList.add("api-table");
-                    //
-                    // const tableHeaderLi = document.createElement("li");
-                    // tableHeaderLi.classList.add("api-table-header");
-                    // tableHeaderLi.insertAdjacentHTML("beforeend", `<div class="col col-1 tableHeader">Request Name</div>`);
-                    // tableHeaderLi.insertAdjacentHTML("beforeend", `<div class="col col-2 tableHeader">Method</div>`);
-                    // tableHeaderLi.insertAdjacentHTML("beforeend", `<div class="col col-3 tableHeader">URL</div>`);
-                    // tableHeaderLi.insertAdjacentHTML("beforeend", `<div class="col col-4 tableHeader"></div>`);
-                    //
-                    // ul.appendChild(tableHeaderLi);
-
                     data.forEach(api => {
 
                         const tbodyTr = document.createElement("tr");
@@ -113,77 +93,17 @@ if (token === null) {
                         testButton.addEventListener("click", () => {
                             selectedAPI = api;
                             const queryString = `?selectedAPI=${encodeURIComponent(JSON.stringify(selectedAPI))}`;
-                            window.location.href = "/APITest.html" + queryString;
+                            window.location.href = "/APITest" + queryString;
                         })
                         deleteButton.addEventListener("click", () => {
                             deleteAPI();
                         })
-
-                        // const li = document.createElement("li");
-                        // li.classList.add("api-table-row");
-                        // li.insertAdjacentHTML("beforeend", `<div class="col col-1" data-label="Request Name">${api["requestName"]}</div>`);
-                        // li.insertAdjacentHTML("beforeend", `<div class="col col-2" data-label="Method">${api["method"]}</div>`);
-                        // li.insertAdjacentHTML("beforeend", `<div class="col col-3" data-label="URL">${api["apiurl"]}</div>`);
-                        //
-                        // const buttonDiv = document.createElement("div");
-                        // buttonDiv.classList.add("col", "col-4", "buttonDiv");
-                        //
-                        // const testButton = document.createElement("button");
-                        // testButton.type = "button";
-                        // testButton.classList.add("btn", "btn-primary", "btn-xs", "dt-edit");
-                        // testButton.style.marginRight = "16px";
-                        // testButton.style.backgroundImage = "url('/test-all.png')";
-                        // testButton.style.backgroundSize = "contain";
-                        // testButton.style.backgroundRepeat = "no-repeat";
-                        // testButton.style.backgroundPosition = "center";
-                        //
-                        // const testIcon = document.createElement("span");
-                        // testIcon.classList.add("glyphicon", "glyphicon-pencil");
-                        // testIcon.setAttribute("aria-hidden", "true");
-                        //
-                        // testButton.appendChild(testIcon);
-                        //
-                        // const deleteButton = document.createElement("button");
-                        // deleteButton.type = "button";
-                        // deleteButton.classList.add("btn", "btn-primary", "btn-xs", "dt-delete");
-                        // deleteButton.style.marginRight = "16px";
-                        // deleteButton.style.backgroundImage = "url('/delete.png')";
-                        // deleteButton.style.backgroundSize = "contain";
-                        // deleteButton.style.backgroundRepeat = "no-repeat";
-                        // deleteButton.style.backgroundPosition = "center";
-                        //
-                        // const deleteIcon = document.createElement("span");
-                        // deleteIcon.classList.add("glyphicon", "glyphicon-pencil");
-                        // deleteIcon.setAttribute("aria-hidden", "true");
-                        //
-                        // deleteButton.appendChild(deleteIcon);
-                        //
-                        // buttonDiv.appendChild(testButton);
-                        // buttonDiv.appendChild(deleteButton);
-                        //
-                        // li.appendChild(buttonDiv);
-                        //
-                        // ul.appendChild(li);
-                        //
-                        // selectedCollectionName = api["requestName"];
-                        // selectedRequestId = api["id"];
-                        //
-                        // testButton.addEventListener("click", () => {
-                        //     selectedAPI = api;
-                        //     const queryString = `?selectedAPI=${encodeURIComponent(JSON.stringify(selectedAPI))}`;
-                        //     window.location.href = "/APITest.html" + queryString;
-                        // })
-                        // deleteButton.addEventListener('click', () => {
-                        //     deleteAPI();
-                        // });
                     });
                     table.appendChild(thead);
                     table.appendChild(tbody);
                     container.insertAdjacentHTML("beforeend",
                         '<div class="buttonDiv"><button type="button" class="btn btn-block btn-add" onclick="addAPI()">+ Add</button>' +
                         '<button type="button" class="btn btn-block btn-run-all" onclick="testAllAPI()">Test All</button></div>');
-                    // container.insertAdjacentHTML("beforeend",
-                    // '<button type="button" class="btn btn-block btn-run-all" onclick="testAllAPI()">Test All</button>');
                     container.appendChild(table);
                 }
             })
@@ -251,7 +171,7 @@ if (token === null) {
                         alert("Please confirm whether the entered information is correct.");
                     } else {
                         window.location.href =
-                            "/api/1.0/collections/details?collectionName=" + selectedCollectionName + "&collectionId=" + collectionId;
+                            "/collections/details?collectionName=" + selectedCollectionName + "&collectionId=" + collectionId;
                         alert("Added Successfully!");
                     }
                 })
@@ -344,8 +264,6 @@ if (token === null) {
 
     function deleteAPI() {
 
-        // fetch('/api/1.0/collections/delete?userId=1&collectionName=' + selectedCollectionName +
-        //     "&requestId=" + selectedRequestId, {
         fetch('/api/1.0/collections/delete?collectionName=' + selectedCollectionName +
             "&requestId=" + selectedRequestId, {
             method: 'DELETE',
@@ -358,7 +276,7 @@ if (token === null) {
                     alert("Failed to delete!");
                 } else {
                     window.location.href =
-                        "/api/1.0/collections/details?collectionName=" + selectedCollectionName + "&collectionId=" + collectionId;
+                        "/collections/details?collectionName=" + selectedCollectionName + "&collectionId=" + collectionId;
                     alert("Delete Successfully!");
                 }
             })
@@ -380,7 +298,7 @@ if (token === null) {
         const socket = new SockJS('https://apiblitz.site/ws');
         const stompClient = Stomp.over(socket);
 
-        stompClient.connect({}, function(frame) {
+        stompClient.connect({}, function (frame) {
 
             fetch('/api/1.0/collections/testAll?collectionId=' + collectionId, {
                 method: 'POST',
@@ -399,15 +317,13 @@ if (token === null) {
                     const testDate = data.testDate;
                     const testTime = (data.testTime).split(".")[0];
 
-                    stompClient.subscribe('/topic/Collections', function(message) {
+                    stompClient.subscribe('/topic/Collections', function (message) {
 
                         document.getElementById("overlay").style.display = 'none';
                         document.getElementById('loading').style.display = 'none';
 
                         window.location.href =
-                            "/api/1.0/autoTest/monitor?collectionId=" + collectionId + "&testDate=" + testDate + "&testTime=" + testTime;
-                        // window.location.href =
-                        //     "/api/1.0/autoTest/monitor/testResult?collectionId=" + collectionId + "&testDate=" + testDate + "&testTime=" + testTime;
+                            "/report?collectionId=" + collectionId + "&testDate=" + testDate + "&testTime=" + testTime;
                         alert("Successfully set up test all!");
                     });
 

@@ -1,12 +1,14 @@
 package org.example.apiblitz.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
-import org.example.apiblitz.model.*;
+import org.example.apiblitz.error.TokenParsingException;
+import org.example.apiblitz.model.APIData;
+import org.example.apiblitz.model.APITestResult;
+import org.example.apiblitz.model.Request;
 import org.example.apiblitz.repository.APIRepository;
 import org.example.apiblitz.repository.CollectionsRepository;
 import org.example.apiblitz.util.JwtUtil;
@@ -19,9 +21,12 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
-import java.sql.Timestamp;
 
-import java.util.*;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -84,63 +89,12 @@ public class APIService {
 		apiRepository.insertToAPIHistory(userId, apiData.getUrl(), request, testDateTime, responseHeaders, responseBody, statusCode);
 	}
 
-	// Consumer
-//	public ResponseEntity<?> setResponse(Integer userId, APIData apiData, ResponseEntity<?> result) throws InterruptedException {
-//	@Profile("Consumer")
-//	public Message setResponse(Integer userId,
-//	                        APIData apiData,
-//	                        Timestamp testDateTime,
-//	                        ResponseEntity<?> result) throws InterruptedException {
-//
-//		// Get status code
-//		HttpStatusCode statusCode = result.getStatusCode();
-//
-//		// To Producer
-//		Message message = new Message();
-//
-//		if (apiData.getMethod().equals("HEAD")) {
-//			HttpHeaders headers = result.getHeaders();
-//			String headersString = headers.entrySet().stream()
-//					.map(entry -> entry.getKey() + ": " + entry.getValue())
-//					.collect(Collectors.joining("\n"));
-//
-//			message.setUserId(userId);
-//			message.setCategory("APITest");
-//			message.setTestDateTime(testDateTime);
-//			message.setContent(ResponseEntity.status(statusCode).body(headersString));
-//			message.setCreatedAt(new Date());
-//
-////			return ResponseEntity
-////					.status(statusCode)
-////					.body(headersString);
-//		} else {
-//			message.setUserId(userId);
-//			message.setCategory("APITest");
-//			message.setTestDateTime(testDateTime);
-//			message.setContent(ResponseEntity.status(statusCode).body(result));
-//			message.setCreatedAt(new Date());
-//		}
-//
-//		return message;
-//
-////		return ResponseEntity
-////				.status(statusCode)
-////				.body(result);
-//	}
-
 	public Request httpRequest(APIData apiData) {
 
 		Request request = new Request();
 
 		try {
 			// API url
-//			String APIUrl;
-//			if (apiData.getParamsKey() != null) {
-//				APIUrl = addParamsToAPIUrl(apiData.getUrl(), apiData.getParamsKey(), apiData.getParamsValue());
-//			} else {
-//				APIUrl = apiData.getUrl();
-//			}
-//			request.setAPIUrl(APIUrl);
 			request.setAPIUrl(apiData.getUrl());
 
 			// Method
@@ -194,7 +148,7 @@ public class APIService {
 			HttpEntity<?> requestEntity = getHttpEntity(request);
 
 			// Send Request
-			ResponseEntity<?> response =  switch (method) {
+			ResponseEntity<?> response = switch (method) {
 				case "GET", "HEAD" -> restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
 				case "POST" -> restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
 				case "PUT" -> restTemplate.exchange(url, HttpMethod.PUT, requestEntity, String.class);
@@ -247,43 +201,6 @@ public class APIService {
 		}
 	}
 
-//	public String addParams(String APIUrl, Object getQueryParams) throws JsonProcessingException {
-//
-//		boolean isFirstIteration = true;
-//
-//		Map<String, Object> queryParams = objectMapper.readValue(getQueryParams.toString(), new TypeReference<>() {});
-//
-//		for (Map.Entry<String, Object> queryParam : queryParams.entrySet()) {
-//			String key = queryParam.getKey();
-//			Object value = queryParam.getValue();
-//			String param = key + "=" + value;
-//			if (isFirstIteration) {
-//				APIUrl += "?";
-//				isFirstIteration = false;
-//			} else {
-//				APIUrl += "&";
-//			}
-//			APIUrl += param;
-//		}
-//		return APIUrl;
-//	}
-
-//	public String addParamsToAPIUrl(String APIUrl, ArrayList<Object> paramsKey, ArrayList<Object> paramsValue) {
-//
-//		for (int i = 0; i < paramsKey.size(); i++) {
-//			if (paramsKey.get(i) != "" && paramsValue.get(i) != "") {
-//				String param = paramsKey.get(i) + "=" + paramsValue.get(i);
-//				if (i == 0) {
-//					APIUrl += "?";
-//				} else {
-//					APIUrl += "&";
-//				}
-//				APIUrl += param;
-//			}
-//		}
-//		return APIUrl;
-//	}
-
 	@Profile("Consumer")
 	public String getQueryParams(ArrayList<Object> paramsKey, ArrayList<Object> paramsValue)
 			throws JsonProcessingException {
@@ -314,13 +231,11 @@ public class APIService {
 		if (!apiData.getAuthorizationKey().equals("No Auth")) {
 			headers.set("Authorization", apiData.getAuthorizationKey() + " " + apiData.getAuthorizationValue());
 		}
-
 		return headers;
 	}
 
 	@Profile("Consumer")
 	public HttpEntity<?> getHttpEntity(Request request) {
-
 		MultiValueMap<String, String> requestHeaders = convertJsonToMultiValueMap((String) request.getRequestHeaders());
 		return new HttpEntity<>(request.getRequestBody(), requestHeaders);
 	}
@@ -346,24 +261,17 @@ public class APIService {
 		} catch (Exception e) {
 			log.info(e.getMessage());
 		}
-
 		return requestHeaders;
 	}
 
-	public APITestResult getApiTestResult(String accessToken, String testDateTime) {
-
-		Claims claims = jwtUtil.parseToken(accessToken);
-		Integer userId = claims.get("userId", Integer.class);
-
-		return apiRepository.getApiTestResultByUserIdAndDateTime(userId, testDateTime);
+	public APITestResult getApiTestResult(String accessToken, String testDateTime) throws TokenParsingException {
+		Integer userId = parseToken(accessToken);
+		return apiRepository.getApiTestResultByUserIdAndTestDateTime(userId, testDateTime);
 	}
 
-	public List<Request> getAllHistory(String accessToken) {
-
-		Claims claims = jwtUtil.parseToken(accessToken);
-		Integer userId = claims.get("userId", Integer.class);
-
-		return apiRepository.getAllHistoryList(userId);
+	public List<Request> getApiTestHistory(String accessToken) throws TokenParsingException {
+		Integer userId = parseToken(accessToken);
+		return apiRepository.getHistoryList(userId);
 	}
 
 	private boolean isValidJson(String responseBody) {
@@ -374,5 +282,10 @@ public class APIService {
 		} catch (JsonProcessingException e) {
 			return false;
 		}
+	}
+
+	public Integer parseToken(String accessToken) throws TokenParsingException {
+		Claims claims = jwtUtil.parseToken(accessToken);
+		return claims.get("userId", Integer.class);
 	}
 }

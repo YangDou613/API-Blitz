@@ -61,7 +61,7 @@ public class CollectionsRepository {
 		log.info("Successfully insert to collections table!");
 	}
 
-	public void addAPIToCollection(Integer collectionId, Collections collection) throws SQLException {
+	public void insertToCollectionDetailsTable(Integer collectionId, Collections collection) throws SQLException {
 
 		String addAPISql = "INSERT INTO collectionDetails (collectionId, requestName, apiurl, method, " +
 				"queryParams, headers, body) VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -118,7 +118,7 @@ public class CollectionsRepository {
 		log.info("Delete successfully!");
 	}
 
-	public List<Request> getAllAPIFromCollection(Integer collectionId) throws SQLException {
+	public List<Request> getCollectionAllApiList(Integer collectionId) throws SQLException {
 
 		String getAllAPISql = "SELECT id, requestName, apiurl, method, queryParams, headers, body " +
 				"FROM collectionDetails WHERE collectionId = ?";

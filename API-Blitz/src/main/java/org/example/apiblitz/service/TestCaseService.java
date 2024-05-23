@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
+import org.example.apiblitz.error.TokenParsingException;
 import org.example.apiblitz.model.*;
 import org.example.apiblitz.queue.Publisher;
 import org.example.apiblitz.repository.TestCaseRepository;
@@ -37,18 +38,16 @@ public class TestCaseService {
 
 	@Autowired
 	AutoTestService autoTestService;
-
+	@Autowired
+	Publisher publisher;
 	@Autowired
 	private JwtUtil jwtUtil;
 
-	@Autowired
-	Publisher publisher;
-
 	@Profile("Producer")
-	public Integer save(Integer userId, TestCase testCase) throws JsonProcessingException {
+	public Integer createTestCase(Integer userId, TestCase testCase) throws JsonProcessingException {
 
 		// Set testCase data in APIData
-		APIData apiData = setAPIData(testCase);
+		APIData apiData = APIData.setAPIData(testCase);
 
 		// Package API data into http request
 		Request request = apiService.httpRequest(apiData);
@@ -66,11 +65,11 @@ public class TestCaseService {
 		}
 
 		// Store API data into APIHistory table and return testCaseId
-		return testCaseRepository.insertToTestCase(userId, request, testCase, expectedResponseBody);
+		return testCaseRepository.insertToTestCaseTable(userId, request, testCase, expectedResponseBody);
 	}
 
 	@Profile("Producer")
-	public void setTestSchedule(Integer userId, Integer testCaseId, TestCase testCase) {
+	public void setTestCaseTestSchedule(Integer userId, Integer testCaseId, TestCase testCase) {
 
 		LocalDate testDate = LocalDate.now(); // Test Date
 		LocalTime testTime = LocalTime.now(); // Test time
@@ -94,11 +93,6 @@ public class TestCaseService {
 
 				if (resetStatus == 0) {
 
-					// User ID
-//					String accessToken = extractAccessToken(authorization);
-//					Claims claims = jwtUtil.parseToken(accessToken);
-//					Integer userId = claims.get("userId", Integer.class);
-
 					// Category
 					String category = "TestCase";
 
@@ -114,14 +108,13 @@ public class TestCaseService {
 
 					publisher.publishMessage(userId, category, id, testDateTime, content);
 
-//					autoTestService.autoTest(testCaseId);
 					log.info(timestamp + " : testCaseId <" + testCaseId + "> Set Schedule Successfully!");
 				} else {
 					executor.shutdown();
 					log.info(timestamp + " : testCaseId <" + testCaseId + "> Schedule Shutdown!");
 					if (resetStatus == 1) {
 						executor.shutdown();
-						setTestSchedule(userId, testCaseId, testCase);
+						setTestCaseTestSchedule(userId, testCaseId, testCase);
 						testCaseRepository.updateResetStatusByTestCaseId(testCaseId);
 						log.info(timestamp + " : testCaseId <" + testCaseId + "> Reset Schedule Successfully!");
 					}
@@ -132,7 +125,7 @@ public class TestCaseService {
 
 				LocalTime originalTime = nextTestTime;
 
-				switch(testCase.getIntervalsTimeUnit()) {
+				switch (testCase.getIntervalsTimeUnit()) {
 					case "Hour":
 						nextTestTime = nextTestTime.plusHours(testCase.getIntervalsTimeValue());
 						if (nextTestTime.isBefore(originalTime)) {
@@ -163,7 +156,7 @@ public class TestCaseService {
 
 		TimeUnit timeUnit = null;
 
-		switch(intervalsTimeUnit) {
+		switch (intervalsTimeUnit) {
 			case "Hour":
 				timeUnit = TimeUnit.HOURS;
 				break;
@@ -182,13 +175,12 @@ public class TestCaseService {
 	}
 
 	@Profile("Producer")
-	public List<NextSchedule> get(String accessToken) {
+	public List<NextSchedule> getTestCase(String accessToken) throws TokenParsingException {
 
-		Claims claims = jwtUtil.parseToken(accessToken);
-		Integer userId = claims.get("userId", Integer.class);
+		Integer userId = parseToken(accessToken);
 
 		try {
-			return testCaseRepository.getTestCase(userId);
+			return testCaseRepository.getTestCaseList(userId);
 		} catch (SQLException e) {
 			log.error(e.getMessage());
 			return null;
@@ -196,14 +188,13 @@ public class TestCaseService {
 	}
 
 	@Profile("Producer")
-	public void update(String accessToken, ResetTestCase resetTestCase) {
+	public void updateTestCase(String accessToken, ResetTestCase resetTestCase) throws TokenParsingException {
 
-		Claims claims = jwtUtil.parseToken(accessToken);
-		Integer userId = claims.get("userId", Integer.class);
+		Integer userId = parseToken(accessToken);
 
 		try {
 			// Set testCase data in APIData
-			APIData apiData = resetAPIData(resetTestCase);
+			APIData apiData = APIData.setAPIData(resetTestCase);
 
 			// Package API data into http request
 			Request request = apiService.httpRequest(apiData);
@@ -216,7 +207,7 @@ public class TestCaseService {
 	}
 
 	@Profile("Producer")
-	public void delete(Integer testCaseId) {
+	public void deleteTestCase(Integer testCaseId) {
 
 		// Delete API data in APIHistory table
 		try {
@@ -224,42 +215,6 @@ public class TestCaseService {
 		} catch (SQLException e) {
 			log.error(e.getMessage());
 		}
-	}
-
-	@Profile("Consumer")
-	public APIData setAPIData(TestCase testCase) {
-
-		APIData apiData = new APIData();
-
-		apiData.setMethod(testCase.getMethod());
-		apiData.setUrl(testCase.getUrl());
-		apiData.setParamsKey(testCase.getParamsKey());
-		apiData.setParamsValue(testCase.getParamsValue());
-		apiData.setAuthorizationKey(testCase.getAuthorizationKey());
-		apiData.setAuthorizationValue(testCase.getAuthorizationValue());
-		apiData.setHeadersKey(testCase.getHeadersKey());
-		apiData.setHeadersValue(testCase.getHeadersValue());
-		apiData.setBody(testCase.getBody());
-
-		return apiData;
-	}
-
-	@Profile("Consumer")
-	public APIData resetAPIData(ResetTestCase resetTestCase) {
-
-		APIData apiData = new APIData();
-
-		apiData.setMethod(resetTestCase.getMethod());
-		apiData.setUrl(resetTestCase.getUrl());
-		apiData.setParamsKey(resetTestCase.getParamsKey());
-		apiData.setParamsValue(resetTestCase.getParamsValue());
-		apiData.setAuthorizationKey(resetTestCase.getAuthorizationKey());
-		apiData.setAuthorizationValue(resetTestCase.getAuthorizationValue());
-		apiData.setHeadersKey(resetTestCase.getHeadersKey());
-		apiData.setHeadersValue(resetTestCase.getHeadersValue());
-		apiData.setBody(resetTestCase.getBody());
-
-		return apiData;
 	}
 
 	@Profile("Consumer")
@@ -271,5 +226,10 @@ public class TestCaseService {
 		} catch (JsonProcessingException e) {
 			return false;
 		}
+	}
+
+	private Integer parseToken(String accessToken) throws TokenParsingException {
+		Claims claims = jwtUtil.parseToken(accessToken);
+		return claims.get("userId", Integer.class);
 	}
 }

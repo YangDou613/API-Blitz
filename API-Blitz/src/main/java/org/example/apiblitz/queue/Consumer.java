@@ -24,28 +24,21 @@ import java.util.Date;
 @Slf4j
 public class Consumer {
 
-	@Value("${aws.queueName}")
-	private String queueName;
-
 	private final AmazonSQS amazonSQSClient;
-
 	@Autowired
 	ObjectMapper objectMapper;
-
 	@Autowired
 	APIService apiService;
-
 	@Autowired
 	AutoTestService autoTestService;
-
 	@Autowired
 	TestCaseService testCaseService;
-
 	@Autowired
 	CollectionsService collectionsService;
-
 	@Autowired
 	Sender sender;
+	@Value("${aws.queueName}")
+	private String queueName;
 
 	public Consumer(AmazonSQS amazonSQSClient) {
 		this.amazonSQSClient = amazonSQSClient;
@@ -86,20 +79,21 @@ public class Consumer {
 						sender.sendMessage(objectMapper.writeValueAsString(messageToReceiver));
 						break;
 					case "TestCase":
-						autoTestService.autoTest(messageBody.getId());
+						autoTestService.automatedTesting(messageBody.getId());
 						sender.sendMessage(objectMapper.writeValueAsString(messageToReceiver));
 						break;
 					case "Collections":
-						collectionsService.sendRequestAtSameTime(
+						collectionsService.testCollectionAllApi(
 								messageBody.getId(),
 								messageBody.getTestDateTime(),
-								objectMapper.convertValue(messageBody.getContent(), new TypeReference<>() {}));
+								objectMapper.convertValue(messageBody.getContent(), new TypeReference<>() {
+								}));
 						sender.sendMessage(objectMapper.writeValueAsString(messageToReceiver));
 						break;
 				}
 				amazonSQSClient.deleteMessage(queueUrl, message.getReceiptHandle());
 			}
-		} catch(Exception e){
+		} catch (Exception e) {
 			log.error("Queue Exception Message: { " + e.getMessage() + " }");
 			throw new RuntimeException(e);
 		}

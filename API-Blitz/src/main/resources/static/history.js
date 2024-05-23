@@ -10,11 +10,11 @@ const token = localStorage.getItem("access_token");
 if (token === null) {
 
     alert("Please sign in fist!")
-    window.location.href = "/api/1.0/user/signUpIn";
+    window.location.href = "/signUpIn";
 
 } else {
 
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
 
         const currentPagePath = window.location.pathname;
 
@@ -30,8 +30,7 @@ if (token === null) {
         });
     });
 
-    // fetch('/APITest/history?userId=1')
-    fetch('/APITest/history', {
+    fetch('/api/1.0/APITest/history', {
         method: 'GET',
         headers: {
             "Authorization": `Bearer ${token}`
@@ -85,7 +84,7 @@ if (token === null) {
                 testButton.addEventListener("click", () => {
                     selectedAPI = api;
                     const queryString = `?selectedAPI=${encodeURIComponent(JSON.stringify(selectedAPI))}`;
-                    window.location.href = "/APITest.html" + queryString;
+                    window.location.href = "/APITest" + queryString;
                 })
                 addButton.addEventListener("click", () => {
                     selectedAPI = api;
@@ -107,9 +106,8 @@ if (token === null) {
         }
     };
 
-    apiURL = "/api/1.0/collections/get";
+    apiURL = "/api/1.0/collections";
 
-    // fetch('/api/1.0/collections/get?userId=1')
     fetch(apiURL, requestHeader)
         .then(response => {
             if (!response.ok) {
@@ -207,55 +205,3 @@ if (token === null) {
         })
     }
 }
-
-// function getCollectionList() {
-//
-//     fetch('/api/1.0/collections/get?userId=1')
-//         .then(response => {
-//             if (!response.ok) {
-//                 console.log(response.status)
-//                 throw new Error('Network response was not ok');
-//             }
-//             return response.json();
-//         })
-//         .then(data => {
-//
-//             const collectionListContainer = document.getElementById('collection-list-container');
-//             collectionListContainer.insertAdjacentHTML("beforeend", "<div>Collection List</div>");
-//             const select = document.createElement('select');
-//
-//             data.forEach(collection => {
-//
-//                 const option = document.createElement('option');
-//                 option.setAttribute("value", collection["id"]);
-//                 option.insertAdjacentHTML("beforeend", `${collection["collectionName"]}`);
-//                 select.appendChild(option)
-//             });
-//             collectionListContainer.appendChild(select);
-//             collectionListContainer.insertAdjacentHTML("beforeend", "<br>");
-//
-//             collectionListContainer.insertAdjacentHTML("beforeend", `<input id="api-button" type="submit" value="Submit">`);
-//             collectionListContainer.insertAdjacentHTML("beforeend", `<input id="cancel-button" type="button" value="Cancel">`);
-//
-//             select.addEventListener("change", function (event) {
-//                 selectedCollectionId = event.target.value;
-//             });
-//
-//             // const label = document.createElement("label");
-//             // label.setAttribute("for", "requestName");
-//             // label.innerText = "Request Name: ";
-//             // const input = document.createElement("input");
-//             // input.setAttribute("type", "text");
-//             // input.setAttribute("id", "requestName");
-//             // input.setAttribute("name", "requestName");
-//             // input.setAttribute("placeholder", "Request Name");
-//             // collectionList.appendChild(label);
-//             // collectionList.appendChild(input);
-//             //
-//             // collectionList.insertAdjacentHTML("beforeend", "<br><br>");
-//
-//         })
-//         .catch(error => {
-//             console.error('There was an error!', error);
-//         });
-// }

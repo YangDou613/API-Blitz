@@ -3,10 +3,10 @@ package org.example.apiblitz.controller;
 import io.jsonwebtoken.Claims;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.example.apiblitz.error.TokenParsingException;
 import org.example.apiblitz.model.NextSchedule;
 import org.example.apiblitz.model.ResetTestCase;
 import org.example.apiblitz.model.TestCase;
-import org.example.apiblitz.model.UserResponse;
 import org.example.apiblitz.queue.Publisher;
 import org.example.apiblitz.service.TestCaseService;
 import org.example.apiblitz.util.JwtUtil;
@@ -31,37 +31,33 @@ public class TestCaseController {
 	TestCaseService testCaseService;
 
 	@Autowired
-	private JwtUtil jwtUtil;
-
-	@Autowired
 	Publisher publisher;
 
-	@GetMapping
-	public String testCasePage() {
-		return "testCase";
-	}
+	@Autowired
+	private JwtUtil jwtUtil;
 
 	@GetMapping(path = "/get")
 	public ResponseEntity<?> getTestCase(
 			@RequestHeader("Authorization") String authorization) {
 
-		UserResponse userResponse = new UserResponse();
-
 		if (authorization == null || !authorization.startsWith("Bearer ")) {
-			userResponse.setError("Invalid or missing Bearer token");
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(userResponse);
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing Bearer token");
 		}
 
-		String accessToken = extractAccessToken(authorization);
+		String accessToken = jwtUtil.extractAccessToken(authorization);
 
-		List<NextSchedule> testCaseList = testCaseService.get(accessToken);
+		try {
+			List<NextSchedule> testCaseList = testCaseService.getTestCase(accessToken);
 
-		if (testCaseList != null) {
-			return ResponseEntity
-					.ok()
-					.body(testCaseList);
-		} else {
-			return ResponseEntity.badRequest().body("You don't have any Test cases yet.");
+			if (testCaseList != null) {
+				return ResponseEntity
+						.ok()
+						.body(testCaseList);
+			} else {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("You don't have any Test cases yet.");
+			}
+		} catch (TokenParsingException e) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid access token");
 		}
 	}
 
@@ -71,11 +67,8 @@ public class TestCaseController {
 			@Valid @ModelAttribute TestCase testCase,
 			BindingResult bindingResult) throws BindException {
 
-		UserResponse userResponse = new UserResponse();
-
 		if (authorization == null || !authorization.startsWith("Bearer ")) {
-			userResponse.setError("Invalid or missing Bearer token");
-			return ResponseEntity.badRequest().body(userResponse);
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing Bearer token");
 		}
 
 		if (bindingResult.hasErrors()) {
@@ -84,14 +77,16 @@ public class TestCaseController {
 
 		try {
 			// User ID
-			String accessToken = extractAccessToken(authorization);
+			String accessToken = jwtUtil.extractAccessToken(authorization);
 			Claims claims = jwtUtil.parseToken(accessToken);
 			Integer userId = claims.get("userId", Integer.class);
 
-			Integer testCaseId = testCaseService.save(userId, testCase);
+			Integer testCaseId = testCaseService.createTestCase(userId, testCase);
 
-			testCaseService.setTestSchedule(userId, testCaseId, testCase);
+			testCaseService.setTestCaseTestSchedule(userId, testCaseId, testCase);
 
+		} catch (TokenParsingException e) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid access token");
 		} catch (Exception e) {
 			log.error(e.getMessage());
 		}
@@ -100,22 +95,14 @@ public class TestCaseController {
 				.build();
 	}
 
-	@GetMapping("/myTestCase")
-	public String modifyTestCasePage() {
-		return "myTestCase";
-	}
-
 	@PostMapping(path = "/update")
 	public ResponseEntity<?> updateTestCase(
 			@RequestHeader("Authorization") String authorization,
 			@Valid @ModelAttribute ResetTestCase resetTestCase,
 			BindingResult bindingResult) throws BindException {
 
-		UserResponse userResponse = new UserResponse();
-
 		if (authorization == null || !authorization.startsWith("Bearer ")) {
-			userResponse.setError("Invalid or missing Bearer token");
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(userResponse);
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing Bearer token");
 		}
 
 		if (bindingResult.hasErrors()) {
@@ -123,15 +110,15 @@ public class TestCaseController {
 		}
 
 		try {
-			String accessToken = extractAccessToken(authorization);
+			String accessToken = jwtUtil.extractAccessToken(authorization);
 
-			testCaseService.update(accessToken, resetTestCase);
+			testCaseService.updateTestCase(accessToken, resetTestCase);
 
-			return ResponseEntity
-					.ok()
-					.build();
+			return ResponseEntity.ok().build();
+		} catch (TokenParsingException e) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid access token");
 		} catch (Exception e) {
-			log.info(e.getMessage());
+			log.error(e.getMessage());
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error");
 		}
 	}
@@ -141,15 +128,12 @@ public class TestCaseController {
 			@RequestHeader("Authorization") String authorization,
 			Integer testCaseId) {
 
-		UserResponse userResponse = new UserResponse();
-
 		if (authorization == null || !authorization.startsWith("Bearer ")) {
-			userResponse.setError("Invalid or missing Bearer token");
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(userResponse);
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing Bearer token");
 		}
 
 		try {
-			testCaseService.delete(testCaseId);
+			testCaseService.deleteTestCase(testCaseId);
 
 			return ResponseEntity
 					.ok()
@@ -157,15 +141,6 @@ public class TestCaseController {
 		} catch (Exception e) {
 			log.info(e.getMessage());
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error");
-		}
-	}
-
-	private String extractAccessToken(String authorization) {
-		String[] parts = authorization.split(" ");
-		if (parts.length == 2 && parts[0].equalsIgnoreCase("Bearer")) {
-			return parts[1];
-		} else {
-			return null;
 		}
 	}
 }

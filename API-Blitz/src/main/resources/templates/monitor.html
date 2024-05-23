@@ -1,160 +1,207 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>API Blitz</title>
-        <link rel="stylesheet" href="/monitor.css">
-        <link rel="favicon" href="/favicon.ico">
-        <script src='https://cdn.plot.ly/plotly-2.31.1.min.js'></script>
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    </head>
 
-    <body>
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>API Blitz</title>
+    <link href="/monitor.css" rel="stylesheet">
+    <link href="/favicon.ico" rel="favicon">
+</head>
 
-        <header>
+<body>
 
-            <div class="nav">
-                <a href="/APITest.html">
-                    <img id="logo" src="/logo.png" alt="Logo">
-                </a>
+<header>
 
-                <h1>API Blitz</h1>
+    <div class="nav">
+        <a href="/APITest">
+            <img alt="Logo" id="logo" src="/logo.png">
+        </a>
+        <h1>API Blitz</h1>
 
-                <a href="/api/1.0/user/signUpIn">
-                    <img id="user" src="/user.png" alt="user">
-                </a>
-            </div>
+        <a href="/signUpIn">
+            <img alt="user" id="user" src="/user.png">
+        </a>
+    </div>
 
-        </header>
+</header>
 
-        <div class="content-wrapper">
+<div class="content-wrapper">
 
-            <div class="sidebar">
+    <div class="sidebar">
 
-                <br>
-                <a href="/APITest.html" class="sidebar-link">
-                    <img id="test" src="/test.png" alt="test">
-                    <p>API Test</p>
-                </a>
+        <br>
+        <a class="sidebar-link" href="/APITest">
+            <img alt="test" id="test" src="/test.png">
+            <p>API Test</p>
+        </a>
 
-                <br>
-                <a href="/history" class="sidebar-link">
-                    <img id="history" src="/history.png" alt="test">
-                    <p>History</p>
-                </a>
+        <br>
+        <a class="sidebar-link" href="/history">
+            <img alt="test" id="history" src="/history.png">
+            <p>History</p>
+        </a>
 
-                <br>
-                <a href="/api/1.0/collections" class="sidebar-link">
-                    <img id="collections" src="/collections.png" alt="test">
-                    <p>Collections</p>
-                </a>
+        <br>
+        <a class="sidebar-link" href="/collections">
+            <img alt="test" id="collections" src="/collections.png">
+            <p>Collections</p>
+        </a>
 
-<!--                <br>-->
-<!--                <a href="/api/1.0/testCase" class="sidebar-link">-->
-<!--                    <img id="auto-test" src="/auto-test.png" alt="test">-->
-<!--                    <p>Automated Testing</p>-->
-<!--                </a>-->
+        <br>
+        <a class="sidebar-link" href="/monitor">
+            <img alt="test" id="my-test-case" src="/monitor.png">
+            <p>Monitor</p>
+        </a>
 
-                <br>
-                <a href="/api/1.0/testCase/myTestCase" class="sidebar-link">
-                    <img id="my-test-case" src="/myTestCase.png" alt="test">
-<!--                    <p>My Test Case</p>-->
-<!--                    <p>Automated Testing</p>-->
-                    <p>Monitor</p>
-                </a>
+        <br>
+        <a class="sidebar-link" href="/report">
+            <img alt="test" id="monitor" src="/report.png">
+            <p>Report</p>
+        </a>
 
-                <br>
-<!--                <a href="/api/1.0/autoTest/monitor" class="sidebar-link">-->
-                <a href="/api/1.0/autoTest/monitor" class="sidebar-link" onclick="openSidebar()">
-                    <img id="monitor" src="/monitor.png" alt="test">
-<!--                    <p>Monitor</p>-->
-                    <p>Report</p>
-                </a>
+    </div>
 
-            </div>
+    <div id="container">
 
-            <div id="container">
+        <div class="test-case-container" id="test-case-container"></div>
 
-                <div id="smallSidebar" class="sidenav">
+        <div class="overlay" id="overlay"></div>
 
-                    <a href="#" class="closeBtn" onclick="closeSidebar()">&times;</a>
+        <div class="add-container popup" id="add-container" style="display: none">
 
-                    <a href="#" id="monitor-myTestCase" class="myTestCase-container" onclick="toggleTriangle(this)">
-                        <span class="triangle"></span>
-                        <p>My Test Case</p>
-                    </a>
-                    <div id="test-case-list" style="display: none"></div>
+            <form id="modify-form" method="post">
 
-                    <a href="#" id="monitor-collections" class="collections-container" onclick="toggleTriangle(this)">
-                        <span class="triangle"></span>
-                        <p>Collections</p>
-                    </a>
-                    <div id="collections-list" style="display: none"></div>
+                <label for="id">ID</label><br>
+                <input id="id" name="id" type="number">
+                <br><br>
 
+                <label for="testItem">Test Item</label><br>
+                <input id="testItem" name="testItem" placeholder="Test Item" required
+                       style="margin-top: 10px; width: 600px;" type="text">
+                <br><br>
+
+                <label for="method"></label>
+                <select id="method" name="method">
+                    <option value="GET">GET</option>
+                    <option value="POST">POST</option>
+                    <option value="PUT">PUT</option>
+                    <option value="DELETE">DELETE</option>
+                    <option value="HEAD">HEAD</option>
+                    <option value="PATCH">PATCH</option>
+                    <option value="OPTIONS">OPTIONS</option>
+                </select>
+
+                <label for="url"></label>
+                <input id="url" name="url" placeholder="Enter URL or paste text" required style="width: 470px;"
+                       type="text">
+                <br><br><br>
+
+                <div id="queryParams">
+                    <label for="queryParams">Query Params</label><br>
+                    <input class="dynamic-input paramsKey" id="paramsKey" name="paramsKey"
+                           oninput="addQueryParamsInput(event)" placeholder="Key"
+                           style="margin-top: 10px; margin-top: 10px" type="text">
+                    <input class="dynamic-input paramsValue" id="paramsValue" name="paramsValue"
+                           oninput="addQueryParamsInput(event)"
+                           placeholder="Value" style="margin-top: 10px; margin-top: 10px"
+                           type="text">
                 </div>
+                <br><br>
 
-                <div id="result-container">
-
-                    <div class="tab-container">
-                        <button id="show-testCase-details" class="tablinks" onclick="displayDetails()" style="font-size: 16pt; font-weight: bold; font-family: 'Baloo Chettan 2'; display: none">Test case details</button>
-                        <button id="show-testCase-result" class="tablinks" onclick="displayResult()" style="font-size: 16pt; font-weight: bold; font-family: 'Baloo Chettan 2'; display: none">Test result</button>
-                    </div>
-
-                    <div id="charts-data-container">
-
-                        <div id="charts-container">
-                            <canvas id="doughnut"></canvas>
-                        </div>
-
-                        <div id="testCaseData"></div>
-
-                        <div id="test-result-container">
-
-                            <div id='test-result-dashboard' style="display: none"></div>
-
-                            <div id="test-result" style="display: none"></div>
-
-                        </div>
-
-                    </div>
-
-                    <div id="collections-container">
-
-                        <div id="select"></div>
-                        <div id="outline" style="display: none"></div>
-
-                        <div id="api-testResult-container">
-
-                            <div id="api-testResult" style="display: none"></div>
-
-                            <div id="response-container">
-
-                                <div class="tab-container">
-                                    <button id="show-response-body" class="tablinks" onclick="displayResponse()" style="font-size: 16pt; font-weight: bold; font-family: 'Baloo Chettan 2'; display: none">Body</button>
-                                    <button id="show-response-header" class="tablinks" onclick="displayHeaders()" style="font-size: 16pt; font-weight: bold; font-family: 'Baloo Chettan 2'; display: none">Headers</button>
-                                    <button id="show-retest-result" class="tablinks" onclick="displayRetestResult()" style="font-size: 16pt; font-weight: bold; font-family: 'Baloo Chettan 2'; display: none">Retest Result</button>
-                                </div>
-
-                                <div id="api-testResultDetails"></div>
-
-                                <div id="overlay" class="overlay" style="display: none"></div>
-
-                                <div id="retestResult" class="popup" style="display: none"></div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
+                <div id="authorization">
+                    <label for="authorization">Authorization</label><br>
+                    <select id="authorizationKey" name="authorizationKey" style="margin-top: 10px">
+                        <option value="No Auth">No Auth</option>
+                        <option value="Basic Auth">Basic Auth</option>
+                        <option value="Bearer Token">Bearer Token</option>
+                        <option value="JWT Bearer">JWT Bearer</option>
+                        <option value="Digest Auth">Digest Auth</option>
+                        <option value="OAuth 1.0">OAuth 1.0</option>
+                        <option value="OAuth 2.0">OAuth 2.0</option>
+                        <option value="Hawk Authentication">Hawk Authentication</option>
+                        <option value="AWS Signature">AWS Signature</option>
+                        <option value="NTLM Authentication [Beta]">NTLM Authentication [Beta]</option>
+                        <option value="API Key">API Key</option>
+                        <option value="Akamai EdgeGrid">Akamai EdgeGrid</option>
+                        <option value="ASAP (Atlassian)">ASAP (Atlassian)</option>
+                        <option value="Inherit auth from parent">Inherit auth from parent</option>
+                    </select>
+                    <input id="authorizationValue" name="authorizationValue" placeholder="Value" type="text">
+                    <br>
                 </div>
+                <br><br>
 
-            </div>
+                <div id="headers">
+                    <label for="headers">Headers</label><br>
+                    <input class="headers-input" id="headersKey" name="headersKey" oninput="addHeadersInput(event)"
+                           placeholder="Key"
+                           style="margin-top: 10px" type="text">
+                    <input class="headers-input" id="headersValue" name="headersValue" oninput="addHeadersInput(event)"
+                           placeholder="Value"
+                           style="margin-top: 10px" type="text">
+                </div>
+                <br><br>
+
+                <label for="body">Body</label><br>
+                <textarea cols="80" id="body" name="body" placeholder="Body" rows="10"></textarea>
+                <br><br>
+
+                <label for="statusCode">Status Code</label><br>
+                <input id="statusCode" name="statusCode" placeholder="Status Code" required style="margin-top: 10px"
+                       type="text">
+                <br><br>
+
+                <label for="expectedResponseBody">Expected Response Body</label><br>
+                <textarea cols="80" id="expectedResponseBody" name="expectedResponseBody"
+                          placeholder="Expected Response Body"
+                          rows="10" style="margin-top: 10px"></textarea>
+                <br><br>
+
+                <label for="intervalsTimeUnit">Intervals Time Unit</label>
+                <select id="intervalsTimeUnit" name="intervalsTimeUnit">
+                    <option value="Hour">Hour</option>
+                    <option value="Day">Day</option>
+                </select>
+                <br><br>
+
+                <label for="intervalsTimeValue">Intervals Time Value</label><br>
+                <input id="intervalsTimeValue" max="23" min="1"
+                       name="intervalsTimeValue" placeholder="Intervals Time Value" required
+                       style="margin-top: 10px; width: 200px;"
+                       type="number">
+                <br><br>
+
+                <label for="notification">Notification</label><br>
+                <select id="notification" name="notification" style="margin-top: 10px">
+                    <option value="No">No</option>
+                    <option value="Yes">Yes</option>
+                </select>
+                <br><br>
+
+                <div id="recipientEmail" style="display: none">
+                    <label for="recipientEmail">Recipient Email</label><br>
+                    <input id="email" name="email" placeholder="Email" style="margin-top: 10px; width: 300px;"
+                           type="text">
+                    <br>
+                </div>
+                <input id="emailButton" onclick="addRecipientEmail()" style="display: none" type="button"
+                       value="Add Recipient Email">
+                <br><br><br>
+
+                <input id="test-case-button" type="submit" value="Submit">
+                <input id="cancel-button" type="button" value="Cancel">
+
+            </form>
 
         </div>
 
-        <script src="/monitor.js"></script>
+    </div>
 
-    </body>
+</div>
+
+<script src="/monitor.js"></script>
+
+</body>
+
 </html>

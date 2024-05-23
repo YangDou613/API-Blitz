@@ -7,8 +7,8 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import org.example.apiblitz.model.UserSignIn;
-import org.example.apiblitz.model.UserSignUp;
+import org.example.apiblitz.error.TokenParsingException;
+import org.example.apiblitz.model.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -32,12 +32,12 @@ public class JwtUtil {
 		secretKey = Keys.hmacShaKeyFor(secret.getBytes());
 	}
 
-	public String userSignUpGenerateToken(UserSignUp user) {
+	public String generateToken(User user) {
 
 		long nowMills = System.currentTimeMillis();
 		Date expireDate = new Date(nowMills + EXPIRE_TIME * 30);
 
-		Map<String, Object> claims = userSignUpGetClaims(user);
+		Map<String, Object> claims = getClaims(user);
 
 		JwtBuilder jwtBuilder = Jwts.builder()
 				.setClaims(claims)
@@ -49,47 +49,32 @@ public class JwtUtil {
 		return jwtBuilder.compact();
 	}
 
-	public String userSignInGenerateToken(UserSignIn user) {
-
-		long nowMills = System.currentTimeMillis();
-		Date expireDate = new Date(nowMills + EXPIRE_TIME * 30);
-
-		Map<String, Object> claims = userSignInGetClaims(user);
-
-		JwtBuilder jwtBuilder = Jwts.builder()
-				.setClaims(claims)
-				.setSubject(user.getName())
-				.setIssuedAt(new Date(nowMills))
-				.setExpiration(expireDate)
-				.signWith(SignatureAlgorithm.HS256, secretKey);
-
-		return jwtBuilder.compact();
-	}
-
-	public Map<String, Object> userSignUpGetClaims(UserSignUp user) {
+	public Map<String, Object> getClaims(User user) {
 
 		Map<String, Object> claims = new HashMap<>();
+
 		claims.put("userId", user.getId());
 		claims.put("name", user.getName());
 		claims.put("email", user.getEmail());
+
 		return claims;
 	}
 
-	public Map<String, Object> userSignInGetClaims(UserSignIn user) {
-
-		Map<String, Object> claims = new HashMap<>();
-		claims.put("userId", user.getId());
-		claims.put("name", user.getName());
-		claims.put("email", user.getEmail());
-		return claims;
-	}
-
-	public Claims parseToken(String token) {
-		try {
-			return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
-		} catch (Exception e) {
-			log.info(e.getMessage());
+	public String extractAccessToken(String authorization) {
+		String[] parts = authorization.split(" ");
+		if (parts.length == 2 && parts[0].equalsIgnoreCase("Bearer")) {
+			return parts[1];
+		} else {
 			return null;
+		}
+	}
+
+	public Claims parseToken(String accessToken) throws TokenParsingException {
+		try {
+			return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(accessToken).getBody();
+		} catch (Exception e) {
+			log.error("Parsing token error: " + e.getMessage());
+			throw new TokenParsingException(e);
 		}
 	}
 }

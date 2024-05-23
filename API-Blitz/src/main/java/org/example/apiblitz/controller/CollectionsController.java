@@ -2,9 +2,9 @@ package org.example.apiblitz.controller;
 
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
+import org.example.apiblitz.error.TokenParsingException;
 import org.example.apiblitz.model.Collections;
 import org.example.apiblitz.model.Request;
-import org.example.apiblitz.model.UserResponse;
 import org.example.apiblitz.queue.Publisher;
 import org.example.apiblitz.service.APIService;
 import org.example.apiblitz.service.CollectionsService;
@@ -39,44 +39,33 @@ public class CollectionsController {
 	APIService apiService;
 
 	@Autowired
-	private JwtUtil jwtUtil;
-
-	@Autowired
 	Publisher publisher;
 
+	@Autowired
+	private JwtUtil jwtUtil;
+
 	@GetMapping
-	public String collectionsPage() {
-		return "collections";
-	}
-
-	@GetMapping(path = "/details")
-	public String collectionDetailsPage(
-			@RequestParam("collectionName") String collectionName,
-			@RequestParam("collectionId") Integer collectionId) {
-		return "collectionDetails";
-	}
-
-	@GetMapping(path = "/get")
 	public ResponseEntity<?> getCollections(
 			@RequestHeader("Authorization") String authorization) {
 
-		UserResponse userResponse = new UserResponse();
-
 		if (authorization == null || !authorization.startsWith("Bearer ")) {
-			userResponse.setError("Invalid or missing Bearer token");
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(userResponse);
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing Bearer token");
 		}
 
-		String accessToken = extractAccessToken(authorization);
+		String accessToken = jwtUtil.extractAccessToken(authorization);
 
-		List<Map<String, Object>> collectionList = collectionService.get(accessToken);
+		try {
+			List<Map<String, Object>> collectionList = collectionService.getCollections(accessToken);
 
-		if (collectionList != null) {
-			return ResponseEntity
-					.ok()
-					.body(collectionList);
-		} else {
-			return ResponseEntity.badRequest().body("You don't have any collections yet.");
+			if (collectionList != null) {
+				return ResponseEntity
+						.ok()
+						.body(collectionList);
+			} else {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("You don't have any collections yet.");
+			}
+		} catch (TokenParsingException e) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid access token");
 		}
 	}
 
@@ -86,11 +75,8 @@ public class CollectionsController {
 			@ModelAttribute Collections collection,
 			BindingResult bindingResult) throws BindException {
 
-		UserResponse userResponse = new UserResponse();
-
 		if (authorization == null || !authorization.startsWith("Bearer ")) {
-			userResponse.setError("Invalid or missing Bearer token");
-			return ResponseEntity.badRequest().body(userResponse);
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing Bearer token");
 		}
 
 		if (bindingResult.hasErrors()) {
@@ -98,16 +84,18 @@ public class CollectionsController {
 		}
 
 		try {
-			String accessToken = extractAccessToken(authorization);
+			String accessToken = jwtUtil.extractAccessToken(authorization);
+			collectionService.createCollection(accessToken, collection);
 
-			collectionService.create(accessToken, collection);
-
+			return ResponseEntity
+					.ok()
+					.build();
+		} catch (TokenParsingException e) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid access token");
 		} catch (Exception e) {
 			log.error(e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error");
 		}
-		return ResponseEntity
-				.ok()
-				.build();
 	}
 
 	@PostMapping(path = "/create/addAPI")
@@ -117,11 +105,8 @@ public class CollectionsController {
 			@ModelAttribute Collections collection,
 			BindingResult bindingResult) throws BindException {
 
-		UserResponse userResponse = new UserResponse();
-
 		if (authorization == null || !authorization.startsWith("Bearer ")) {
-			userResponse.setError("Invalid or missing Bearer token");
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(userResponse);
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing Bearer token");
 		}
 
 		if (bindingResult.hasErrors()) {
@@ -129,8 +114,7 @@ public class CollectionsController {
 		}
 
 		try {
-
-			collectionService.add(collectionId, collection);
+			collectionService.addApiToCollection(collectionId, collection);
 
 			return ResponseEntity
 					.ok()
@@ -148,11 +132,8 @@ public class CollectionsController {
 			@RequestBody Collections collection,
 			BindingResult bindingResult) throws BindException {
 
-		UserResponse userResponse = new UserResponse();
-
 		if (authorization == null || !authorization.startsWith("Bearer ")) {
-			userResponse.setError("Invalid or missing Bearer token");
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(userResponse);
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing Bearer token");
 		}
 
 		if (bindingResult.hasErrors()) {
@@ -160,8 +141,7 @@ public class CollectionsController {
 		}
 
 		try {
-
-			collectionService.add(collectionId, collection);
+			collectionService.addApiToCollection(collectionId, collection);
 
 			return ResponseEntity
 					.ok()
@@ -179,11 +159,8 @@ public class CollectionsController {
 			@ModelAttribute Collections collection,
 			BindingResult bindingResult) throws BindException {
 
-		UserResponse userResponse = new UserResponse();
-
 		if (authorization == null || !authorization.startsWith("Bearer ")) {
-			userResponse.setError("Invalid or missing Bearer token");
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(userResponse);
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing Bearer token");
 		}
 
 		if (bindingResult.hasErrors()) {
@@ -191,8 +168,7 @@ public class CollectionsController {
 		}
 
 		try {
-
-			collectionService.update(collectionId, collection);
+			collectionService.updateCollection(collectionId, collection);
 
 			return ResponseEntity
 					.ok()
@@ -209,21 +185,20 @@ public class CollectionsController {
 			String collectionName,
 			@RequestParam(required = false) Integer requestId) {
 
-		UserResponse userResponse = new UserResponse();
-
 		if (authorization == null || !authorization.startsWith("Bearer ")) {
-			userResponse.setError("Invalid or missing Bearer token");
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(userResponse);
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing Bearer token");
 		}
 
 		try {
-			String accessToken = extractAccessToken(authorization);
+			String accessToken = jwtUtil.extractAccessToken(authorization);
 
-			collectionService.delete(accessToken, collectionName, requestId);
+			collectionService.deleteCollection(accessToken, collectionName, requestId);
 
 			return ResponseEntity
 					.ok()
 					.build();
+		} catch (TokenParsingException e) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid access token");
 		} catch (Exception e) {
 			log.info(e.getMessage());
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error");
@@ -231,9 +206,9 @@ public class CollectionsController {
 	}
 
 	@GetMapping(path = "/getAllAPI")
-	public ResponseEntity<List<Request>> getAllAPI(Integer collectionId) {
+	public ResponseEntity<List<Request>> getCollectionAllApi(Integer collectionId) {
 
-		List<Request> apiList = collectionService.getAPIList(collectionId);
+		List<Request> apiList = collectionService.getCollectionAllApi(collectionId);
 
 		if (apiList != null) {
 			return ResponseEntity.ok().body(apiList);
@@ -243,21 +218,18 @@ public class CollectionsController {
 	}
 
 	@PostMapping("/testAll")
-	public ResponseEntity<?> getResponseAtSameTime(
+	public ResponseEntity<?> testCollectionAllApi(
 			@RequestHeader("Authorization") String authorization,
 			Integer collectionId,
 			@RequestBody List<Request> requests) {
 
-		UserResponse userResponse = new UserResponse();
-
 		if (authorization == null || !authorization.startsWith("Bearer ")) {
-			userResponse.setError("Invalid or missing Bearer token");
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(userResponse);
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing Bearer token");
 		}
 
 		try {
 			// User ID
-			String accessToken = extractAccessToken(authorization);
+			String accessToken = jwtUtil.extractAccessToken(authorization);
 			Claims claims = jwtUtil.parseToken(accessToken);
 			Integer userId = claims.get("userId", Integer.class);
 
@@ -287,19 +259,11 @@ public class CollectionsController {
 			publisher.publishMessage(userId, category, id, testDateTime, content);
 
 			return ResponseEntity.ok().body(collectionTestTime);
-
+		} catch (TokenParsingException e) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid access token");
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error");
-		}
-	}
-
-	private String extractAccessToken(String authorization) {
-		String[] parts = authorization.split(" ");
-		if (parts.length == 2 && parts[0].equalsIgnoreCase("Bearer")) {
-			return parts[1];
-		} else {
-			return null;
 		}
 	}
 }

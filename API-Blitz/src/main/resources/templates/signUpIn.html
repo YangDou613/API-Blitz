@@ -1,159 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>API Blitz</title>
-        <link rel="stylesheet" href="/signUpIn.css">
-        <link rel="favicon" href="/favicon.ico">
-    </head>
-    <body>
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>API Blitz</title>
+    <link href="/signUpIn.css" rel="stylesheet">
+    <link href="/favicon.ico" rel="favicon">
+</head>
+<body>
 
-        <header>
+<header>
 
-            <div class="nav">
-                <img id="logo" src="/logo.png" alt="Logo">
-                <h1>API Blitz</h1>
-            </div>
+    <div class="nav">
+        <img alt="Logo" id="logo" src="/logo.png">
+        <h1>API Blitz</h1>
+    </div>
 
-        </header>
+</header>
 
-        <div class="content-wrapper">
+<div class="container" id="container">
 
-            <div id="introduce">
+    <div class="row">
 
-                <div id="welcome-message" style="font-size: 25pt; font-family: 'Baloo Chettan 2'">
-                    <p id="line1" style="font-size: 30pt; color: #4C4C4C; font-weight: bold;"></p>
-<!--                    <p id="line2" style="font-size: 20pt;"></p>-->
-<!--                    <p id="line3" style="font-size: 20pt;"></p>-->
+        <div class="col align-items-center flex-col sign-up">
+            <div class="form-wrapper align-items-center">
+                <div class="form sign-up">
+                    <div class="input-group">
+                        <i class='bx bxs-user'></i>
+                        <input id="signUpName" name="name" placeholder="Username" required type="text">
+                    </div>
+                    <div class="input-group">
+                        <i class='bx bx-mail-send'></i>
+                        <input id="signUpEmail" name="signUpEmail" placeholder="Email" required type="email">
+                    </div>
+                    <div class="input-group">
+                        <i class='bx bxs-lock-alt'></i>
+                        <input id="signUpPassword" name="signUpPassword" placeholder="Password" required
+                               type="password">
+                    </div>
+                    <button id="SignUpForm" type="submit">Sign up</button>
+                    <p>
+                        <span>Already have an account?</span>
+                        <b class="pointer" onclick="toggle()">Sign in here</b>
+                    </p>
                 </div>
-
-<!--                <div id="welcome-message" style="font-size: 25pt; font-family: 'Baloo Chettan 2'">-->
-<!--                    <p style="font-size: 30pt; color: #179c5e; font-weight: bold;">-->
-<!--                        Welcome!<br>-->
-<!--                    </p>-->
-
-<!--                    <p style="font-size: 20pt;">-->
-<!--                        Are you looking for a flexible and reliable way to test your API?<br>-->
-<!--                    </p>-->
-
-<!--                    <p style="font-size: 20pt;">-->
-<!--                        You've come to the right place! We provide one-stop API testing related services,<br>-->
-<!--                        allowing you to easily test and monitor your applications.-->
-<!--                    </p>-->
-<!--                </div>-->
-
-                <div class="APITest-introduce">
-
-                </div>
-
             </div>
-
-<!--            <div class="sidebar">-->
-
-<!--                <br><br>-->
-<!--                <a href="/APITest.html" class="sidebar-link">-->
-<!--                    <img id="test" src="/test.png" alt="test">-->
-<!--                    <p>API Test</p>-->
-<!--                </a>-->
-
-<!--                <br><br>-->
-<!--                <a href="/history" class="sidebar-link">-->
-<!--                    <img id="history" src="/history.png" alt="test">-->
-<!--                    <p>History</p>-->
-<!--                </a>-->
-
-<!--                <br><br>-->
-<!--                <a href="/api/1.0/testCase" class="sidebar-link">-->
-<!--                    <img id="auto-test" src="/auto-test.png" alt="test">-->
-<!--                    <p>Automated Testing</p>-->
-<!--                </a>-->
-
-<!--                <br><br>-->
-<!--                <a href="/api/1.0/testCase/myTestCase" class="sidebar-link">-->
-<!--                    <img id="my-test-case" src="/myTestCase.png" alt="test">-->
-<!--                    <p>My Test Case</p>-->
-<!--                </a>-->
-
-<!--                <br><br>-->
-<!--                <a href="/api/1.0/autoTest/monitor" class="sidebar-link">-->
-<!--                    <img id="monitor" src="/monitor.png" alt="test">-->
-<!--                    <p>Monitor</p>-->
-<!--                </a>-->
-
-<!--                <br><br>-->
-<!--                <a href="/api/1.0/collections" class="sidebar-link">-->
-<!--                    <img id="collections" src="/collections.png" alt="test">-->
-<!--                    <p>Collections</p>-->
-<!--                </a>-->
-
-<!--            </div>-->
-
-            <div id="container">
-
-
-
-<!--                <h2>Sign Up</h2>-->
-<!--                <form id="SignUpForm">-->
-<!--                    <div class="form-group">-->
-<!--                        <label for="name">Name</label>-->
-<!--                        <input type="text" id="name" name="name" required>-->
-<!--                    </div>-->
-<!--                    <div class="form-group">-->
-<!--                        <label for="signUpEmail">Email</label>-->
-<!--                        <input type="text" id="signUpEmail" name="signUpEmail" required>-->
-<!--                    </div>-->
-<!--                    <div class="form-group">-->
-<!--                        <label for="signUpPassword">Password</label>-->
-<!--                        <input type="password" id="signUpPassword" name="signUpPassword" required>-->
-<!--                    </div>-->
-<!--                    <button type="submit" class="btn">Sign Up</button>-->
-<!--                </form>-->
-
-<!--                <h2>Sign In</h2>-->
-<!--                <form id="SignInForm">-->
-<!--                    <div class="form-group">-->
-<!--                        <label for="signInEmail">Email</label>-->
-<!--                        <input type="text" id="signInEmail" name="signInEmail" required>-->
-<!--                    </div>-->
-<!--                    <div class="form-group">-->
-<!--                        <label for="signInPassword">Password</label>-->
-<!--                        <input type="password" id="signInPassword" name="signInPassword" required>-->
-<!--                    </div>-->
-<!--                    <button type="submit" class="btn">Sign In</button>-->
-<!--                </form>-->
-
-            </div>
-
-            <div id="signUp-form">
-
-                <h2>Sign Up</h2>
-                <form id="SignUpForm">
-
-                    <div class="form-group">
-                        <label for="name">Name</label>
-                        <input type="text" id="name" name="name" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="signUpEmail">Email</label>
-                        <input type="text" id="signUpEmail" name="signUpEmail" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="signUpPassword">Password</label>
-                        <input type="password" id="signUpPassword" name="signUpPassword" required>
-                    </div>
-
-                    <button type="submit" class="btn">Sign Up</button>
-
-                </form>
-
-            </div>
-
         </div>
 
-        <script src="/signUpIn.js"></script>
+        <div class="col align-items-center flex-col sign-in">
+            <div class="form-wrapper align-items-center">
+                <div class="form sign-in">
+                    <div class="input-group">
+                        <i class='bx bx-mail-send'></i>
+                        <input id="signInEmail" name="signInEmail" placeholder="Email" required type="email">
+                    </div>
+                    <div class="input-group">
+                        <i class='bx bxs-lock-alt'></i>
+                        <input id="signInPassword" name="signInPassword" placeholder="Password" required
+                               type="password">
+                    </div>
+                    <button id="SignInForm" type="submit">Sign in</button>
+                    <p>
+                        <span>Don't have an account?</span>
+                        <b class="pointer" onclick="toggle()">Sign up here</b>
+                    </p>
+                </div>
+            </div>
+        </div>
 
-    </body>
+    </div>
+
+    <div class="row content-row">
+
+        <div class="col align-items-center flex-col">
+            <div class="text sign-in">
+                <h2>Welcome</h2>
+            </div>
+            <div class="img sign-in"></div>
+        </div>
+
+        <div class="col align-items-center flex-col">
+            <div class="img sign-up"></div>
+            <div class="text sign-up">
+                <h2>Join with us</h2>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<script src="/signUpIn.js"></script>
+
+</body>
+
 </html>

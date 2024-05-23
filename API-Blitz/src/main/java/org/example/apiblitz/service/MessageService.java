@@ -1,4 +1,4 @@
-package org.example.apiblitz.controller;
+package org.example.apiblitz.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

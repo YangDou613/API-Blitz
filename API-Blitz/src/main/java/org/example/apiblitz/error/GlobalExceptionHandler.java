@@ -15,5 +15,4 @@ public class GlobalExceptionHandler {
 				.status(HttpStatus.BAD_REQUEST)
 				.body("Please confirm the information you entered is correct.");
 	}
-
 }

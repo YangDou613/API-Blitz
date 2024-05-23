@@ -61,12 +61,13 @@ public class APIRepository {
 		return APIAutoId;
 	}
 
-	public List<Request> getAllHistoryList(Integer userId) {
+	public List<Request> getHistoryList(Integer userId) {
+		// Get the history of the latest 20 API tests
 		String getHistoryListSql = "SELECT * FROM APIHistory WHERE userId = ? ORDER BY id DESC LIMIT 20";
 		return jdbcTemplate.query(getHistoryListSql, new BeanPropertyRowMapper<>(Request.class), userId);
 	}
 
-	public APITestResult getApiTestResultByUserIdAndDateTime(Integer userId, String testDateTime) {
+	public APITestResult getApiTestResultByUserIdAndTestDateTime(Integer userId, String testDateTime) {
 		String getApiTestResultSql = "SELECT * FROM APIHistory WHERE userId = ? AND testDateTime = ?";
 		return jdbcTemplate.queryForObject(getApiTestResultSql, new BeanPropertyRowMapper<>(APITestResult.class), userId, testDateTime);
 	}

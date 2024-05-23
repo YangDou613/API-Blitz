@@ -42,8 +42,8 @@ public class APIServiceTest {
 
 	String testResult = """
 			{
-			    "id": 1483,
-			    "userId": 14,
+			    "id": 1094,
+			    "userId": 11,
 			    "method": "GET",
 			    "queryParams": "{\\"id\\": \\"30\\"}",
 			    "headers": "{\\"Content-Type\\": [\\"application/json\\"]}",
@@ -71,7 +71,7 @@ public class APIServiceTest {
 		claims.put("userId", userId);
 		when(jwtUtil.parseToken(accessToken)).thenReturn(claims);
 
-		when(apiRepository.getApiTestResultByUserIdAndDateTime(userId, testDateTime)).thenReturn(getMockTestResult());
+		when(apiRepository.getApiTestResultByUserIdAndTestDateTime(userId, testDateTime)).thenReturn(getMockTestResult());
 
 		APITestResult apiTestResult = apiService.getApiTestResult(accessToken, testDateTime);
 		assertNotNull(apiTestResult);

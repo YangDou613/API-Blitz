@@ -4,14 +4,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.example.apiblitz.model.*;
+import org.example.apiblitz.error.TokenParsingException;
+import org.example.apiblitz.model.APIData;
+import org.example.apiblitz.model.APITestResult;
+import org.example.apiblitz.model.Request;
 import org.example.apiblitz.queue.Publisher;
 import org.example.apiblitz.service.APIService;
 import org.example.apiblitz.service.AutoTestService;
 import org.example.apiblitz.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
@@ -24,6 +28,7 @@ import java.util.List;
 @Profile("Producer")
 @Controller
 @Slf4j
+@RequestMapping("/api/1.0/APITest")
 public class APIController {
 
 	@Autowired
@@ -33,31 +38,22 @@ public class APIController {
 	AutoTestService autoTestService;
 
 	@Autowired
-	private JwtUtil jwtUtil;
-
-	@Autowired
 	ObjectMapper objectMapper;
 
 	@Autowired
 	Publisher publisher;
 
-	@GetMapping ("/APITest.html")
-	public String APITestPage() {
-		return "APITest";
-	}
+	@Autowired
+	private JwtUtil jwtUtil;
 
-	@PostMapping("/APITest.html")
-	public ResponseEntity<?> getResponse(
+	@PostMapping
+	public ResponseEntity<?> receiveApiTestData(
 			@RequestHeader("Authorization") String authorization,
 			@Valid @ModelAttribute APIData apiData,
-			BindingResult bindingResult)
-			throws BindException {
-
-		UserResponse userResponse = new UserResponse();
+			BindingResult bindingResult) throws BindException {
 
 		if (authorization == null || !authorization.startsWith("Bearer ")) {
-			userResponse.setError("Invalid or missing Bearer token");
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(userResponse);
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing Bearer token");
 		}
 
 		if (bindingResult.hasErrors()) {
@@ -66,7 +62,7 @@ public class APIController {
 
 		try {
 			// User ID
-			String accessToken = extractAccessToken(authorization);
+			String accessToken = jwtUtil.extractAccessToken(authorization);
 			Claims claims = jwtUtil.parseToken(accessToken);
 			Integer userId = claims.get("userId", Integer.class);
 
@@ -85,71 +81,59 @@ public class APIController {
 
 			publisher.publishMessage(userId, category, id, testDateTime, content);
 
-			return ResponseEntity
-					.ok()
-					.body(currentDateTime);
+			return ResponseEntity.ok().body(currentDateTime);
+		} catch (TokenParsingException e) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid access token");
 		} catch (Exception e) {
-			log.error(e.getMessage());
+			log.error("Internal server error: " + e.getMessage());
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error");
 		}
 	}
 
-	@GetMapping("/APITest/testResult")
-	public ResponseEntity<?> getTestResult(
+	@GetMapping("/testResult")
+	public ResponseEntity<?> getApiTestResult(
 			@RequestHeader("Authorization") String authorization,
 			@RequestParam("testDateTime") String testDateTime) {
 
-		UserResponse userResponse = new UserResponse();
-
 		if (authorization == null || !authorization.startsWith("Bearer ")) {
-			userResponse.setError("Invalid or missing Bearer token");
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(userResponse);
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing Bearer token");
 		}
 
-		String accessToken = extractAccessToken(authorization);
+		String accessToken = jwtUtil.extractAccessToken(authorization);
 
-		APITestResult apiTestResult = apiService.getApiTestResult(accessToken, testDateTime);
+		try {
+			APITestResult apiTestResult = apiService.getApiTestResult(accessToken, testDateTime);
 
-		if (apiTestResult != null) {
-			return ResponseEntity.ok(apiTestResult);
-		} else {
-			return ResponseEntity.badRequest().body("There is currently no API test result.");
+			if (apiTestResult != null) {
+				return ResponseEntity.ok(apiTestResult);
+			} else {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("There is currently no API test result.");
+			}
+		} catch (TokenParsingException e) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid access token");
 		}
 	}
 
-	@GetMapping ("/history")
-	public String historyPage() {
-		return "history";
-	}
-
-	@GetMapping("/APITest/history")
-	public ResponseEntity<?> getHistory(
+	@GetMapping("/history")
+	public ResponseEntity<?> getApiTestHistory(
 			@RequestHeader("Authorization") String authorization) {
 
-		UserResponse userResponse = new UserResponse();
-
 		if (authorization == null || !authorization.startsWith("Bearer ")) {
-			userResponse.setError("Invalid or missing Bearer token");
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(userResponse);
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing Bearer token");
 		}
 
-		String accessToken = extractAccessToken(authorization);
+		String accessToken = jwtUtil.extractAccessToken(authorization);
 
-		List<Request> historyList = apiService.getAllHistory(accessToken);
+		try {
+			List<Request> historyList = apiService.getApiTestHistory(accessToken);
 
-		if (historyList != null) {
-			return ResponseEntity.ok(historyList);
-		} else {
-			return ResponseEntity.badRequest().body("There is currently no API history.");
-		}
-	}
-
-	private String extractAccessToken(String authorization) {
-		String[] parts = authorization.split(" ");
-		if (parts.length == 2 && parts[0].equalsIgnoreCase("Bearer")) {
-			return parts[1];
-		} else {
-			return null;
+			if (historyList != null) {
+				return ResponseEntity.ok(historyList);
+			} else {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("There is currently no API history.");
+			}
+		} catch (TokenParsingException e) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid access token");
 		}
 	}
 }

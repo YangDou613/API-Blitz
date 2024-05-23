@@ -1,86 +1,77 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>API Blitz</title>
-        <link rel="stylesheet" href="/history.css">
-        <link rel="favicon" href="/favicon.ico">
-    </head>
-    <body>
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>API Blitz</title>
+    <link href="/history.css" rel="stylesheet">
+    <link href="/favicon.ico" rel="favicon">
+</head>
+<body>
 
-        <header>
+<header>
 
-            <div class="nav">
-                <a href="/APITest.html">
-                    <img id="logo" src="/logo.png" alt="Logo">
-                </a>
+    <div class="nav">
+        <a href="/APITest">
+            <img alt="Logo" id="logo" src="/logo.png">
+        </a>
 
-                <h1>API Blitz</h1>
+        <h1>API Blitz</h1>
 
-                <a href="/api/1.0/user/signUpIn">
-                    <img id="user" src="/user.png" alt="user">
-                </a>
-            </div>
+        <a href="/signUpIn">
+            <img alt="user" id="user" src="/user.png">
+        </a>
+    </div>
 
-        </header>
+</header>
 
-        <div class="content-wrapper">
+<div class="content-wrapper">
 
-            <div class="sidebar">
+    <div class="sidebar">
 
-                <br>
-                <a href="/APITest.html" class="sidebar-link">
-                    <img id="test" src="/test.png" alt="test">
-                    <p>API Test</p>
-                </a>
+        <br>
+        <a class="sidebar-link" href="/APITest">
+            <img alt="test" id="test" src="/test.png">
+            <p>API Test</p>
+        </a>
 
-                <br>
-                <a href="/history" class="sidebar-link">
-                    <img id="history" src="/history.png" alt="test">
-                    <p>History</p>
-                </a>
+        <br>
+        <a class="sidebar-link" href="/history">
+            <img alt="test" id="history" src="/history.png">
+            <p>History</p>
+        </a>
 
-                <br>
-                <a href="/api/1.0/collections" class="sidebar-link">
-                    <img id="collections" src="/collections.png" alt="test">
-                    <p>Collections</p>
-                </a>
+        <br>
+        <a class="sidebar-link" href="/collections">
+            <img alt="test" id="collections" src="/collections.png">
+            <p>Collections</p>
+        </a>
 
-                <!--                <br>-->
-                <!--                <a href="/api/1.0/testCase" class="sidebar-link">-->
-                <!--                    <img id="auto-test" src="/auto-test.png" alt="test">-->
-                <!--                    <p>Automated Testing</p>-->
-                <!--                </a>-->
+        <br>
+        <a class="sidebar-link" href="/monitor">
+            <img alt="test" id="my-test-case" src="/monitor.png">
+            <p>Monitor</p>
+        </a>
 
-                <br>
-                <a href="/api/1.0/testCase/myTestCase" class="sidebar-link">
-                    <img id="my-test-case" src="/myTestCase.png" alt="test">
-<!--                    <p>My Test Case</p>-->
-<!--                    <p>Automated Testing</p>-->
-                    <p>Monitor</p>
-                </a>
+        <br>
+        <a class="sidebar-link" href="/monitor">
+            <img alt="test" id="monitor" src="/report.png">
+            <p>Report</p>
+        </a>
 
-                <br>
-                <a href="/api/1.0/autoTest/monitor" class="sidebar-link">
-                    <img id="monitor" src="/monitor.png" alt="test">
-<!--                    <p>Monitor</p>-->
-                    <p>Report</p>
-                </a>
+    </div>
 
-            </div>
+    <div id="container">
 
-            <div id="container">
+        <div class="overlay" id="overlay"></div>
 
-                <div id="overlay" class="overlay"></div>
+        <div class="popup" id="collection-list-container" style="display: none"></div>
 
-                <div class="popup" id="collection-list-container" style="display: none"></div>
+    </div>
 
-            </div>
+</div>
 
-        </div>
+<script src="/history.js"></script>
 
-        <script src="/history.js"></script>
-
-    </body>
+</body>
 </html>

@@ -1,107 +1,100 @@
 <!DOCTYPE html>
 <html lang="en">
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>API Blitz</title>
-        <link rel="stylesheet" href="/collections.css">
-        <link rel="favicon" href="/favicon.ico">
-    </head>
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>API Blitz</title>
+    <link href="/collections.css" rel="stylesheet">
+    <link href="/favicon.ico" rel="favicon">
+</head>
 
-    <body>
+<body>
 
-        <header>
+<header>
 
-            <div class="nav">
-                <a href="/APITest.html">
-                    <img id="logo" src="/logo.png" alt="Logo">
-                </a>
-                <h1>API Blitz</h1>
+    <div class="nav">
+        <a href="/APITest">
+            <img alt="Logo" id="logo" src="/logo.png">
+        </a>
+        <h1>API Blitz</h1>
 
-                <a href="/api/1.0/user/signUpIn">
-                    <img id="user" src="/user.png" alt="user">
-                </a>
-            </div>
+        <a href="/signUpIn">
+            <img alt="user" id="user" src="/user.png">
+        </a>
+    </div>
 
-        </header>
+</header>
 
-        <div class="content-wrapper">
+<div class="content-wrapper">
 
-            <div class="sidebar">
+    <div class="sidebar">
 
-                <br>
-                <a href="/APITest.html" class="sidebar-link">
-                    <img id="test" src="/test.png" alt="test">
-                    <p>API Test</p>
-                </a>
+        <br>
+        <a class="sidebar-link" href="/APITest">
+            <img alt="test" id="test" src="/test.png">
+            <p>API Test</p>
+        </a>
 
-                <br>
-                <a href="/history" class="sidebar-link">
-                    <img id="history" src="/history.png" alt="test">
-                    <p>History</p>
-                </a>
+        <br>
+        <a class="sidebar-link" href="/history">
+            <img alt="test" id="history" src="/history.png">
+            <p>History</p>
+        </a>
 
-                <br>
-                <a href="/api/1.0/collections" class="sidebar-link">
-                    <img id="collections" src="/collections.png" alt="test">
-                    <p>Collections</p>
-                </a>
+        <br>
+        <a class="sidebar-link" href="/collections">
+            <img alt="test" id="collections" src="/collections.png">
+            <p>Collections</p>
+        </a>
 
-<!--                <br>-->
-<!--                <a href="/api/1.0/testCase" class="sidebar-link">-->
-<!--                    <img id="auto-test" src="/auto-test.png" alt="test">-->
-<!--                    <p>Automated Testing</p>-->
-<!--                </a>-->
+        <br>
+        <a class="sidebar-link" href="/monitor">
+            <img alt="test" id="my-test-case" src="/monitor.png">
+            <p>Monitor</p>
+        </a>
 
-                <br>
-                <a href="/api/1.0/testCase/myTestCase" class="sidebar-link">
-                    <img id="my-test-case" src="/myTestCase.png" alt="test">
-<!--                    <p>My Test Case</p>-->
-<!--                    <p>Automated Testing</p>-->
-                    <p>Monitor</p>
-                </a>
+        <br>
+        <a class="sidebar-link" href="/report">
+            <img alt="test" id="monitor" src="/report.png">
+            <p>Report</p>
+        </a>
 
-                <br>
-                <a href="/api/1.0/autoTest/monitor" class="sidebar-link">
-                    <img id="monitor" src="/monitor.png" alt="test">
-<!--                    <p>Monitor</p>-->
-                    <p>Report</p>
-                </a>
+    </div>
 
-            </div>
+    <div id="container">
 
-            <div id="container">
+        <div class="collection-container" id="collection-container"></div>
 
-                <div class="collection-container" id="collection-container"></div>
+        <div class="overlay" id="overlay"></div>
 
-                <div id="overlay" class="overlay"></div>
+        <div class="edit-container popup" id="edit-container" style="display: none">
 
-                <div class="edit-container popup" id="edit-container" style="display: none">
+            <form id="collection-form" method="post">
 
-                    <form id="collection-form" method="post">
+                <label for="collectionName">Collection Name</label><br>
+                <input id="collectionName" name="collectionName" placeholder="Collection Name" required
+                       style="margin-top: 10px; width: 300px;" type="text">
+                <br><br>
 
-                        <label for="collectionName">Collection Name</label><br>
-                        <input type="text" id="collectionName" name="collectionName" placeholder="Collection Name" style="margin-top: 10px; width: 300px;" required>
-                        <br><br>
+                <label for="description">Description</label><br>
+                <textarea cols="80" id="description" name="description" placeholder="Description" required
+                          rows="10"></textarea>
+                <br><br>
 
-                        <label for="description">Description</label><br>
-                        <textarea id="description" name="description" rows="10" cols="80" placeholder="Description" required></textarea>
-                        <br><br>
+                <input id="collection-button" type="submit" value="Submit">
+                <input id="cancel-button" type="button" value="Cancel">
 
-                        <input id="collection-button" type="submit" value="Submit">
-                        <input id="cancel-button" type="button" value="Cancel">
-
-                    </form>
-
-                </div>
-
-            </div>
+            </form>
 
         </div>
 
-        <script src="/collections.js"></script>
+    </div>
 
-    </body>
+</div>
+
+<script src="/collections.js"></script>
+
+</body>
 
 </html>

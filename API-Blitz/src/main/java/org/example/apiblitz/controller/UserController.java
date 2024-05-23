@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,11 +25,6 @@ public class UserController {
 
 	@Autowired
 	UserService userService;
-
-	@GetMapping(path = "signUpIn")
-	public String signUpSignInPage() {
-		return "signUpIn";
-	}
 
 	@PostMapping("/signup")
 	@Validated
@@ -46,20 +40,19 @@ public class UserController {
 					"you entered is correct. The email addresses need to follow the standard format, " +
 					"and passwords need to contain at least one letter," +
 					" one number, and be at least 8 characters long.");
-			return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(userResponse);
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(userResponse);
 		}
 
 		try {
-			userResponse = userService.signUp(user);
+			userResponse = userService.userSignUp(user);
 
 			if (userResponse.getError() == null) {
 				return ResponseEntity.ok(userResponse);
 			} else {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(userResponse);
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(userResponse);
 			}
 		} catch (Exception e) {
-			userResponse.setError("Internal server error");
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(userResponse);
+			return errorMessage(userResponse);
 		}
 	}
 
@@ -72,22 +65,26 @@ public class UserController {
 		UserResponse userResponse = new UserResponse();
 
 		if (bindingResult.hasErrors()) {
-			userResponse.setError("Please enter provider, your email and password, " +
-					"and confirm the information you entered is correct.");
-			return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(userResponse);
+			userResponse.setError("Please enter your email and password, " +
+			                      "and confirm the information you entered is correct.");
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(userResponse);
 		}
 
 		try {
-			userResponse = userService.signIn(user);
+			userResponse = userService.userSignIn(user);
 
 			if (userResponse.getError() == null) {
 				return ResponseEntity.ok(userResponse);
 			} else {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(userResponse);
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(userResponse);
 			}
 		} catch (Exception e) {
-			userResponse.setError("Internal server error");
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(userResponse);
+			return errorMessage(userResponse);
 		}
+	}
+
+	public ResponseEntity<?> errorMessage(UserResponse userResponse) {
+		userResponse.setError("Internal server error");
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(userResponse);
 	}
 }

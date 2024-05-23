@@ -27,7 +27,7 @@ public class UserRepository {
 		return count != null && count > 0;
 	}
 
-	public Integer addToUserTableWhenSignUp(UserSignUp user) {
+	public Integer addNewUser(UserSignUp user) {
 		String sql = "INSERT INTO user (name, email, password) VALUES (?, ?, ?)";
 
 		KeyHolder keyHolder = new GeneratedKeyHolder();

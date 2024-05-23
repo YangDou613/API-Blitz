@@ -1,200 +1,188 @@
 <!DOCTYPE html>
 <html lang="en">
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>API Blitz</title>
-        <link rel="stylesheet" href="APITest.css">
-        <link rel="favicon" href="favicon.ico">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>API Blitz</title>
+    <link href="APITest.css" rel="stylesheet">
+    <link href="favicon.ico" rel="favicon">
 
-        <script src="https://cdn.jsdelivr.net/npm/sockjs-client/dist/sockjs.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js"></script>
-    </head>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js"></script>
+</head>
 
-    <body>
+<body>
 
-        <header>
+<header>
 
-            <div class="nav">
-                <a href="APITest.html">
-                    <img id="logo" src="logo.png" alt="Logo">
-                </a>
-                <h1>API Blitz</h1>
+    <div class="nav">
+        <a href="APITest">
+            <img alt="Logo" id="logo" src="logo.png">
+        </a>
+        <h1>API Blitz</h1>
 
-                <a href="/api/1.0/user/signUpIn">
-                    <img id="user" src="user.png" alt="user">
-                </a>
-            </div>
+        <a href="/signUpIn">
+            <img alt="user" id="user" src="user.png">
+        </a>
+    </div>
 
-        </header>
+</header>
 
-        <div class="content-wrapper">
+<div class="content-wrapper">
 
-            <div class="sidebar">
+    <div class="sidebar">
 
-                <br>
-                <a href="/APITest.html" class="sidebar-link">
-                    <img id="test" src="test.png" alt="test">
-                    <p>API Test</p>
-                </a>
+        <br>
+        <a class="sidebar-link" href="/APITest">
+            <img alt="test" id="test" src="test.png">
+            <p>API Test</p>
+        </a>
 
-                <br>
-                <a href="/history" class="sidebar-link">
-                    <img id="history" src="history.png" alt="test">
-                    <p>History</p>
-                </a>
+        <br>
+        <a class="sidebar-link" href="/history">
+            <img alt="test" id="history" src="history.png">
+            <p>History</p>
+        </a>
 
-                <br>
-                <a href="/api/1.0/collections" class="sidebar-link">
-                    <img id="collections" src="/collections.png" alt="test">
-                    <p>Collections</p>
-                </a>
+        <br>
+        <a class="sidebar-link" href="/collections">
+            <img alt="test" id="collections" src="/collections.png">
+            <p>Collections</p>
+        </a>
 
-<!--                <br>-->
-<!--                <a href="/api/1.0/testCase" class="sidebar-link">-->
-<!--                    <img id="auto-test" src="auto-test.png" alt="test">-->
-<!--                    <p>Automated Testing</p>-->
-<!--                </a>-->
+        <br>
+        <a class="sidebar-link" href="/monitor">
+            <img alt="test" id="my-test-case" src="monitor.png">
+            <p>Monitor</p>
+        </a>
 
-                <br>
-                <a href="/api/1.0/testCase/myTestCase" class="sidebar-link">
-                    <img id="my-test-case" src="myTestCase.png" alt="test">
-<!--                    <p>My Test Case</p>-->
-<!--                    <p>Automated Testing</p>-->
-                    <p>Monitor</p>
-                </a>
+        <br>
+        <a class="sidebar-link" href="/report">
+            <img alt="test" id="monitor" src="report.png">
+            <p>Report</p>
+        </a>
 
-                <br>
-                <a href="/api/1.0/autoTest/monitor" class="sidebar-link">
-                    <img id="monitor" src="monitor.png" alt="test">
-<!--                    <p>Monitor</p>-->
-                    <p>Report</p>
-                </a>
+    </div>
 
-            </div>
+    <div id="container">
 
-            <div id="container">
+        <div class="content">
 
-                <div class="content">
+            <h3>API Data</h3><br><br><br>
 
-                    <h3>API Data</h3><br><br><br>
+            <div id="api-history-list" style="display: none"></div>
 
-<!--                    <button id="show-history" onclick="showHistory()">API History</button>-->
-<!--                    <br><br>-->
+            <form action="/api/1.0/APITest" id="api-form" method="post">
 
-                    <div id="api-history-list" style="display: none"></div>
+                <label for="method"></label>
+                <select id="method" name="method">
+                    <option value="GET">GET</option>
+                    <option value="POST">POST</option>
+                    <option value="PUT">PUT</option>
+                    <option value="DELETE">DELETE</option>
+                    <option value="HEAD">HEAD</option>
+                    <option value="PATCH">PATCH</option>
+                    <option value="OPTIONS">OPTIONS</option>
+                </select>
 
-                    <form id="api-form" action="/APITest.html" method="post">
+                <label for="url"></label>
+                <input id="url" name="url" placeholder="Enter URL or paste text" required style="width: 510px;"
+                       type="text">
 
-                        <label for="method"></label>
-                        <select name="method" id="method">
-                            <option value="GET">GET</option>
-                            <option value="POST">POST</option>
-                            <option value="PUT">PUT</option>
-                            <option value="DELETE">DELETE</option>
-                            <option value="HEAD">HEAD</option>
-                            <option value="PATCH">PATCH</option>
-                            <option value="OPTIONS">OPTIONS</option>
-                        </select>
+                <input class="btn" type="submit" value="Send">
+                <br><br><br>
 
-                        <label for="url"></label>
-                        <input type="text" id="url" name="url" placeholder="Enter URL or paste text" style="width: 510px;" required>
-
-                        <input class="btn" type="submit" value="Send">
-                        <br><br><br>
-
-<!--                        <div id="queryParams">-->
-<!--                            <label for="queryParams">Query Params:</label><br>-->
-<!--                            <input id="paramsKey" type="text" name="paramsKey" placeholder="Key">-->
-<!--                            <input id="paramsValue" type="text" name="paramsValue" placeholder="Value">-->
-<!--                            <br>-->
-<!--                        </div>-->
-<!--                        <button id="queryParamsButton" type="button" onclick="addQueryParam()">Add Query Param</button>-->
-<!--                        <br><br>-->
-
-                        <div id="queryParams">
-                            <label for="queryParams">Query Params</label><br>
-                            <input id="paramsKey" type="text" class="dynamic-input paramsKey" name="paramsKey" placeholder="Key" style="margin-top: 10px; margin-top: 10px" oninput="addQueryParamsInput(event)">
-                            <input id="paramsValue" type="text" class="dynamic-input paramsValue" name="paramsValue" placeholder="Value" style="margin-top: 10px; margin-top: 10px" oninput="addQueryParamsInput(event)">
-                        </div>
-                        <br><br>
-
-                        <div id="authorization">
-                            <label for="authorization">Authorization</label><br>
-                            <select name="authorizationKey" id="authorizationKey" style="margin-top: 10px">
-                                <option value="No Auth">No Auth</option>
-                                <option value="Basic Auth">Basic Auth</option>
-                                <option value="Bearer Token">Bearer Token</option>
-                                <option value="JWT Bearer">JWT Bearer</option>
-                                <option value="Digest Auth">Digest Auth</option>
-                                <option value="OAuth 1.0">OAuth 1.0</option>
-                                <option value="OAuth 2.0">OAuth 2.0</option>
-                                <option value="Hawk Authentication">Hawk Authentication</option>
-                                <option value="AWS Signature">AWS Signature</option>
-                                <option value="NTLM Authentication [Beta]">NTLM Authentication [Beta]</option>
-                                <option value="API Key">API Key</option>
-                                <option value="Akamai EdgeGrid">Akamai EdgeGrid</option>
-                                <option value="ASAP (Atlassian)">ASAP (Atlassian)</option>
-                                <option value="Inherit auth from parent">Inherit auth from parent</option>
-                            </select>
-<!--                            <input id="authorizationKey" type="text" name="authorizationKey" placeholder="Key">-->
-                            <input id="authorizationValue" type="text" name="authorizationValue" placeholder="Value">
-                            <br>
-                        </div>
-                        <br><br>
-
-<!--                        <div id="headers">-->
-<!--                            <label for="headers">Headers:</label><br>-->
-<!--                            <input id="headersKey" type="text" name="headersKey" placeholder="Key">-->
-<!--                            <input id="headersValue" type="text" name="headersValue" placeholder="Value">-->
-<!--                            <br>-->
-<!--                        </div>-->
-<!--                        <button id="headersButton" type="button" onclick="addHeader()">Add Header</button>-->
-<!--                        <br><br>-->
-
-                        <div id="headers">
-                            <label for="headers">Headers</label><br>
-                            <input id="headersKey" type="text" class="headers-input headersKey" name="headersKey" placeholder="Key" style="margin-top: 10px" oninput="addHeadersInput(event)">
-                            <input id="headersValue" type="text" class="headers-input headersValue" name="headersValue" placeholder="Value" style="margin-top: 10px" oninput="addHeadersInput(event)">
-                        </div>
-                        <br><br>
-
-                        <label for="body">Body</label><br>
-                        <textarea id="body" name="body" placeholder="Body" rows="10" cols="76"></textarea>
-
-                    </form>
-                    <br><br>
-
+                <div id="queryParams">
+                    <label for="queryParams">Query Params</label><br>
+                    <input class="dynamic-input paramsKey" id="paramsKey" name="paramsKey"
+                           oninput="addQueryParamsInput(event)" placeholder="Key"
+                           style="margin-top: 10px; margin-top: 10px" type="text">
+                    <input class="dynamic-input paramsValue" id="paramsValue" name="paramsValue"
+                           oninput="addQueryParamsInput(event)"
+                           placeholder="Value" style="margin-top: 10px; margin-top: 10px"
+                           type="text">
                 </div>
+                <br><br>
 
-                <div id="response-container">
-
-                    <h3>Response</h3><br><br><br>
-
-                    <div id="loading" style="display: none">
-                        <img src="/loading.gif" alt="loading">
-                    </div>
-
-                    <div id="status-code" style="font-weight: bold"></div><br>
-                    <div id="response-time" style="font-weight: bold"> </div><br>
-                    <div id="response-size" style="font-weight: bold"></div><br>
-                    <div class="tab-container">
-                        <button id="show-response-body" class="tablinks" onclick="displayResponse()" style="font-size: 16pt; font-weight: bold; font-family: 'Baloo Chettan 2'; display: none">Body</button>
-                        <button id="show-response-header" class="tablinks" onclick="displayHeaders()" style="font-size: 16pt; font-weight: bold; font-family: 'Baloo Chettan 2'; display: none">Headers</button>
-                    </div>
+                <div id="authorization">
+                    <label for="authorization">Authorization</label><br>
+                    <select id="authorizationKey" name="authorizationKey" style="margin-top: 10px">
+                        <option value="No Auth">No Auth</option>
+                        <option value="Basic Auth">Basic Auth</option>
+                        <option value="Bearer Token">Bearer Token</option>
+                        <option value="JWT Bearer">JWT Bearer</option>
+                        <option value="Digest Auth">Digest Auth</option>
+                        <option value="OAuth 1.0">OAuth 1.0</option>
+                        <option value="OAuth 2.0">OAuth 2.0</option>
+                        <option value="Hawk Authentication">Hawk Authentication</option>
+                        <option value="AWS Signature">AWS Signature</option>
+                        <option value="NTLM Authentication [Beta]">NTLM Authentication [Beta]</option>
+                        <option value="API Key">API Key</option>
+                        <option value="Akamai EdgeGrid">Akamai EdgeGrid</option>
+                        <option value="ASAP (Atlassian)">ASAP (Atlassian)</option>
+                        <option value="Inherit auth from parent">Inherit auth from parent</option>
+                    </select>
+                    <!--                            <input id="authorizationKey" type="text" name="authorizationKey" placeholder="Key">-->
+                    <input id="authorizationValue" name="authorizationValue" placeholder="Value" type="text">
                     <br>
-
-                    <div id="response"></div>
-
                 </div>
+                <br><br>
 
-            </div>
+                <div id="headers">
+                    <label for="headers">Headers</label><br>
+                    <input class="headers-input headersKey" id="headersKey" name="headersKey"
+                           oninput="addHeadersInput(event)"
+                           placeholder="Key" style="margin-top: 10px" type="text">
+                    <input class="headers-input headersValue" id="headersValue" name="headersValue"
+                           oninput="addHeadersInput(event)"
+                           placeholder="Value" style="margin-top: 10px" type="text">
+                </div>
+                <br><br>
+
+                <label for="body">Body</label><br>
+                <textarea cols="76" id="body" name="body" placeholder="Body" rows="10"></textarea>
+
+            </form>
+            <br><br>
 
         </div>
 
-        <script src="APITest.js"></script>
+        <div id="response-container">
 
-    </body>
+            <h3>Response</h3><br><br><br>
+
+            <div id="loading" style="display: none">
+                <img alt="loading" src="/loading.gif">
+            </div>
+
+            <div id="status-code" style="font-weight: bold"></div>
+            <br>
+            <div id="response-time" style="font-weight: bold"></div>
+            <br>
+            <div id="response-size" style="font-weight: bold"></div>
+            <br>
+            <div class="tab-container">
+                <button class="tablinks" id="show-response-body" onclick="displayResponse()"
+                        style="font-size: 16pt; font-weight: bold; font-family: 'Baloo Chettan 2'; display: none">Body
+                </button>
+                <button class="tablinks" id="show-response-header" onclick="displayHeaders()"
+                        style="font-size: 16pt; font-weight: bold; font-family: 'Baloo Chettan 2'; display: none">
+                    Headers
+                </button>
+            </div>
+            <br>
+
+            <div id="response"></div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="APITest.js"></script>
+
+</body>
 
 </html>

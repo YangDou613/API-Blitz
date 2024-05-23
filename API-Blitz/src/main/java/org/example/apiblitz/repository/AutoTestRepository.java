@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -51,8 +50,8 @@ public class AutoTestRepository {
 	                               String result) {
 
 		String insertToTestResultSql = "INSERT INTO testResult (testCaseId, testDate, testTime, statusCode, " +
-				"executionDuration, contentLength, responseHeaders, responseBody, result) " +
-				"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		                               "executionDuration, contentLength, responseHeaders, responseBody, result) " +
+		                               "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 		jdbcTemplate.update(insertToTestResultSql, testCaseId, testDate, testTime, statusCode,
 				executionDuration, contentLength, responseHeaders, responseBody, result);
@@ -65,12 +64,12 @@ public class AutoTestRepository {
 		return jdbcTemplate.queryForObject(getRecipientEmailListSql, String.class, testCaseId);
 	}
 
-	public List<Integer> getAllTestCaseIdByUserId(Integer userId) {
+	public List<Integer> getTestCaseIdListByUserId(Integer userId) {
 		String getTestCaseIdListSql = "SELECT id FROM testCase WHERE resetStatus = 0 AND userId = ?";
 		return jdbcTemplate.queryForList(getTestCaseIdListSql, Integer.class, userId);
 	}
 
-	public Map<String, Object> getTestStartTime(Integer testCaseId) {
+	public Map<String, Object> getTestCaseStartTimeByTestCaseId(Integer testCaseId) {
 
 		String getMinTestDateSql = "SELECT MIN(testDate) FROM testResult WHERE testCaseId = ?";
 		Date startTestDate = jdbcTemplate.queryForObject(getMinTestDateSql, Date.class, testCaseId);
@@ -79,54 +78,33 @@ public class AutoTestRepository {
 		return jdbcTemplate.queryForMap(getMinTestTimeSql, testCaseId, startTestDate);
 	}
 
-	public List<TestResult> getAllTestResultByTestCaseId(Integer testCaseId) {
+	public List<TestResult> getTestCaseResultByTestCaseId(Integer testCaseId) {
 		String getTestResultListSql = "SELECT * FROM testResult WHERE testCaseId = ?";
 		return jdbcTemplate.query(getTestResultListSql, new Object[]{testCaseId}, new BeanPropertyRowMapper<>(TestResult.class));
 	}
 
-	public List<TestResult> getTenTestResultByTestCaseId(Integer testCaseId) {
+	public List<TestResult> getTenTestCaseTestResultListByTestCaseId(Integer testCaseId) {
 		String getTestResultListSql = "SELECT * FROM ( SELECT * FROM testResult WHERE testCaseId = ? " +
-				"ORDER BY testDate DESC, testTime DESC LIMIT 10 ) AS subquery ORDER BY testTime ASC";
+		                              "ORDER BY testDate DESC, testTime DESC LIMIT 10 ) AS subquery ORDER BY testTime ASC";
 		return jdbcTemplate.query(getTestResultListSql, new Object[]{testCaseId}, new BeanPropertyRowMapper<>(TestResult.class));
 	}
 
-	public List<Map<String, Object>> getAllTestTime(Integer testCaseId) {
+	public List<Map<String, Object>> getCollectionTestTimeByCollectionId(Integer testCaseId) {
 		String getTestTimeSql = "SELECT DISTINCT testDate, testTime FROM collectionTestResult WHERE collectionId = ?";
 		return jdbcTemplate.queryForList(getTestTimeSql, testCaseId);
 	}
 
-	public List<CollectionTestResult> getTestResultByCollectionId(Integer collectionId, LocalDate testDate, LocalTime testTime) {
+	public List<CollectionTestResult> getCollectionTestResultByCollectionId(Integer collectionId, LocalDate testDate, LocalTime testTime) {
 
 		String getTestTimeSql = "SELECT cd.*, ctr.* FROM collectionDetails cd JOIN collectionTestResult ctr " +
-				"ON cd.id = ctr.collectionDetailsId WHERE testDate = ? AND testTime = ? AND cd.collectionId = ?";
+		                        "ON cd.id = ctr.collectionDetailsId WHERE testDate = ? AND testTime = ? AND cd.collectionId = ?";
 		return jdbcTemplate.query(getTestTimeSql, new BeanPropertyRowMapper<>(CollectionTestResult.class), testDate, testTime, collectionId);
 	}
 
-	public List<CollectionTestResult> getRetestResultByCollectionTestResultId(Integer collectionTestResultId) {
+	public List<CollectionTestResult> getCollectionRetestResultByCollectionTestResultId(Integer collectionTestResultId) {
 
 		String getRetestResultSql =
 				"SELECT * FROM collectionTestResultException WHERE collectionTestResultId = ?";
 		return jdbcTemplate.query(getRetestResultSql, new BeanPropertyRowMapper<>(CollectionTestResult.class), collectionTestResultId);
-	}
-
-	public List<List<TestResult>> getAllTestResultByCollectionId(Integer collectionId) {
-
-		// Get test time
-		String getTestTimeSql = "SELECT DISTINCT testDate, testTime FROM collectionTestResult WHERE collectionId = ?";
-		List<Map<String, Object>> testTimeList = jdbcTemplate.queryForList(getTestTimeSql, collectionId);
-
-		// Get test result
-		List<List<TestResult>> testResultList = new ArrayList<>();
-
-		for (Map<String, Object> testTime : testTimeList) {
-			String getTestResultSql =
-					"SELECT * FROM collectionTestResult WHERE testDate = ? AND testTime = ? AND collectionId = ?";
-			List<TestResult> testResult = jdbcTemplate.query(getTestResultSql, new BeanPropertyRowMapper<>(TestResult.class),
-					testTime.get("testDate"),
-					testTime.get("testTime"),
-					collectionId);
-			testResultList.add(testResult);
-		}
-		return testResultList;
 	}
 }

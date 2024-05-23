@@ -30,7 +30,7 @@ public class TestCaseRepository {
 	@Autowired
 	ObjectMapper objectMapper;
 
-	public Integer insertToTestCase(Integer userId, Request request, TestCase testCase, Object expectedResponseBody) throws JsonProcessingException {
+	public Integer insertToTestCaseTable(Integer userId, Request request, TestCase testCase, Object expectedResponseBody) throws JsonProcessingException {
 
 		Integer notification = testCase.getNotification().equals("Yes") ? 1 : 0;
 
@@ -106,7 +106,7 @@ public class TestCaseRepository {
 				resetTestCase.getId());
 	}
 
-	public List<NextSchedule> getTestCase(Integer userId) throws SQLException {
+	public List<NextSchedule> getTestCaseList(Integer userId) throws SQLException {
 		String getTestCaseSql = "SELECT * FROM testCase WHERE userId = ? AND resetStatus IS NOT NULL";
 		return jdbcTemplate.query(getTestCaseSql, new BeanPropertyRowMapper<>(NextSchedule.class), userId);
 	}

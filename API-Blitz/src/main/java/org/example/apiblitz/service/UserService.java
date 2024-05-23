@@ -26,7 +26,7 @@ public class UserService {
 	@Autowired
 	private JwtUtil jwtUtil;
 
-	public UserResponse signUp(UserSignUp user) {
+	public UserResponse userSignUp(UserSignUp user) {
 
 		boolean userExist = userRepository.findByEmail(user.getEmail());
 
@@ -41,11 +41,11 @@ public class UserService {
 		String hashPassword = securityConfig.passwordEncode(user.getPassword());
 		user.setPassword(hashPassword);
 
-		Integer id = userRepository.addToUserTableWhenSignUp(user);
+		Integer id = userRepository.addNewUser(user);
 		user.setId(id);
 		user.setPassword(null);
 
-		String token = jwtUtil.userSignUpGenerateToken(user);
+		String token = jwtUtil.generateToken(user);
 		data.put("access_token", token);
 		data.put("access_expired", 3600);
 		data.put("user", user);
@@ -53,19 +53,19 @@ public class UserService {
 		return userResponse;
 	}
 
-	public UserResponse signIn(UserSignIn user) {
+	public UserResponse userSignIn(UserSignIn user) {
+
+		boolean userExist = userRepository.findByEmail(user.getEmail());
 
 		UserResponse userResponse = new UserResponse();
 		Map<Object, Object> data = new HashMap<>();
-
-		boolean userExist = userRepository.findByEmail(user.getEmail());
 
 		if (userExist) {
 			UserSignIn userInfo = userRepository.getUserInfo(user.getEmail());
 			boolean passwordMatches = securityConfig.passwordCheck(user.getPassword(), userInfo.getPassword());
 			if (passwordMatches) {
 				userInfo.setPassword(null);
-				String token = jwtUtil.userSignInGenerateToken(userInfo);
+				String token = jwtUtil.generateToken(user);
 				data.put("access_token", token);
 				data.put("access_expired", 3600);
 				data.put("user", userInfo);

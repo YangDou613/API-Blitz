@@ -1,39 +1,13 @@
-const welcomeMessage = document.getElementById("welcome-message");
-const line1 = document.getElementById("line1");
-const line2 = document.getElementById("line2");
-const line3 = document.getElementById("line3");
+document.getElementById("signInEmail").value = "apiblitz0222@gmail.com";
+document.getElementById("signInPassword").value = "apiblitz0222";
 
-const text1 = "Welcome!";
-// const text2 = "Are you looking for a flexible and reliable way to test your API?";
-// const text3 = "You've come to the right place! We provide one-stop API testing related services, allowing you to easily test and monitor your applications.";
+document.getElementById('SignUpForm').addEventListener('click', function (event) {
 
-let index1 = 0;
-let index2 = 0;
-let index3 = 0;
+    console.log("goooo")
 
-function typeWriter() {
-    if (index1 < text1.length) {
-        line1.innerHTML += text1.charAt(index1);
-        index1++;
-        setTimeout(typeWriter, 100);
-    }
-    // else if (index2 < text2.length) {
-    //     line2.innerHTML += text2.charAt(index2);
-    //     index2++;
-    //     setTimeout(typeWriter, 10);
-    // } else if (index3 < text3.length) {
-    //     line3.innerHTML += text3.charAt(index3);
-    //     index3++;
-    //     setTimeout(typeWriter, 10);
-    // }
-}
-
-window.onload = typeWriter;
-
-document.getElementById('SignUpForm').addEventListener('submit', function(event) {
     event.preventDefault();
 
-    let name = document.getElementById("name").value;
+    let name = document.getElementById("signUpName").value;
     let email = document.getElementById('signUpEmail').value;
     let password = document.getElementById('signUpPassword').value;
 
@@ -71,7 +45,7 @@ document.getElementById('SignUpForm').addEventListener('submit', function(event)
         });
 });
 
-document.getElementById('SignInForm').addEventListener('submit', function(event) {
+document.getElementById('SignInForm').addEventListener('click', function (event) {
     event.preventDefault();
 
     let email = document.getElementById('signInEmail').value;
@@ -102,10 +76,20 @@ document.getElementById('SignInForm').addEventListener('submit', function(event)
             alert("Sign in successfully!");
             const previousPageUrl = document.referrer;
             window.location.href = previousPageUrl;
-
         })
         .catch(error => {
             alert("Sign in failed, please check whether the entered information is correct!");
             console.error('There was an error!', error);
         });
 });
+
+let container = document.getElementById('container')
+
+toggle = () => {
+    container.classList.toggle('sign-in')
+    container.classList.toggle('sign-up')
+}
+
+setTimeout(() => {
+    container.classList.add('sign-in')
+}, 200)
