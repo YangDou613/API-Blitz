@@ -169,7 +169,7 @@ header {
     color: #4C4C4C;
 }
 
-form label{
+form label {
     font-family: "Baloo Chettan 2";
     font-size: 16pt;
     font-weight: bold;
@@ -233,6 +233,7 @@ pre {
     color: #4C4C4C;
     height: calc(100% - 100px);
     position: relative;
+    width: 500px;
 }
 
 #loading {

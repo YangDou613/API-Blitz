@@ -20,6 +20,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 import java.sql.Timestamp;
@@ -68,11 +69,26 @@ public class APIService {
 
 		Object responseHeaders = objectMapper.writeValueAsString(result.getHeaders());
 
-		String contentType = result.getHeaders().get("Content-type").get(0);
+		String contentType = null;
+
+		List<String> contentTypeList = result.getHeaders().get("Content-Type");
+
+		if (contentTypeList != null && !contentTypeList.isEmpty()) {
+			contentType = contentTypeList.get(0);
+		} else if (result.getBody() != null) {
+			if (objectMapper.writeValueAsString(result.getBody()).contains("<!DOCTYPE html>") ||
+					objectMapper.writeValueAsString(result.getBody()).contains("<!doctype html>")) {
+				contentType = "text/html; charset=UTF-8";
+
+				Map<String, Object> headersMap = new HashMap<>(result.getHeaders());
+				headersMap.put("Content-Type", List.of(contentType));
+				responseHeaders = objectMapper.writeValueAsString(headersMap);
+			}
+		}
 
 		Object responseBody;
 
-		if (result.getBody() != null) {
+		if (result.getBody() != null && contentType != null) {
 
 			if (!isValidJson(result.getBody().toString()) || contentType.equals("image/jpeg")) {
 				responseBody = objectMapper.writeValueAsString(result.getBody());
@@ -194,10 +210,24 @@ public class APIService {
 			// Calculate response size
 			int body = e.getMessage().length();
 			newHeaders.set("Content-Length", String.valueOf(body));
-
 			newHeaders.set("Execution-Duration", String.valueOf(executionDuration));
 
 			return new ResponseEntity<>(e.getResponseBodyAsString(), newHeaders, e.getStatusCode());
+		} catch (ResourceAccessException e) {
+
+			// Execution duration
+			long endTime = System.currentTimeMillis(); // End time (To calculate the execution duration)
+			long executionDuration = endTime - startTime;
+
+			// Create a new HttpHeaders object
+			HttpHeaders newHeaders = new HttpHeaders();
+
+			// Calculate response size
+			int body = e.getMessage().length();
+			newHeaders.set("Content-Length", String.valueOf(body));
+			newHeaders.set("Execution-Duration", String.valueOf(executionDuration));
+
+			return new ResponseEntity<>("Error: Request timed out.", newHeaders, HttpStatus.REQUEST_TIMEOUT);
 		}
 	}
 

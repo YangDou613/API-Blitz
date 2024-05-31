@@ -195,6 +195,12 @@ if (token === null) {
 
     function displayResponse() {
 
+        if (response["statusCode"] === 408) {
+            let responseBody = document.getElementById('response');
+            responseBody.innerHTML = 'Error: Request timed out.';
+            return;
+        }
+
         let responseHeaders = JSON.parse(response["responseHeaders"]);
 
         let statusCode = document.getElementById('status-code');
@@ -231,6 +237,19 @@ if (token === null) {
             img.src = `data:image/bmp;base64, ${imageURL}`;
             responseBody.insertAdjacentHTML("beforeend", "<br>");
             responseBody.appendChild(img);
+        } else if (contentType === "text") {
+            let pre = document.createElement("pre");
+            loadScript('https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.15.1/beautify-html.js')
+                .then(() => {
+                    return html_beautify(response["responseBody"]);
+                })
+                .then((htmlResponse) => {
+                    pre.innerText = htmlResponse;
+                })
+                .catch(error => {
+                    console.error('Beautify-html.js loading error:', error);
+                });
+            responseBody.appendChild(pre);
         } else {
             let responseBodyText = formatJSON(JSON.parse(response["responseBody"]));
             let responseBodyHtml = `<pre><code>${responseBodyText}</code></pre>`;
@@ -238,10 +257,24 @@ if (token === null) {
         }
     }
 
+    function loadScript(src) {
+        return new Promise((resolve, reject) => {
+            let script = document.createElement('script');
+            script.src = src;
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.appendChild(script);
+        });
+    }
+
     function getContentType() {
         let responseHeaders = JSON.parse(response["responseHeaders"]);
-        let contentType = responseHeaders["Content-Type"];
-        return contentType[0].split("/")[0];
+        if (responseHeaders["Content-Type"]) {
+            let contentType = responseHeaders["Content-Type"];
+            return contentType[0].split("/")[0];
+        } else {
+            return null;
+        }
     }
 
     function displayHeaders() {

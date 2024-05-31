@@ -58,6 +58,7 @@ public class Consumer {
 				com.amazonaws.services.sqs.model.Message message = receiveMessageResult.getMessages().get(0);
 				org.example.apiblitz.model.Message messageBody =
 						objectMapper.readValue(message.getBody(), org.example.apiblitz.model.Message.class);
+				amazonSQSClient.deleteMessage(queueUrl, message.getReceiptHandle());
 
 				log.info("Read Message from queue: { " + messageBody + "}");
 
@@ -91,7 +92,6 @@ public class Consumer {
 						sender.sendMessage(objectMapper.writeValueAsString(messageToReceiver));
 						break;
 				}
-				amazonSQSClient.deleteMessage(queueUrl, message.getReceiptHandle());
 			}
 		} catch (Exception e) {
 			log.error("Queue Exception Message: { " + e.getMessage() + " }");
